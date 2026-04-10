@@ -24,7 +24,7 @@ function Page() {
       >
         <div className="mx-auto flex min-h-[calc(100dvh-4.5rem)] max-w-8xl flex-col items-center justify-center gap-10 px-6 py-16 text-center sm:gap-14 sm:py-20">
           <div className="w-full text-white">
-            <p className="text-sm font-semibold uppercase tracking-[0.35em] text-white/80 sm:text-base">
+            <p className="text-2xl font-bold leading-tight sm:text-5xl lg:text-6xl">
               KSM Katering
             </p>
             <div className="mt-4 flex flex-col items-center justify-center gap-3 sm:gap-4 lg:flex-row">
