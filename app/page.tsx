@@ -22,13 +22,13 @@ function Page() {
         id="hero"
         className="min-h-[calc(100dvh-4.5rem)] bg-[url('/images/bg-hero.png')] bg-cover bg-center shadow-[inset_0_0_0_2000px_rgba(63,59,59,0.48)]"
       >
-        <div className="mx-auto flex min-h-[calc(100dvh-4.5rem)] max-w-6xl flex-col items-center justify-center gap-10 px-6 py-16 text-center sm:gap-14 sm:py-20">
-          <div className="max-w-5xl text-white">
+        <div className="mx-auto flex min-h-[calc(100dvh-4.5rem)] max-w-8xl flex-col items-center justify-center gap-10 px-6 py-16 text-center sm:gap-14 sm:py-20">
+          <div className="w-full text-white">
             <p className="text-sm font-semibold uppercase tracking-[0.35em] text-white/80 sm:text-base">
               KSM Katering
             </p>
             <div className="mt-4 flex flex-col items-center justify-center gap-3 sm:gap-4 lg:flex-row">
-              <h1 className="text-4xl font-bold leading-tight text-balance sm:text-5xl lg:text-6xl">
+              <h1 className="text-4xl font-bold leading-tight sm:text-5xl lg:text-6xl">
                 Layanan Katering Untuk
               </h1>
               <RotatingText
@@ -173,7 +173,7 @@ function Page() {
 
       <section className="bg-[url('/images/testi.svg')] bg-cover bg-top shadow-[inset_0_0_0_2000px_rgba(255,255,255,0.72)]">
         <div className="mx-auto flex max-w-7xl flex-col items-center gap-10 px-6 py-16 text-center sm:gap-14 sm:py-24">
-          <div className="max-w-5xl text-[#332929]">
+          <div className="w-full text-[#332929]">
             <h2 className="text-3xl font-bold uppercase sm:text-4xl lg:text-5xl">
               Biarkan Pelanggan Kami yang Bercerita
             </h2>

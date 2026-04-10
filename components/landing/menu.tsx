@@ -2,11 +2,16 @@ import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import prasmanan from "@/public/images/prasmanan.svg";
 
-const packageCards = Array.from({ length: 8 }, (_, index) => ({
-  id: index + 1,
-  title: "Prasmanan",
-  price: "Mulai dari Rp:xx.xxx / paket",
-}));
+const packageCards = [
+  { id: 1, title: "Prasmanan", price: "Mulai dari Rp:xx.xxx / paket" },
+  { id: 2, title: "Aqiqah", price: "Mulai dari Rp:xx.xxx / paket" },
+  { id: 3, title: "Nasi Kotak", price: "Mulai dari Rp:xx.xxx / paket" },
+  { id: 4, title: "Snack Box", price: "Mulai dari Rp:xx.xxx / paket" },
+  { id: 5, title: "Wedding", price: "Mulai dari Rp:xx.xxx / paket" },
+  { id: 6, title: "Katering Korporat", price: "Mulai dari Rp:xx.xxx / paket" },
+  { id: 7, title: "Tumpeng", price: "Mulai dari Rp:xx.xxx / paket" },
+  { id: 8, title: "Coffee Break", price: "Mulai dari Rp:xx.xxx / paket" },
+];
 
 function Menu() {
   return (

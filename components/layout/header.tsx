@@ -112,7 +112,7 @@ function Header() {
         >
           <span className="relative h-5 w-5">
             <span
-              className={`absolute left-0 top-1/2 h-0.5 w-5 -translate-y-[7px] rounded-full bg-current transition duration-300 ${
+              className={`absolute left-0 top-1/2 h-0.5 w-5 -translate-y-1.75 rounded-full bg-current transition duration-300 ${
                 isMenuOpen ? "translate-y-0 rotate-45" : ""
               }`}
             />
@@ -122,7 +122,7 @@ function Header() {
               }`}
             />
             <span
-              className={`absolute left-0 top-1/2 h-0.5 w-5 translate-y-[7px] rounded-full bg-current transition duration-300 ${
+              className={`absolute left-0 top-1/2 h-0.5 w-5 translate-y-1.75 rounded-full bg-current transition duration-300 ${
                 isMenuOpen ? "translate-y-0 -rotate-45" : ""
               }`}
             />
