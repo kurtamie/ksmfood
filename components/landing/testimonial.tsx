@@ -127,10 +127,10 @@ function Testimonial() {
   };
 
   return (
-    <div className="mt-12 flex w-full max-w-7xl flex-col gap-8 sm:mt-20 lg:mt-28">
+    <div className="mt-28 flex w-full max-w-7xl flex-col gap-8">
       <div
         ref={scrollRef}
-        className="flex cursor-grab gap-4 overflow-x-auto pb-4 select-none active:cursor-grabbing sm:gap-6 [&::-webkit-scrollbar]:hidden"
+        className="flex gap-6 overflow-x-auto pb-4 select-none cursor-grab active:cursor-grabbing [&::-webkit-scrollbar]:hidden"
         style={{
           scrollbarWidth: "none",
           WebkitUserSelect: "none",
@@ -146,7 +146,7 @@ function Testimonial() {
         {testimonials.map((testimonial) => (
           <article
             key={testimonial.id}
-            className="flex w-[88%] shrink-0 flex-col items-center sm:w-[70%] md:w-[calc((100%-24px)/2)] xl:w-[calc((100%-48px)/3)]"
+            className="flex w-full shrink-0 flex-col items-center md:w-[calc((100%-24px)/2)] xl:w-[calc((100%-48px)/3)]"
           >
             <div className="pointer-events-none relative w-full overflow-hidden rounded-[2rem]">
               <Image
@@ -156,12 +156,12 @@ function Testimonial() {
                 priority={testimonial.id <= 3}
               />
               <div className="absolute inset-x-[11%] top-[18%] flex items-center justify-center">
-                <p className="text-center text-xs font-medium leading-5 text-white sm:text-sm sm:leading-6 md:text-base xl:text-lg">
+                <p className="text-center text-sm font-medium leading-6 text-white md:text-base xl:text-lg">
                   {testimonial.text}
                 </p>
               </div>
             </div>
-            <p className="mt-5 text-center text-base font-semibold text-[#332929] sm:text-lg">
+            <p className="mt-5 text-center text-lg font-semibold text-[#332929]">
               {testimonial.name}
             </p>
           </article>

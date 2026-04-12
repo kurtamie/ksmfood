@@ -1,38 +1,50 @@
 import React from "react";
+import { LuPlane } from "react-icons/lu";
+import { FaHistory } from "react-icons/fa";
+import { LuUtensilsCrossed } from "react-icons/lu";
+import { FiHome } from "react-icons/fi";
+import { BiCheckShield } from "react-icons/bi";
+import { TbChefHat } from "react-icons/tb";
 
 const reasons = [
   {
-    number: "1",
-    title: "Kualitas Terjamin",
+    id: 1,
+    icon: <LuPlane />,
+    title: "Katering Penerbangan",
     description:
-      "Menggunakan bahan berkualitas dan proses pengolahan yang higienis untuk menjaga cita rasa terbaik.",
+      "KSM merupakan satu-satunya katering di Batam yang dipercaya melayani kebutuhan katering maskapai Garuda Indonesia.",
   },
   {
-    number: "2",
-    title: "Menu Variatif",
+    id: 2,
+    icon: <FaHistory />,
+    title: "Berpengalaman",
     description:
-      "Pilihan menu lengkap untuk acara keluarga, kantor, hingga kebutuhan katering harian.",
+      "KSM memiliki pengalaman 17 tahun dalam melayani berbagai jenis acara (pernikahan, acara peresmian, serah terima jabatan) dan puluhan tahun melayani kebutuhan kantin perusahaan industri yang ada di Batam.",
   },
   {
-    number: "3",
-    title: "Harga Kompetitif",
+    id: 3,
+    icon: <LuUtensilsCrossed />,
+    title: "Pilihan Masakan",
     description:
-      "Menyediakan paket katering yang fleksibel dengan harga yang tetap ramah di anggaran.",
+      "Menyediakan beragam menu masakan Nusantara yang dapat dipilih sesuai dengan selera Anda.",
   },
   {
-    number: "4",
-    title: "Pelayanan Tepat Waktu",
+    id: 4,
+    icon: <FiHome />,
+    title: "Standar Yang Tinggi",
     description:
-      "Pesanan diproses dan dikirim sesuai jadwal agar acara berjalan lancar tanpa kendala.",
+      "Dapur kami berlokasi di Batamindo Industrial Park, kawasan industri dengan standar kebersihan yang tinggi.",
   },
   {
-    number: "5",
-    title: "Porsi Memuaskan",
+    id: 5,
+    icon: <BiCheckShield />,
+    title: "Cita Rasa",
     description:
-      "Setiap menu disiapkan dengan porsi yang pas dan presentasi yang tetap menarik.",
+      "Menghadirkan cita rasa masakan Nusantara dengan racikan bumbu rempah yang  khas.",
   },
   {
-    number: "6",
+    id: 6,
+    icon: <TbChefHat />,
     title: "Tim Berpengalaman",
     description:
       "Didukung tim yang terbiasa menangani berbagai skala acara dengan pelayanan profesional.",
@@ -44,11 +56,11 @@ function WhyChoose() {
     <div className="grid max-w-5xl gap-4 py-12 md:grid-flow-col md:grid-rows-3 md:gap-3 md:py-14">
       {reasons.map((reason) => (
         <div
-          key={reason.number}
+          key={reason.id}
           className="flex h-full items-start gap-4 border border-gray-200 bg-white px-4 py-5 shadow-sm sm:gap-6"
         >
           <div className="flex size-12 shrink-0 items-center justify-center rounded-full bg-red-800 text-2xl font-bold text-white sm:size-14 sm:text-3xl">
-            {reason.number}
+            {reason.icon}
           </div>
           <div className="flex flex-col gap-2">
             <h3 className="text-lg font-bold text-[#332929] sm:text-xl">
