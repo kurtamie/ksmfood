@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import testimonialImage from "@/public/images/bubbleChat.svg";
+import testimonialImage from "@/public/images/bubbleChat.webp";
 
 const testimonials = [
   {

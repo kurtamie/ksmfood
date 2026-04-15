@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import menu from "@/public/images/selectmenu.svg";
+import menu from "@/public/images/selectmenu.webp";
 import { Button } from "../ui/button";
 
 const categories = [

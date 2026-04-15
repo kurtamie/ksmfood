@@ -10,18 +10,18 @@ import Testimonial from "@/components/landing/testimonial";
 import WhyChoose from "@/components/landing/whyChoose";
 import RotatingText from "@/components/motion/rotatingText";
 import { Button } from "@/components/ui/button";
-import about from "@/public/images/about.svg";
-import mie from "@/public/images/mie.svg";
-import opor from "@/public/images/opor-ayam.svg";
-import pattern from "@/public/images/pattern.svg";
+import about from "@/public/images/about.webp";
+import mie from "@/public/images/mie.webp";
+import pattern from "@/public/images/pattern.webp";
 import Client from "@/components/landing/client";
+import Legal from "@/components/landing/legal";
 
 function Page() {
   return (
     <main className="w-full overflow-x-clip">
       <section
         id="hero"
-        className="min-h-[calc(100dvh-4.5rem)] bg-[url('/images/bg-hero.jpg')] bg-cover bg-top shadow-[inset_0_0_0_2000px_rgba(63,59,59,0.48)]"
+        className="min-h-[calc(100dvh-4.5rem)] bg-[url('/images/bg-hero.webp')] bg-cover bg-top shadow-[inset_0_0_0_2000px_rgba(63,59,59,0.48)]"
       >
         <div className="mx-auto flex min-h-[calc(100dvh-4.5rem)] max-w-8xl flex-col items-center justify-center gap-10 px-6 py-16 text-center sm:gap-14 sm:py-20">
           <div className="w-full text-white">
@@ -149,13 +149,23 @@ function Page() {
         />
       </section> */}
 
-      <section className="relative flex w-full justify-center overflow-hidden px-6 py-8 sm:py-10">
-        <Image
-          src={opor}
-          alt=""
-          className="pointer-events-none absolute left-0 top-0 z-0 h-auto w-24 opacity-80 sm:w-auto"
-        />
-        <div className="relative z-10 flex w-full max-w-6xl flex-col items-center justify-center">
+      <section className="relative isolate flex w-full justify-center py-8 sm:py-10">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 z-0"
+        >
+          <Image
+            src={pattern}
+            alt=""
+            className="absolute left-0 top-0 h-auto w-24 opacity-80 sm:w-32 lg:w-40"
+          />
+          <Image
+            src={pattern}
+            alt=""
+            className="absolute bottom-0 right-0 h-auto w-24 opacity-80 sm:w-32 lg:w-40"
+          />
+        </div>
+        <div className="relative z-10 flex w-full max-w-6xl flex-col items-center justify-center px-6">
           <div className="flex flex-col items-center justify-center gap-2 text-center sm:flex-row sm:gap-4">
             <h2 className="text-3xl font-bold text-[#332929] sm:text-4xl lg:text-5xl">
               Mengapa Memilih
@@ -166,11 +176,6 @@ function Page() {
           </div>
           <WhyChoose />
         </div>
-        <Image
-          src={mie}
-          alt=""
-          className="pointer-events-none absolute bottom-0 right-0 z-0 h-auto w-24 opacity-80 sm:w-auto"
-        />
       </section>
 
       <section
@@ -183,7 +188,7 @@ function Page() {
         <Client />
       </section>
 
-      <section className="bg-[url('/images/testi.svg')] bg-cover bg-top shadow-[inset_0_0_0_2000px_rgba(255,255,255,0.72)]">
+      <section className="bg-[url('/images/testi.webp')] bg-cover bg-top shadow-[inset_0_0_0_2000px_rgba(255,255,255,0.72)]">
         <div className="mx-auto flex max-w-7xl flex-col items-center gap-10 px-6 py-16 text-center sm:gap-14 sm:py-24">
           <div className="w-full text-[#332929]">
             <h2 className="text-3xl font-bold uppercase sm:text-4xl lg:text-5xl">
@@ -205,9 +210,16 @@ function Page() {
         <Faq />
       </section>
 
+      <section className="flex w-full flex-col items-center px-6 py-16 sm:py-20">
+        <h2 className="text-center text-3xl font-bold text-[#332929] sm:text-4xl lg:text-5xl">
+          Legalitas Yang Terjamin
+        </h2>
+        <Legal />
+      </section>
+
       <section
         id="kontak"
-        className="bg-[url('/images/testi.svg')] bg-cover bg-top shadow-[inset_0_0_0_2000px_rgba(141,0,0,0.84)]"
+        className="bg-[url('/images/testi.webp')] bg-cover bg-top shadow-[inset_0_0_0_2000px_rgba(141,0,0,0.84)]"
       >
         <div className="mx-auto flex max-w-4xl flex-col items-center justify-center gap-6 px-6 py-20 text-center text-white sm:gap-8 sm:py-24">
           <h2 className="text-3xl font-bold sm:text-4xl lg:text-5xl">
@@ -217,9 +229,14 @@ function Page() {
             Diskusikan kebutuhan acara Anda bersama kami dan dapatkan solusi
             katering yang sesuai.
           </p>
-          <Button className="mt-2 h-12 bg-[#1E1E1E] px-8 text-base text-white sm:text-lg">
-            Hubungi Kami
-          </Button>
+          <div className="flex gap-8">
+            <Button className="mt-2 h-12 bg-white px-8 text-base text-red-800 sm:text-lg">
+              Mulai Pesan
+            </Button>
+            <Button className="mt-2 h-12 bg-transparent px-8 border-white text-base text-white sm:text-lg">
+              Konsultasi Sekarang
+            </Button>
+          </div>
         </div>
       </section>
     </main>

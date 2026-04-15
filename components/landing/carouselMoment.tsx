@@ -3,15 +3,15 @@
 import React, { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
+import pattern from "@/public/images/patternred.webp";
 
-// Ganti array ini dengan path gambar asli Anda
 const IMAGES = [
-  { src: "/images/prasmanan.svg", alt: "Momen KSM 1" },
-  { src: "/images/opor-ayam.svg", alt: "Momen KSM 2" },
-  { src: "/images/bg-hero.png", alt: "Momen KSM 3" },
-  { src: "/images/about.svg", alt: "Momen KSM 4" },
-  { src: "/images/prasmanan.svg", alt: "Momen KSM 5" },
-  { src: "/images/selectMenu.svg", alt: "Momen KSM 6" },
+  { src: "/images/prasmanan.webp", alt: "Momen KSM 1" },
+  { src: "/images/opor-ayam.webp", alt: "Momen KSM 2" },
+  { src: "/images/bg-hero.webp", alt: "Momen KSM 3" },
+  { src: "/images/about.webp", alt: "Momen KSM 4" },
+  { src: "/images/prasmanan.webp", alt: "Momen KSM 5" },
+  { src: "/images/selectMenu.webp", alt: "Momen KSM 6" },
 ];
 
 const SLIDE_WIDTH = 280;
@@ -79,15 +79,28 @@ export default function CarouselMoment() {
   };
 
   return (
-    <section className="flex min-h-screen w-full items-center justify-center overflow-hidden bg-white px-6 py-16 sm:px-8 lg:px-16">
-      <div className="flex w-full max-w-7xl flex-col gap-10 lg:flex-row lg:items-center lg:gap-12">
+    <section className="relative flex w-full items-center justify-center overflow-hidden bg-[#8D0000] px-6 py-16 sm:px-8 lg:px-16">
+      <Image
+        src={pattern}
+        alt=""
+        aria-hidden="true"
+        className="absolute left-0 -top-48 z-0 h-auto w-32 sm:w-40"
+      />
+      <Image
+        src={pattern}
+        alt=""
+        aria-hidden="true"
+        className="pointer-events-none absolute -bottom-48 left-120 z-0 h-auto w-32 sm:w-40"
+      />
+
+      <div className="relative z-10 flex w-full max-w-7xl flex-col gap-10 lg:flex-row lg:items-center lg:gap-12">
         <div className="shrink-0 max-w-xl text-center lg:text-left">
-          <h2 className="text-3xl font-bold leading-tight text-gray-900 sm:text-4xl lg:text-6xl">
-          Momen Bersama <span className="text-red-800">KSM Katering</span>
+          <h2 className="text-3xl font-bold leading-tight text-white sm:text-4xl lg:text-6xl">
+            Momen Bersama KSM Katering
           </h2>
           <Button
             variant="outline"
-            className="mt-8 h-12 border-red-800 px-8 text-base font-bold text-red-800 hover:border-red-800 hover:bg-red-800 hover:text-white sm:mt-10 sm:text-lg lg:mt-14"
+            className="mt-8 h-12 border-white bg-transparent px-8 text-base font-bold text-white  hover:bg-white hover:text-[#8D0000] sm:mt-10 sm:text-lg lg:mt-14"
           >
             Lihat Galeri Lengkap
           </Button>

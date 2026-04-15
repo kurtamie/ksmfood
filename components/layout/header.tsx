@@ -6,6 +6,7 @@ import Link from "next/link";
 import logo from "@/public/ksm-logo.svg";
 import { FaChevronDown } from "react-icons/fa";
 import { Button } from "../ui/button";
+import { services } from "@/lib/services";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,15 +17,6 @@ import {
 
 const navLinkClassName =
   "text-sm font-bold text-gray-700 transition-colors hover:text-gray-900";
-
-const services = [
-  "Aqiqah",
-  "Nasi Kotak",
-  "Prasmanan",
-  "Snack Kotak",
-  "Wedding Services",
-  "Katering Korporat",
-];
 
 const links = [
   { href: "/#hero", label: "Beranda" },
@@ -51,9 +43,9 @@ function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-black/5 bg-white/95 shadow-sm backdrop-blur-md">
+    <header className="sticky top-0 z-50 w-full border-b border-black/5 bg-white/95 shadow-sm backdrop-blur-xl">
       <div className="mx-auto flex w-full max-w-5xl items-center justify-between gap-4 px-4 py-2">
-        <Link href="/#hero" className="flex items-center" aria-label="KSM Katering">
+        <Link href="/" className="flex items-center" aria-label="KSM Katering">
           <Image
             src={logo}
             alt="KSM Katering"
@@ -63,7 +55,7 @@ function Header() {
         </Link>
 
         <nav className="hidden w-full max-w-2xl items-center justify-center gap-8 px-6 md:flex">
-          <Link href="/#hero" className={`${navLinkClassName} active:text-red-900`}>
+          <Link href="/" className={`${navLinkClassName} active:text-red-900`}>
             Beranda
           </Link>
 
@@ -79,7 +71,9 @@ function Header() {
             <DropdownMenuContent className="w-48" align="start">
               <DropdownMenuGroup>
                 {services.map((service) => (
-                  <DropdownMenuItem key={service}>{service}</DropdownMenuItem>
+                  <DropdownMenuItem key={service.slug} asChild>
+                    <Link href={service.href}>{service.label}</Link>
+                  </DropdownMenuItem>
                 ))}
               </DropdownMenuGroup>
             </DropdownMenuContent>
@@ -182,12 +176,14 @@ function Header() {
                 <div className="overflow-hidden">
                   <div className="flex flex-col px-4 pb-4">
                     {services.map((service) => (
-                      <span
-                        key={service}
-                        className="rounded-xl px-3 py-2 text-sm text-gray-600"
+                      <Link
+                        key={service.slug}
+                        href={service.href}
+                        className="rounded-xl px-3 py-2 text-sm text-gray-600 transition hover:bg-white hover:text-[#8D0000]"
+                        onClick={closeMenu}
                       >
-                        {service}
-                      </span>
+                        {service.label}
+                      </Link>
                     ))}
                   </div>
                 </div>
