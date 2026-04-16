@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { Button } from "@/components/ui/button";
 import { getServiceBySlug, services } from "@/lib/services";
 
@@ -16,6 +17,7 @@ export default async function ServicePage({
 }) {
   const { slug } = await params;
   const service = getServiceBySlug(slug);
+  const t = await getTranslations("serviceDetail");
 
   if (!service) {
     notFound();
@@ -25,24 +27,24 @@ export default async function ServicePage({
     <main className="bg-white">
       <section className="mx-auto flex min-h-[calc(100dvh-4.5rem)] w-full max-w-6xl flex-col justify-center px-6 py-16 sm:py-20">
         <p className="text-sm font-semibold uppercase tracking-[0.2em] text-red-800">
-          Layanan KSM Katering
+          {t("eyebrow")}
         </p>
         <h1 className="mt-4 max-w-3xl text-4xl font-bold text-[#332929] sm:text-5xl lg:text-6xl">
-          {service.label}
+          {t(`items.${slug}.label`)}
         </h1>
         <p className="mt-6 max-w-2xl text-base leading-8 text-[#5f5757] sm:text-lg">
-          {service.description}
+          {t(`items.${slug}.description`)}
         </p>
         <div className="mt-10 flex flex-col gap-3 sm:flex-row">
           <Button asChild className="h-12 bg-[#8D0000] px-8 text-base">
-            <Link href="/#kontak">Hubungi Kami</Link>
+            <Link href="/#kontak">{t("primaryCta")}</Link>
           </Button>
           <Button
             asChild
             variant="outline"
             className="h-12 border-[#8D0000] px-8 text-base text-[#8D0000]"
           >
-            <Link href="/#layanan">Kembali ke Layanan</Link>
+            <Link href="/#layanan">{t("secondaryCta")}</Link>
           </Button>
         </div>
       </section>

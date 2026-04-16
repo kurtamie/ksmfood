@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslations } from "next-intl";
 import { LuPlane } from "react-icons/lu";
 import { FaHistory } from "react-icons/fa";
 import { LuUtensilsCrossed } from "react-icons/lu";
@@ -44,9 +45,19 @@ const reasons = [
 ];
 
 function WhyChoose() {
+  const t = useTranslations("whyChoose");
+  const reasonsText = t.raw("reasons") as Array<{
+    id: number;
+    title: string;
+    description: string;
+  }>;
+
   return (
     <div className="grid max-w-5xl gap-4 py-12 md:grid-cols-2 md:gap-3 md:py-14">
       {reasons.map((reason, index) => {
+        const translatedReason = reasonsText.find(
+          (item) => item.id === reason.id,
+        );
         const isLastOddItem =
           reasons.length % 2 !== 0 && index === reasons.length - 1;
 
@@ -64,10 +75,10 @@ function WhyChoose() {
             </div>
             <div className="flex flex-col gap-2">
               <h3 className="text-lg font-bold text-[#332929] sm:text-xl">
-                {reason.title}
+                {translatedReason?.title ?? reason.title}
               </h3>
               <p className="text-sm leading-6 text-gray-600 sm:text-base">
-                {reason.description}
+                {translatedReason?.description ?? reason.description}
               </p>
             </div>
           </div>

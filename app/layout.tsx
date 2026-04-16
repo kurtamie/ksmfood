@@ -1,12 +1,15 @@
 import type { Metadata, Viewport } from "next";
+import { NextIntlClientProvider } from "next-intl";
+import { cookies } from "next/headers";
+import { getMessages } from "next-intl/server";
 import Footer from "@/components/layout/footer";
 import Header from "@/components/layout/header";
+import { defaultLocale, hasLocale, localeCookieName } from "@/i18n/routing";
 import "./globals.css";
 
-const siteUrl =
-  process.env.NEXT_PUBLIC_SITE_URL?.startsWith("http")
-    ? process.env.NEXT_PUBLIC_SITE_URL
-    : "http://localhost:3000";
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL?.startsWith("http")
+  ? process.env.NEXT_PUBLIC_SITE_URL
+  : "http://localhost:3000";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -44,17 +47,25 @@ export const viewport: Viewport = {
   themeColor: "#8D0000",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const cookieStore = await cookies();
+  const cookieLocale = cookieStore.get(localeCookieName)?.value;
+  const locale =
+    cookieLocale && hasLocale(cookieLocale) ? cookieLocale : defaultLocale;
+  const messages = await getMessages();
+
   return (
-    <html lang="id" className="h-full antialiased">
+    <html lang={locale} className="h-full antialiased">
       <body className="min-h-full flex flex-col">
-        <Header />
-        <div className="flex-1">{children}</div>
-        <Footer />
+        <NextIntlClientProvider locale={locale} messages={messages}>
+          <Header />
+          <div className="flex-1">{children}</div>
+          <Footer />
+        </NextIntlClientProvider>
       </body>
     </html>
   );

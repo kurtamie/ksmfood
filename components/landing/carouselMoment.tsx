@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import pattern from "@/public/images/patternred.webp";
 
@@ -23,6 +24,7 @@ const CLONED = [...IMAGES, ...IMAGES, ...IMAGES];
 const LOOP_LENGTH = IMAGES.length * (SLIDE_WIDTH + GAP);
 
 export default function CarouselMoment() {
+  const t = useTranslations("portfolio");
   const trackRef = useRef<HTMLDivElement>(null);
   const offsetRef = useRef(0);
   const rafRef = useRef<number | null>(null);
@@ -96,13 +98,13 @@ export default function CarouselMoment() {
       <div className="relative z-10 flex w-full max-w-7xl flex-col gap-10 lg:flex-row lg:items-center lg:gap-12">
         <div className="shrink-0 max-w-xl text-center lg:text-left">
           <h2 className="text-3xl font-bold leading-tight text-white sm:text-4xl lg:text-6xl">
-            Momen Bersama KSM Katering
+            {t("title")}
           </h2>
           <Button
             variant="outline"
             className="mt-8 h-12 border-white bg-transparent px-8 text-base font-bold text-white  hover:bg-white hover:text-[#8D0000] sm:mt-10 sm:text-lg lg:mt-14"
           >
-            Lihat Galeri Lengkap
+            {t("cta")}
           </Button>
         </div>
 
@@ -151,7 +153,7 @@ export default function CarouselMoment() {
                     ? "h-1.5 w-9 bg-red-800"
                     : "h-1.5 w-6 bg-gray-300 hover:bg-gray-400"
                 }`}
-                aria-label={`Slide ${i + 1}`}
+                aria-label={t("slide", { number: i + 1 })}
               />
             ))}
           </div>

@@ -3,10 +3,12 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import logo from "@/public/ksm-logo.svg";
 import { FaChevronDown } from "react-icons/fa";
 import { Button } from "../ui/button";
 import { services } from "@/lib/services";
+import LanguageSwitcher from "./language-switcher";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,16 +20,17 @@ import {
 const navLinkClassName =
   "text-sm font-bold text-gray-700 transition-colors hover:text-gray-900";
 
-const links = [
-  { href: "/#hero", label: "Beranda" },
-  { href: "/#portofolio", label: "Portofolio" },
-  { href: "/#tentang", label: "Tentang Kami" },
-  { href: "/#kontak", label: "Kontak" },
-];
-
 function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isServicesOpen, setIsServicesOpen] = useState(false);
+  const t = useTranslations("header");
+  const serviceT = useTranslations("services");
+  const commonT = useTranslations("common");
+  const links = [
+    { href: "/", label: t("home") },
+    { href: "/#galeri", label: t("gallery") },
+    { href: "/#tentang", label: t("about") },
+  ];
 
   useEffect(() => {
     document.body.style.overflow = isMenuOpen ? "hidden" : "";
@@ -44,7 +47,7 @@ function Header() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-black/5 bg-white/95 shadow-sm backdrop-blur-xl">
-      <div className="mx-auto flex w-full max-w-5xl items-center justify-between gap-4 px-4 py-2">
+      <div className="mx-auto flex w-full max-w-5xl items-center gap-4 px-4 py-2">
         <Link href="/" className="flex items-center" aria-label="KSM Katering">
           <Image
             src={logo}
@@ -54,9 +57,9 @@ function Header() {
           />
         </Link>
 
-        <nav className="hidden w-full max-w-2xl items-center justify-center gap-8 px-6 md:flex">
+        <nav className="hidden w-full max-w-2xl items-center justify-center gap-8 px-4 md:flex">
           <Link href="/" className={`${navLinkClassName} active:text-red-900`}>
-            Beranda
+            {t("home")}
           </Link>
 
           <DropdownMenu>
@@ -65,43 +68,44 @@ function Header() {
                 type="button"
                 className={`${navLinkClassName} flex items-center gap-2`}
               >
-                Layanan <FaChevronDown className="size-3" />
+                {t("services")} <FaChevronDown className="size-3" />
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-48" align="start">
               <DropdownMenuGroup>
                 {services.map((service) => (
                   <DropdownMenuItem key={service.slug} asChild>
-                    <Link href={service.href}>{service.label}</Link>
+                    <Link href={service.href}>
+                      {serviceT(`items.${service.slug}.label`)}
+                    </Link>
                   </DropdownMenuItem>
                 ))}
               </DropdownMenuGroup>
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <Link href="/#portofolio" className={navLinkClassName}>
-            Portofolio
+          <Link href="/#galeri" className={navLinkClassName}>
+            {t("gallery")}
           </Link>
 
           <Link href="/#tentang" className={navLinkClassName}>
-            Tentang Kami
-          </Link>
-
-          <Link href="/#kontak" className={navLinkClassName}>
-            Kontak
+            {t("about")}
           </Link>
         </nav>
 
-        <Button className="hidden cursor-pointer bg-[#8D0000] px-5 py-5 md:inline-flex">
-          Hubungi Kami
-        </Button>
+        <div className="hidden items-center gap-3 md:flex">
+          <LanguageSwitcher />
+          <Button className="cursor-pointer bg-[#8D0000] px-5 py-5">
+            {commonT("orderNow")}
+          </Button>
+        </div>
 
         <button
           type="button"
           className="flex size-11 items-center justify-center rounded-full border border-red-100 bg-red-50 text-[#8D0000] transition hover:bg-red-100 md:hidden"
           aria-expanded={isMenuOpen}
           aria-controls="mobile-navigation"
-          aria-label={isMenuOpen ? "Tutup menu" : "Buka menu"}
+          aria-label={isMenuOpen ? t("closeMenu") : t("openMenu")}
           onClick={() => setIsMenuOpen((prev) => !prev)}
         >
           <span className="relative h-5 w-5">
@@ -161,7 +165,7 @@ function Header() {
                 aria-expanded={isServicesOpen}
                 onClick={() => setIsServicesOpen((prev) => !prev)}
               >
-                <span>Layanan</span>
+                <span>{t("services")}</span>
                 <FaChevronDown
                   className={`size-3 transition-transform duration-300 ${
                     isServicesOpen ? "rotate-180" : ""
@@ -182,7 +186,7 @@ function Header() {
                         className="rounded-xl px-3 py-2 text-sm text-gray-600 transition hover:bg-white hover:text-[#8D0000]"
                         onClick={closeMenu}
                       >
-                        {service.label}
+                        {serviceT(`items.${service.slug}.label`)}
                       </Link>
                     ))}
                   </div>
@@ -190,8 +194,15 @@ function Header() {
               </div>
             </div>
 
+            <div className="mt-4">
+              <LanguageSwitcher
+                className="flex w-full items-center justify-center gap-2 rounded-2xl border border-red-100 bg-red-50 px-4 py-3 text-base font-semibold text-[#8D0000] transition hover:bg-red-100"
+                onSelect={closeMenu}
+              />
+            </div>
+
             <Button className="mt-4 h-12 rounded-2xl bg-[#8D0000] text-base">
-              Hubungi Kami
+              {commonT("orderNow")}
             </Button>
           </nav>
         </div>

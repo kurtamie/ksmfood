@@ -1,19 +1,29 @@
 import Image from "next/image";
 import Link from "next/link";
-import { FaInstagram, FaYoutube, FaFacebookF, FaMapMarkerAlt, FaPhoneAlt, FaExternalLinkAlt } from "react-icons/fa";
+import { useTranslations } from "next-intl";
+import {
+  FaInstagram,
+  FaYoutube,
+  FaFacebookF,
+  FaMapMarkerAlt,
+  FaPhoneAlt,
+  FaExternalLinkAlt,
+} from "react-icons/fa";
 import { HiMap } from "react-icons/hi";
 
 const Footer = () => {
+  const t = useTranslations("footer");
+  const serviceLinks = t.raw("serviceLinks") as string[];
+  const galleryLinks = t.raw("galleryLinks") as string[];
+  const aboutLinks = t.raw("aboutLinks") as string[];
+
   return (
     <footer className="bg-[#1a1a1a] px-6 pb-8 pt-14 text-white md:px-12 lg:px-20">
       <div className="mx-auto max-w-8xl">
         <div className="mb-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-5 lg:gap-6">
-
           {/* Kolom 1: Brand + Alamat + Sosmed */}
           <div className="space-y-5 lg:col-span-1">
-            <h2 className="text-lg font-bold leading-tight">
-              PT Katering Sukses Mandiri
-            </h2>
+            <h2 className="text-lg font-bold leading-tight">{t("company")}</h2>
 
             {/* Logo */}
             <div className="w-fit rounded-lg bg-[#c0392b] p-3">
@@ -28,10 +38,13 @@ const Footer = () => {
 
             {/* Alamat */}
             <div className="flex items-start gap-3 text-sm text-gray-300">
-              <FaMapMarkerAlt className="mt-0.5 shrink-0 text-gray-400" size={14} />
+              <FaMapMarkerAlt
+                className="mt-0.5 shrink-0 text-gray-400"
+                size={14}
+              />
               <span className="leading-relaxed">
-                Jl. S.Parman, Komp. Ruko Nusa Indah Blok M 16, Mangsang, Kec. Sei
-                Beduk, Kota Batam, Kepulauan Riau 29433
+                Jl. S.Parman, Komp. Ruko Nusa Indah Blok M 16, Mangsang, Kec.
+                Sei Beduk, Kota Batam, Kepulauan Riau 29433
               </span>
             </div>
 
@@ -87,21 +100,15 @@ const Footer = () => {
 
           {/* Kolom 2: Layanan */}
           <div className="lg:col-span-1">
-            <h2 className="mb-5 text-base font-bold">Layanan</h2>
+            <h2 className="mb-5 text-base font-bold">{t("servicesTitle")}</h2>
             <ul className="space-y-3 text-sm text-gray-300">
-              {[
-                { label: "Prasmanan Pernikahan", href: "/#layanan" },
-                { label: "Prasmanan", href: "/#layanan" },
-                { label: "Nasi Kotak", href: "/#layanan" },
-                { label: "Bento", href: "/#layanan" },
-                { label: "Rendang Kemasan", href: "/#layanan" },
-                { label: "Snack Kotak", href: "/#layanan" },
-                { label: "Snack Tampah", href: "/#layanan" },
-                { label: "Tumpeng", href: "/#layanan" },
-              ].map((item) => (
-                <li key={item.label}>
-                  <Link href={item.href} className="transition hover:text-white">
-                    {item.label}
+              {serviceLinks.map((item) => (
+                <li key={item}>
+                  <Link
+                    href="/#layanan"
+                    className="transition hover:text-white"
+                  >
+                    {item}
                   </Link>
                 </li>
               ))}
@@ -110,17 +117,12 @@ const Footer = () => {
 
           {/* Kolom 3: Galeri */}
           <div className="lg:col-span-1">
-            <h2 className="mb-5 text-base font-bold">Galeri</h2>
+            <h2 className="mb-5 text-base font-bold">{t("galleryTitle")}</h2>
             <ul className="space-y-3 text-sm text-gray-300">
-              {[
-                { label: "Acara", href: "/#galeri" },
-                { label: "Menu", href: "/#galeri" },
-                { label: "Snack", href: "/#galeri" },
-                { label: "Video", href: "/#galeri" },
-              ].map((item) => (
-                <li key={item.label}>
-                  <Link href={item.href} className="transition hover:text-white">
-                    {item.label}
+              {galleryLinks.map((item) => (
+                <li key={item}>
+                  <Link href="/#galeri" className="transition hover:text-white">
+                    {item}
                   </Link>
                 </li>
               ))}
@@ -129,15 +131,15 @@ const Footer = () => {
 
           {/* Kolom 4: Tentang KSM */}
           <div className="lg:col-span-1">
-            <h2 className="mb-5 text-base font-bold">Tentang KSM</h2>
+            <h2 className="mb-5 text-base font-bold">{t("aboutTitle")}</h2>
             <ul className="space-y-3 text-sm text-gray-300">
-              {[
-                { label: "Tentang KSM", href: "/#tentang" },
-                { label: "Hubungi Kami", href: "/#kontak" },
-              ].map((item) => (
-                <li key={item.label}>
-                  <Link href={item.href} className="transition hover:text-white">
-                    {item.label}
+              {aboutLinks.map((item, index) => (
+                <li key={item}>
+                  <Link
+                    href={index === 0 ? "/#tentang" : "/#kontak"}
+                    className="transition hover:text-white"
+                  >
+                    {item}
                   </Link>
                 </li>
               ))}
@@ -146,7 +148,7 @@ const Footer = () => {
 
           {/* Kolom 5: Lokasi Kami */}
           <div className="lg:col-span-1">
-            <h2 className="mb-5 text-base font-bold">Lokasi Kami</h2>
+            <h2 className="mb-5 text-base font-bold">{t("locationTitle")}</h2>
             <div className="space-y-3">
               {/* Map preview */}
               <div className="overflow-hidden rounded-lg border border-gray-700">
@@ -172,7 +174,7 @@ const Footer = () => {
               >
                 <div className="flex items-center gap-2">
                   <HiMap size={18} className="text-gray-400" />
-                  <span>Buka di Google Maps</span>
+                  <span>{t("openMaps")}</span>
                 </div>
                 <FaExternalLinkAlt size={12} className="text-gray-500" />
               </Link>
@@ -182,7 +184,8 @@ const Footer = () => {
 
         {/* Copyright */}
         <div className="border-t border-gray-800 pt-6 text-center">
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-gray-500">{t("copyright")}</p>
+          <p className="hidden text-xs text-gray-500">
             Copyright © 2026 KSM Katering. All rights reserved.
           </p>
         </div>

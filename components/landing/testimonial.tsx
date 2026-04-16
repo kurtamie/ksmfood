@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 import testimonialImage from "@/public/images/bubbleChat.webp";
 
 const testimonials = [
@@ -48,6 +49,7 @@ const testimonials = [
 ];
 
 function Testimonial() {
+  const t = useTranslations("testimonials");
   const scrollRef = useRef<HTMLDivElement>(null);
   const dragRef = useRef({
     isDragging: false,
@@ -56,6 +58,11 @@ function Testimonial() {
   });
   const [scrollValue, setScrollValue] = useState(0);
   const [maxScroll, setMaxScroll] = useState(0);
+  const testimonialsText = t.raw("items") as Array<{
+    id: number;
+    name: string;
+    text: string;
+  }>;
 
   useEffect(() => {
     const element = scrollRef.current;
@@ -143,29 +150,35 @@ function Testimonial() {
         onPointerCancel={handlePointerUp}
         onDragStart={(event) => event.preventDefault()}
       >
-        {testimonials.map((testimonial) => (
-          <article
-            key={testimonial.id}
-            className="flex w-full shrink-0 flex-col items-center md:w-[calc((100%-24px)/2)] xl:w-[calc((100%-48px)/3)]"
-          >
-            <div className="pointer-events-none relative w-full overflow-hidden rounded-[2rem]">
-              <Image
-                src={testimonialImage}
-                alt={`Testimoni ${testimonial.name}`}
-                className="h-auto w-full"
-                priority={testimonial.id <= 3}
-              />
-              <div className="absolute inset-x-[11%] top-[18%] flex items-center justify-center">
-                <p className="text-center text-sm font-medium leading-6 text-white md:text-base xl:text-lg">
-                  {testimonial.text}
-                </p>
+        {testimonials.map((testimonial) => {
+          const translated = testimonialsText.find(
+            (item) => item.id === testimonial.id,
+          );
+
+          return (
+            <article
+              key={testimonial.id}
+              className="flex w-full shrink-0 flex-col items-center md:w-[calc((100%-24px)/2)] xl:w-[calc((100%-48px)/3)]"
+            >
+              <div className="pointer-events-none relative w-full overflow-hidden rounded-[2rem]">
+                <Image
+                  src={testimonialImage}
+                  alt={`Testimoni ${translated?.name ?? testimonial.name}`}
+                  className="h-auto w-full"
+                  priority={testimonial.id <= 3}
+                />
+                <div className="absolute inset-x-[11%] top-[18%] flex items-center justify-center">
+                  <p className="text-center text-sm font-medium leading-6 text-white md:text-base xl:text-lg">
+                    {translated?.text ?? testimonial.text}
+                  </p>
+                </div>
               </div>
-            </div>
-            <p className="mt-5 text-center text-lg font-semibold text-[#332929]">
-              {testimonial.name}
-            </p>
-          </article>
-        ))}
+              <p className="mt-5 text-center text-lg font-semibold text-[#332929]">
+                {translated?.name ?? testimonial.name}
+              </p>
+            </article>
+          );
+        })}
       </div>
 
       <div className="mx-auto flex w-full max-w-xl items-center gap-4 px-2">
@@ -185,7 +198,7 @@ function Testimonial() {
             }
           }}
           className="h-2 w-full cursor-pointer appearance-none rounded-full bg-red-200 accent-red-800"
-          aria-label="Slider testimonial"
+          aria-label={t("sliderLabel")}
         />
       </div>
     </div>

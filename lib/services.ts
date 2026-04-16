@@ -21,6 +21,27 @@ export const services = [
       "Sajian prasmanan lengkap untuk acara keluarga, gathering, dan kebutuhan katering skala besar.",
   },
   {
+    slug: "prasmanan-pernikahan",
+    label: "Prasmanan Pernikahan",
+    href: "/services/prasmanan-pernikahan",
+    description:
+      "Sajian prasmanan lengkap untuk acara keluarga, gathering, dan kebutuhan katering skala besar.",
+  },
+  {
+    slug: "bento",
+    label: "Bento",
+    href: "/services/bento",
+    description:
+      "Sajian prasmanan lengkap untuk acara keluarga, gathering, dan kebutuhan katering skala besar.",
+  },
+  {
+    slug: "rendang-kemasan",
+    label: "Rendang Kemasan",
+    href: "/services/rendang-kemasan",
+    description:
+      "Sajian prasmanan lengkap untuk acara keluarga, gathering, dan kebutuhan katering skala besar.",
+  },
+  {
     slug: "snack-kotak",
     label: "Snack Kotak",
     href: "/services/snack-kotak",
@@ -28,9 +49,9 @@ export const services = [
       "Pilihan snack kotak untuk meeting, seminar, pelatihan, dan acara formal maupun informal.",
   },
   {
-    slug: "wedding-services",
-    label: "Wedding Services",
-    href: "/services/wedding-services",
+    slug: "tumpeng",
+    label: "Tumpeng",
+    href: "/services/tumpeng",
     description:
       "Layanan katering pernikahan dengan menu prasmanan dan dukungan kebutuhan jamuan tamu acara spesial Anda.",
   },

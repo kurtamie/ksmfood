@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 import prasnikah from "@/public/images/menu/prasmanan-nikah.webp";
 import prasmanan from "@/public/images/menu/prasmanan.webp";
 import nasi from "@/public/images/menu/nasi-kotak.webp";
@@ -64,13 +65,21 @@ const packageCards = [
     image: tumpeng,
     title: "Katering Korporat",
     price: "Harga Disesuaikan",
-  }
+  },
 ];
 
 function Menu() {
+  const t = useTranslations("homeMenu");
+  const cards = t.raw("cards") as Array<{
+    id: number;
+    title: string;
+    price: string;
+  }>;
+
   return (
     <div className="mt-12 grid w-full max-w-6xl grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4">
       {packageCards.map((card, index) => {
+        const translatedCard = cards.find((item) => item.id === card.id);
         const isLastOddItem =
           packageCards.length % 2 !== 0 && index === packageCards.length - 1;
         return (
@@ -84,18 +93,20 @@ function Menu() {
           >
             <Image
               src={card.image}
-              alt={card.title}
+              alt={translatedCard?.title ?? card.title}
               className="h-auto w-full max-w-56"
             />
             <div className="flex grow flex-col justify-center py-4">
               <h3 className="text-2xl font-bold text-[#332929]">
-                {card.title}
+                {translatedCard?.title ?? card.title}
               </h3>
-              <p className="mt-2 text-sm text-gray-600">{card.price}</p>
+              <p className="mt-2 text-sm text-gray-600">
+                {translatedCard?.price ?? card.price}
+              </p>
             </div>
             <div className="mt-2 flex w-full flex-col gap-2 sm:flex-row">
               <Button className="h-10 flex-1 bg-red-800 text-white hover:bg-red-900 cursor-pointer">
-                Lihat Paket
+                {t("viewPackage")}
               </Button>
               {card.catalog && (
                 <Button
@@ -103,7 +114,7 @@ function Menu() {
                   className="h-10 flex-1 border border-red-800 bg-white text-red-800 hover:bg-red-800 hover:text-white cursor-pointer"
                 >
                   <a href={card.catalog} download>
-                    Unduh Menu
+                    {t("downloadMenu")}
                   </a>
                 </Button>
               )}

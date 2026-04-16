@@ -63,7 +63,11 @@ function SelectMenu() {
             key={item}
             className="flex h-full flex-col items-center border border-black/10 bg-white p-4 text-center shadow-sm transition hover:-translate-y-1 hover:shadow-md"
           >
-            <Image src={menu} alt={item} className="h-auto w-full max-w-40 sm:max-w-44" />
+            <Image
+              src={menu}
+              alt={item}
+              className="h-auto w-full max-w-40 sm:max-w-44"
+            />
             <h3 className="mt-4 text-lg font-bold text-[#332929] sm:text-2xl">
               {item}
             </h3>
