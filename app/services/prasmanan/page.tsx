@@ -13,24 +13,19 @@ export default async function PrasmananPage() {
 
   return (
     <main className="w-full overflow-x-clip bg-white text-[#332929]">
-      <section id="hero" className="relative isolate scroll-mt-24">
-        <div className="absolute inset-0 -z-10">
-          <Image
-            src={prasmananImage}
-            alt="Prasmanan KSM Katering"
-            fill
-            priority
-            sizes="100vw"
-            className="object-cover"
-          />
-          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(30,19,14,0.55),rgba(30,19,14,0.52))]" />
-        </div>
-
-        <div className="mx-auto flex min-h-[420px] max-w-7xl flex-col items-center justify-center px-6 py-20 text-center text-white sm:min-h-[480px] sm:py-24 lg:min-h-[560px]">
-          <p className="text-3xl font-bold sm:text-4xl lg:text-7xl">
+      <section
+        id="hero"
+        className="scroll-mt-24 bg-cover bg-center"
+        style={{
+          backgroundImage:
+            "linear-gradient(180deg, rgba(30,19,14,0.55), rgba(30,19,14,0.52)), url('/images/services/prasmanan/prasmanan.webp')",
+        }}
+      >
+        <div className="mx-auto flex max-w-7xl flex-col items-center justify-center px-6 py-16 text-center text-white sm:py-20 lg:min-h-[560px]">
+          <p className="text-3xl font-bold sm:text-4xl lg:text-6xl">
             {t("hero.eyebrow")}
           </p>
-          <h1 className="mt-4 max-w-4xl text-xl leading-tight sm:text-3xl lg:text-5xl">
+          <h1 className="mt-4 max-w-4xl text-xl leading-tight sm:text-3xl lg:text-4xl">
             {t("hero.title")}
           </h1>
 
@@ -146,7 +141,7 @@ export default async function PrasmananPage() {
 
       <section
         id="hubungi-kami"
-        className="mb-10 mt-6 flex items-center justify-center px-4 sm:px-8 scroll-mt-20"
+        className="mt-6 mb-10 flex items-center justify-center px-4 scroll-mt-20 sm:px-8"
       >
         <div className="w-full max-w-7xl">
           <Cta />
