@@ -10,22 +10,20 @@ import {
   FaExternalLinkAlt,
 } from "react-icons/fa";
 import { HiMap } from "react-icons/hi";
+import { aboutNavItems, galleryNavItems } from "@/lib/navigation";
 
 const Footer = () => {
   const t = useTranslations("footer");
+  const navT = useTranslations("navigation");
   const serviceLinks = t.raw("serviceLinks") as string[];
-  const galleryLinks = t.raw("galleryLinks") as string[];
-  const aboutLinks = t.raw("aboutLinks") as string[];
 
   return (
     <footer className="bg-[#1a1a1a] px-6 pb-8 pt-14 text-white md:px-12 lg:px-20">
       <div className="mx-auto max-w-8xl">
         <div className="mb-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-5 lg:gap-6">
-          {/* Kolom 1: Brand + Alamat + Sosmed */}
           <div className="space-y-5 lg:col-span-1">
             <h2 className="text-lg font-bold leading-tight">{t("company")}</h2>
 
-            {/* Logo */}
             <div className="w-fit rounded-lg bg-[#c0392b] p-3">
               <Image
                 src="/ksm-logo.svg"
@@ -36,7 +34,6 @@ const Footer = () => {
               />
             </div>
 
-            {/* Alamat */}
             <div className="flex items-start gap-3 text-sm text-gray-300">
               <FaMapMarkerAlt
                 className="mt-0.5 shrink-0 text-gray-400"
@@ -48,7 +45,6 @@ const Footer = () => {
               </span>
             </div>
 
-            {/* Kontak */}
             <div className="space-y-1 text-sm text-gray-300">
               <div className="flex items-center gap-3">
                 <FaPhoneAlt className="shrink-0 text-gray-400" size={13} />
@@ -66,7 +62,6 @@ const Footer = () => {
               </div>
             </div>
 
-            {/* Sosmed */}
             <div className="flex gap-3 pt-1">
               <Link
                 href="https://youtube.com"
@@ -98,7 +93,6 @@ const Footer = () => {
             </div>
           </div>
 
-          {/* Kolom 2: Layanan */}
           <div className="lg:col-span-1">
             <h2 className="mb-5 text-base font-bold">{t("servicesTitle")}</h2>
             <ul className="space-y-3 text-sm text-gray-300">
@@ -115,42 +109,41 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Kolom 3: Galeri */}
           <div className="lg:col-span-1">
             <h2 className="mb-5 text-base font-bold">{t("galleryTitle")}</h2>
             <ul className="space-y-3 text-sm text-gray-300">
-              {galleryLinks.map((item) => (
-                <li key={item}>
-                  <Link href="/#galeri" className="transition hover:text-white">
-                    {item}
+              {galleryNavItems.map((item) => (
+                <li key={item.key}>
+                  <Link
+                    href={item.href}
+                    className="transition hover:text-white"
+                  >
+                    {navT(`gallery.${item.labelKey}`)}
                   </Link>
                 </li>
               ))}
             </ul>
           </div>
 
-          {/* Kolom 4: Tentang KSM */}
           <div className="lg:col-span-1">
             <h2 className="mb-5 text-base font-bold">{t("aboutTitle")}</h2>
             <ul className="space-y-3 text-sm text-gray-300">
-              {aboutLinks.map((item, index) => (
-                <li key={item}>
+              {aboutNavItems.map((item) => (
+                <li key={item.key}>
                   <Link
-                    href={index === 0 ? "/#tentang" : "/#kontak"}
+                    href={item.href}
                     className="transition hover:text-white"
                   >
-                    {item}
+                    {navT(`about.${item.labelKey}`)}
                   </Link>
                 </li>
               ))}
             </ul>
           </div>
 
-          {/* Kolom 5: Lokasi Kami */}
           <div className="lg:col-span-1">
             <h2 className="mb-5 text-base font-bold">{t("locationTitle")}</h2>
             <div className="space-y-3">
-              {/* Map preview */}
               <div className="overflow-hidden rounded-lg border border-gray-700">
                 <iframe
                   src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3989.0155!2d104.0!3d1.1!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMcKwMDYnMDAuMCJOIDEwNMKwMDAnMDAuMCJF!5e0!3m2!1sen!2sid!4v1234567890"
@@ -165,7 +158,6 @@ const Footer = () => {
                 />
               </div>
 
-              {/* Tombol Google Maps */}
               <Link
                 href="https://maps.google.com/?q=Jl+S+Parman+Komp+Ruko+Nusa+Indah+Blok+M+16+Mangsang+Batam"
                 target="_blank"
@@ -182,12 +174,8 @@ const Footer = () => {
           </div>
         </div>
 
-        {/* Copyright */}
         <div className="border-t border-gray-800 pt-6 text-center">
           <p className="text-xs text-gray-500">{t("copyright")}</p>
-          <p className="hidden text-xs text-gray-500">
-            Copyright © 2026 KSM Katering. All rights reserved.
-          </p>
         </div>
       </div>
     </footer>

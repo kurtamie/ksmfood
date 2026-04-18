@@ -71,6 +71,17 @@ const messages = {
     openMenu: "Bukak menu",
     closeMenu: "Tutuik menu",
   },
+  navigation: {
+    gallery: {
+      event: "Acara",
+      menu: "Menu",
+      video: "Video",
+    },
+    about: {
+      ksm: "Tentang KSM",
+      contact: "Kontak",
+    },
+  },
   footer: {
     company: "PT Katering Sukses Mandiri",
     servicesTitle: "Layanan",
@@ -89,7 +100,6 @@ const messages = {
       "Snack Tampah",
       "Tumpeng",
     ],
-    galleryLinks: ["Acara", "Menu", "Snack", "Video"],
     aboutLinks: ["Tentang KSM", "Hubungi Kami"],
   },
   services: {
@@ -287,6 +297,13 @@ const messages = {
       { href: "#pilihan-menu", label: "Pilihan Menu" },
       { href: "#hubungi-kami", label: "Hubungi" },
     ],
+    prasmanan: [
+      { href: "#tentang", label: "Tentang" },
+      { href: "#layanan", label: "Paket" },
+      { href: "#informasi-pemesanan", label: "Info Pasanan" },
+      { href: "#pilihan-menu", label: "Pilihan Menu" },
+      { href: "#hubungi-kami", label: "Hubungi" },
+    ],
     aqiqah: [
       { href: "#tentang", label: "Tentang" },
       { href: "#menu", label: "Paket" },
@@ -377,11 +394,100 @@ const messages = {
     consultLink:
       "https://wa.me/628111171713?text=Halo%2C%20sayo%20indaknyo%20konsultasi%20paket%20aqiqah.",
   },
+  prasmananPage: {
+    hero: {
+      eyebrow: "Prasmanan",
+      title: "Cita raso nan indak talupoan, pangalaman nan mangesankan",
+      cta: "Unduah Menu",
+    },
+    about: {
+      titleLead: "Praktih, Barasiah",
+      titleAccent: "jo Bakualitas",
+      paragraph1:
+        "Prasmanan adolah solusi nan praktih jo populerr untuak manyajiakan hidangan nan lamak jo baragam di macam acara, dari patamuoan bisnis sampai acara pribadi.",
+      paragraph2:
+        "Prasmanan dari KSM Katering jadi pilihan nan cadiak untuak manjamu tamu jo macam hidangan khas nusantara. Kami juo manyadiakan layanan pramusaji untuak malayani tamu undangan.",
+    },
+    packages: {
+      titleLead: "Paket",
+      titleBrand: "Prasmanan",
+    },
+    orderingInfo: {
+      titleLead: "Informasi",
+      titleAccent: "Pasanan",
+      deliveryTitle: "Gratis Pengiriman",
+      deliveryDescription: "Tarsadio",
+      equipmentTitle: "Paralatan Prasmanan Tarsadio",
+      equipmentDescription: "Disarato layanan panataan tampek.",
+      serviceTitle: "Layanan Pramusaji",
+      serviceDescription: "Minimal pasanan 100 porsi",
+      minimumTitle: "Minimum Order",
+      minimumDescription: "50 Porsi",
+    },
+    menuSection: {
+      titleLead: "Pilihan",
+      titleBrand: "Menu",
+    },
+  },
+  prasmananMenu: {
+    popular: "Paling Populer",
+  },
+  prasmananMenuServices: {
+    mainTitle: "Lauk Utamo",
+    sideTitle: "Sides",
+  },
+  prasmananCta: {
+    title: "Prasmanan Praktih, Momen Bakasan",
+    description:
+      "Bukan cuman hidangan nan bakualitas, tapi juo kenangan nan bisa dibagi jo disimpan salamo-lamo.",
+    orderLink:
+      "https://wa.me/628111171713?text=Halo%2C%20sayo%20indaknyo%20mamasan%20prasmanan.",
+    consultLink:
+      "https://wa.me/628111171713?text=Halo%2C%20sayo%20indaknyo%20konsultasi%20prasmanan.",
+  },
   serviceDetail: {
     eyebrow: "Layanan KSM Katering",
     primaryCta: "Hubungi Kami",
     secondaryCta: "Kembali ka Layanan",
     items: serviceItems,
+  },
+  sectionPage: {
+    primaryCta: "Hubungi Kami",
+    secondaryCta: "Kembali ka Barando",
+  },
+  galleryPages: {
+    event: {
+      eyebrow: "Galeri Acara",
+      title: "Dokumentasi acara basamo KSM Katering",
+      description:
+        "Halaman ko disiapkan untuak manampilkan momen layanan KSM Katering di macam-macam acara. Konten lengkapnyo bisa ditambah di route file `/gallery/event`.",
+    },
+    menu: {
+      eyebrow: "Galeri Menu",
+      title: "Pilihan menu andalan KSM Katering",
+      description:
+        "Halaman ko disiapkan untuak manampilkan koleksi menu unggulan KSM Katering. Konten lengkapnyo bisa dikembangkan di route file `/gallery/menu`.",
+    },
+    video: {
+      eyebrow: "Galeri Video",
+      title: "Video layanan jo momen KSM Katering",
+      description:
+        "Halaman ko disiapkan untuak manampilkan video promosi, dokumentasi acara, jo konten visual KSM Katering.",
+    },
+  },
+  aboutPages: {
+    ksm: {
+      eyebrow: "Tentang KSM",
+      title: "Profil singkek KSM Katering",
+      description:
+        "Halaman ko disiapkan untuak manampilkan profil perusahaan, sejarah, jo nilai utama KSM Katering sacara labiah lengkap.",
+    },
+    contact: {
+      eyebrow: "Kontak KSM",
+      title: "Hubungi tim KSM Katering",
+      description:
+        "Halaman ko disiapkan untuak mamuadahkan calon palanggan manghubungi tim KSM Katering untuak konsultasi jo pasanan.",
+    },
   },
 } as const;
 

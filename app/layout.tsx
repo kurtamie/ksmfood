@@ -2,8 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { NextIntlClientProvider } from "next-intl";
 import { cookies } from "next/headers";
 import { getMessages } from "next-intl/server";
-import Footer from "@/components/layout/footer";
-import Header from "@/components/layout/header";
+import SiteShell from "@/components/layout/site-shell";
 import { defaultLocale, hasLocale, localeCookieName } from "@/i18n/routing";
 import "./globals.css";
 
@@ -62,9 +61,7 @@ export default async function RootLayout({
     <html lang={locale} className="h-full antialiased">
       <body className="min-h-full flex flex-col">
         <NextIntlClientProvider locale={locale} messages={messages}>
-          <Header />
-          <div className="flex-1">{children}</div>
-          <Footer />
+          <SiteShell>{children}</SiteShell>
         </NextIntlClientProvider>
       </body>
     </html>

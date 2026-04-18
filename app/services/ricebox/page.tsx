@@ -29,8 +29,13 @@ export default async function RiceboxPage() {
             </div>
           </div>
 
-          <Button className="h-12 w-full max-w-xs cursor-pointer border border-white bg-transparent px-8 text-sm font-bold text-white hover:border-red-800 hover:bg-red-800 hover:text-white sm:w-auto">
-            {t("hero.cta")}
+          <Button
+            asChild
+            className="h-12 w-full max-w-xs cursor-pointer border border-white bg-transparent px-8 text-sm font-bold text-white hover:border-red-800 hover:bg-red-800 hover:text-white sm:w-auto"
+          >
+            <a href="/images/pdf/naskot.pdf" download>
+              {t("hero.cta")}
+            </a>
           </Button>
         </div>
       </section>

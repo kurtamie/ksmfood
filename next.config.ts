@@ -10,6 +10,10 @@ const nextConfig: NextConfig = {
         source: "/services/nasi-kotak",
         destination: "/services/ricebox",
       },
+      {
+        source: "/gallery/acara",
+        destination: "/gallery/event",
+      },
     ];
   },
 };

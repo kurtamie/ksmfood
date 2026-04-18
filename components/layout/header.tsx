@@ -4,11 +4,11 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import logo from "@/public/ksm-logo.svg";
 import { FaChevronDown } from "react-icons/fa";
-import { Button } from "../ui/button";
+import { aboutNavItems, galleryNavItems } from "@/lib/navigation";
 import { services } from "@/lib/services";
-import LanguageSwitcher from "./language-switcher";
+import logo from "@/public/ksm-logo.svg";
+import { Button } from "../ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,6 +16,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
+import LanguageSwitcher from "./language-switcher";
 
 const navLinkClassName =
   "text-sm font-bold text-gray-700 transition-colors hover:text-gray-900";
@@ -23,14 +24,13 @@ const navLinkClassName =
 function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isServicesOpen, setIsServicesOpen] = useState(false);
+  const [isGalleryOpen, setIsGalleryOpen] = useState(false);
+  const [isAboutOpen, setIsAboutOpen] = useState(false);
   const t = useTranslations("header");
   const serviceT = useTranslations("services");
+  const navT = useTranslations("navigation");
   const commonT = useTranslations("common");
-  const links = [
-    { href: "/", label: t("home") },
-    { href: "/#galeri", label: t("gallery") },
-    { href: "/#tentang", label: t("about") },
-  ];
+  const links = [{ href: "/", label: t("home") }];
 
   useEffect(() => {
     document.body.style.overflow = isMenuOpen ? "hidden" : "";
@@ -43,6 +43,8 @@ function Header() {
   const closeMenu = () => {
     setIsMenuOpen(false);
     setIsServicesOpen(false);
+    setIsGalleryOpen(false);
+    setIsAboutOpen(false);
   };
 
   return (
@@ -62,35 +64,32 @@ function Header() {
             {t("home")}
           </Link>
 
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button
-                type="button"
-                className={`${navLinkClassName} flex items-center gap-2`}
-              >
-                {t("services")} <FaChevronDown className="size-3" />
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-48" align="start">
-              <DropdownMenuGroup>
-                {services.map((service) => (
-                  <DropdownMenuItem key={service.slug} asChild>
-                    <Link href={service.href}>
-                      {serviceT(`items.${service.slug}.label`)}
-                    </Link>
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuGroup>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <DropdownSection
+            label={t("services")}
+            items={services.map((service) => ({
+              key: service.slug,
+              href: service.href,
+              label: serviceT(`items.${service.slug}.label`),
+            }))}
+          />
 
-          <Link href="/#galeri" className={navLinkClassName}>
-            {t("gallery")}
-          </Link>
+          <DropdownSection
+            label={t("gallery")}
+            items={galleryNavItems.map((item) => ({
+              key: item.key,
+              href: item.href,
+              label: navT(`gallery.${item.labelKey}`),
+            }))}
+          />
 
-          <Link href="/#tentang" className={navLinkClassName}>
-            {t("about")}
-          </Link>
+          <DropdownSection
+            label={t("about")}
+            items={aboutNavItems.map((item) => ({
+              key: item.key,
+              href: item.href,
+              label: navT(`about.${item.labelKey}`),
+            }))}
+          />
         </nav>
 
         <div className="hidden items-center gap-3 md:flex">
@@ -158,41 +157,41 @@ function Header() {
               </Link>
             ))}
 
-            <div className="mt-1 rounded-2xl border border-red-100 bg-red-50/60">
-              <button
-                type="button"
-                className="flex w-full items-center justify-between px-4 py-3 text-left text-base font-semibold text-[#332929]"
-                aria-expanded={isServicesOpen}
-                onClick={() => setIsServicesOpen((prev) => !prev)}
-              >
-                <span>{t("services")}</span>
-                <FaChevronDown
-                  className={`size-3 transition-transform duration-300 ${
-                    isServicesOpen ? "rotate-180" : ""
-                  }`}
-                />
-              </button>
-              <div
-                className={`grid transition-[grid-template-rows] duration-300 ${
-                  isServicesOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
-                }`}
-              >
-                <div className="overflow-hidden">
-                  <div className="flex flex-col px-4 pb-4">
-                    {services.map((service) => (
-                      <Link
-                        key={service.slug}
-                        href={service.href}
-                        className="rounded-xl px-3 py-2 text-sm text-gray-600 transition hover:bg-white hover:text-[#8D0000]"
-                        onClick={closeMenu}
-                      >
-                        {serviceT(`items.${service.slug}.label`)}
-                      </Link>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
+            <MobileAccordion
+              label={t("services")}
+              isOpen={isServicesOpen}
+              onToggle={() => setIsServicesOpen((prev) => !prev)}
+              items={services.map((service) => ({
+                key: service.slug,
+                href: service.href,
+                label: serviceT(`items.${service.slug}.label`),
+              }))}
+              onSelect={closeMenu}
+            />
+
+            <MobileAccordion
+              label={t("gallery")}
+              isOpen={isGalleryOpen}
+              onToggle={() => setIsGalleryOpen((prev) => !prev)}
+              items={galleryNavItems.map((item) => ({
+                key: item.key,
+                href: item.href,
+                label: navT(`gallery.${item.labelKey}`),
+              }))}
+              onSelect={closeMenu}
+            />
+
+            <MobileAccordion
+              label={t("about")}
+              isOpen={isAboutOpen}
+              onToggle={() => setIsAboutOpen((prev) => !prev)}
+              items={aboutNavItems.map((item) => ({
+                key: item.key,
+                href: item.href,
+                label: navT(`about.${item.labelKey}`),
+              }))}
+              onSelect={closeMenu}
+            />
 
             <div className="mt-4">
               <LanguageSwitcher
@@ -208,6 +207,94 @@ function Header() {
         </div>
       </div>
     </header>
+  );
+}
+
+type NavItem = {
+  key: string;
+  href: string;
+  label: string;
+};
+
+function DropdownSection({
+  label,
+  items,
+}: {
+  label: string;
+  items: NavItem[];
+}) {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <button
+          type="button"
+          className={`${navLinkClassName} flex items-center gap-2`}
+        >
+          {label} <FaChevronDown className="size-3" />
+        </button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="w-48" align="start">
+        <DropdownMenuGroup>
+          {items.map((item) => (
+            <DropdownMenuItem key={item.key} asChild>
+              <Link href={item.href}>{item.label}</Link>
+            </DropdownMenuItem>
+          ))}
+        </DropdownMenuGroup>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
+
+function MobileAccordion({
+  label,
+  isOpen,
+  onToggle,
+  items,
+  onSelect,
+}: {
+  label: string;
+  isOpen: boolean;
+  onToggle: () => void;
+  items: NavItem[];
+  onSelect: () => void;
+}) {
+  return (
+    <div className="mt-1 rounded-2xl border border-red-100 bg-red-50/60">
+      <button
+        type="button"
+        className="flex w-full items-center justify-between px-4 py-3 text-left text-base font-semibold text-[#332929]"
+        aria-expanded={isOpen}
+        onClick={onToggle}
+      >
+        <span>{label}</span>
+        <FaChevronDown
+          className={`size-3 transition-transform duration-300 ${
+            isOpen ? "rotate-180" : ""
+          }`}
+        />
+      </button>
+      <div
+        className={`grid transition-[grid-template-rows] duration-300 ${
+          isOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+        }`}
+      >
+        <div className="overflow-hidden">
+          <div className="flex flex-col px-4 pb-4">
+            {items.map((item) => (
+              <Link
+                key={item.key}
+                href={item.href}
+                className="rounded-xl px-3 py-2 text-sm text-gray-600 transition hover:bg-white hover:text-[#8D0000]"
+                onClick={onSelect}
+              >
+                {item.label}
+              </Link>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
 

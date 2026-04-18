@@ -71,6 +71,17 @@ const messages = {
     openMenu: "Open menu",
     closeMenu: "Close menu",
   },
+  navigation: {
+    gallery: {
+      event: "Events",
+      menu: "Menu",
+      video: "Video",
+    },
+    about: {
+      ksm: "About KSM",
+      contact: "Contact",
+    },
+  },
   footer: {
     company: "PT Katering Sukses Mandiri",
     servicesTitle: "Services",
@@ -89,7 +100,6 @@ const messages = {
       "Snack Tray",
       "Tumpeng",
     ],
-    galleryLinks: ["Events", "Menus", "Snacks", "Videos"],
     aboutLinks: ["About KSM", "Contact Us"],
   },
   services: {
@@ -289,6 +299,13 @@ const messages = {
       { href: "#pilihan-menu", label: "Menu Choices" },
       { href: "#hubungi-kami", label: "Contact" },
     ],
+    prasmanan: [
+      { href: "#tentang", label: "About" },
+      { href: "#layanan", label: "Packages" },
+      { href: "#informasi-pemesanan", label: "Ordering Info" },
+      { href: "#pilihan-menu", label: "Menu Choices" },
+      { href: "#hubungi-kami", label: "Contact" },
+    ],
     aqiqah: [
       { href: "#tentang", label: "About" },
       { href: "#menu", label: "Packages" },
@@ -380,11 +397,100 @@ const messages = {
     consultLink:
       "https://wa.me/628111171713?text=Hello%2C%20I%20want%20to%20consult%20about%20an%20aqiqah%20package.",
   },
+  prasmananPage: {
+    hero: {
+      eyebrow: "Prasmanan",
+      title: "Memorable flavors, impressive dining experience",
+      cta: "Download Menu",
+    },
+    about: {
+      titleLead: "Practical, Clean",
+      titleAccent: "and High Quality",
+      paragraph1:
+        "Buffet catering is a practical and popular way to serve delicious and varied dishes across special events, from business gatherings to private celebrations.",
+      paragraph2:
+        "KSM Katering buffet service is a smart choice for hosts who want to spoil their guests with a wide selection of Indonesian dishes. We also provide serving staff for your event.",
+    },
+    packages: {
+      titleLead: "Prasmanan",
+      titleBrand: "Packages",
+    },
+    orderingInfo: {
+      titleLead: "Ordering",
+      titleAccent: "Information",
+      deliveryTitle: "Free Delivery",
+      deliveryDescription: "Available",
+      equipmentTitle: "Buffet Equipment Available",
+      equipmentDescription: "Including table setup assistance.",
+      serviceTitle: "Serving Staff",
+      serviceDescription: "Minimum order 100 portions",
+      minimumTitle: "Minimum Order",
+      minimumDescription: "50 Portions",
+    },
+    menuSection: {
+      titleLead: "Menu",
+      titleBrand: "Choices",
+    },
+  },
+  prasmananMenu: {
+    popular: "Most Popular",
+  },
+  prasmananMenuServices: {
+    mainTitle: "Main Dishes",
+    sideTitle: "Side Dishes",
+  },
+  prasmananCta: {
+    title: "Practical Buffet, Memorable Moments",
+    description:
+      "More than quality dishes, it is also a dining memory worth sharing and remembering.",
+    orderLink:
+      "https://wa.me/628111171713?text=Hello%2C%20I%20want%20to%20order%20buffet%20catering.",
+    consultLink:
+      "https://wa.me/628111171713?text=Hello%2C%20I%20want%20to%20consult%20about%20buffet%20catering.",
+  },
   serviceDetail: {
     eyebrow: "KSM Katering Services",
     primaryCta: "Contact Us",
     secondaryCta: "Back to Services",
     items: serviceItems,
+  },
+  sectionPage: {
+    primaryCta: "Contact Us",
+    secondaryCta: "Back to Home",
+  },
+  galleryPages: {
+    event: {
+      eyebrow: "Event Gallery",
+      title: "Event documentation with KSM Katering",
+      description:
+        "This page is prepared to display KSM Katering service moments across different events. Full content can be added in the `/gallery/event` route file.",
+    },
+    menu: {
+      eyebrow: "Menu Gallery",
+      title: "Featured KSM Katering menu selections",
+      description:
+        "This page is prepared to display KSM Katering featured menu collections. Full content can be expanded in the `/gallery/menu` route file.",
+    },
+    video: {
+      eyebrow: "Video Gallery",
+      title: "Videos of KSM Katering services and moments",
+      description:
+        "This page is prepared to display promotional videos, event documentation, and visual content for KSM Katering.",
+    },
+  },
+  aboutPages: {
+    ksm: {
+      eyebrow: "About KSM",
+      title: "A brief profile of KSM Katering",
+      description:
+        "This page is prepared to present the company profile, history, and core values of KSM Katering in more detail.",
+    },
+    contact: {
+      eyebrow: "KSM Contact",
+      title: "Reach the KSM Katering team",
+      description:
+        "This page is prepared to help prospective customers contact the KSM Katering team for consultation and ordering.",
+    },
   },
 } as const;
 
