@@ -226,7 +226,7 @@ const RotatingText = forwardRef<RotatingTextRef, RotatingTextProps>(
       <>
         <span
           aria-hidden="true"
-          className="pointer-events-none absolute -z-10 inline-flex overflow-hidden whitespace-pre opacity-0"
+          className="pointer-events-none fixed left-0 top-0 -z-10 h-0 w-0 overflow-hidden opacity-0"
         >
           {texts.map((text, index) => (
             <span
@@ -234,7 +234,7 @@ const RotatingText = forwardRef<RotatingTextRef, RotatingTextProps>(
               ref={(element) => {
                 measurementRefs.current[index] = element;
               }}
-              className={cn("inline-flex", mainClassName)}
+              className={cn("absolute left-0 top-0 inline-flex whitespace-pre", mainClassName)}
             >
               {text}
             </span>
@@ -242,7 +242,7 @@ const RotatingText = forwardRef<RotatingTextRef, RotatingTextProps>(
         </span>
         <motion.span
           className={cn(
-            "inline-flex flex-wrap whitespace-pre-wrap relative",
+            "relative inline-flex max-w-full min-w-0 overflow-hidden whitespace-pre-wrap align-middle",
             mainClassName,
           )}
           {...rest}
@@ -261,8 +261,8 @@ const RotatingText = forwardRef<RotatingTextRef, RotatingTextProps>(
               key={currentTextIndex}
               className={cn(
                 splitBy === "lines"
-                  ? "flex flex-col w-full"
-                  : "inline-flex flex-wrap whitespace-pre-wrap relative",
+                  ? "flex w-full max-w-full min-w-0 flex-col"
+                  : "relative inline-flex max-w-full min-w-0 flex-wrap whitespace-pre-wrap",
               )}
               layout
               aria-hidden="true"

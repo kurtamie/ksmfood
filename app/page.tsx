@@ -13,6 +13,7 @@ import WhyChoose from "@/components/landing/whyChoose";
 import RotatingText from "@/components/motion/rotatingText";
 import { Button } from "@/components/ui/button";
 import pattern from "@/public/images/pattern.webp";
+import { whatsappLink } from "@/const/whatsapp";
 
 export default async function Page() {
   const t = await getTranslations("home");
@@ -52,12 +53,14 @@ export default async function Page() {
           </div>
 
           <div className="flex w-full flex-col justify-center gap-3 sm:w-auto sm:flex-row">
-            <Button className="h-12 cursor-pointer bg-white px-8 text-sm font-bold text-black hover:bg-red-800 hover:text-white">
-              {t("hero.primaryCta")}
-            </Button>
-            <Button className="h-12 cursor-pointer border border-white bg-transparent px-8 text-sm font-bold text-white hover:border-red-800 hover:bg-red-800 hover:text-white">
-              {t("hero.secondaryCta")}
-            </Button>
+            <Link
+                href={whatsappLink}
+                target="_blank"
+                rel="noreferrer"
+                className="h-12 cursor-pointer border border-white bg-transparent px-8 text-sm font-bold text-white hover:border-red-800 hover:bg-red-800 hover:text-white"
+              >
+                {t("hero.secondaryCta")}
+              </Link>
           </div>
         </div>
       </section>
@@ -72,11 +75,11 @@ export default async function Page() {
             <h1 className="text-[#8D0000]">{t("about.titleBrand")}</h1>
           </div>
           <div className="mt-10 flex flex-col gap-10 lg:flex-row">
-            <div className="w-full max-w-xl bg-[#8D0000] px-12 py-24">
+            <div className="w-full max-w-xl bg-[#8D0000] px-6 py-10 sm:px-12 sm:py-24">
               <iframe
-                width="420"
-                height="315"
+                title="Profil KSM Katering"
                 src="https://www.youtube.com/embed/wkzB9INsRfY?autoplay=1&mute=1&controls=0&loop=1"
+                className="aspect-video w-full"
               />
             </div>
             <div className="flex flex-col gap-6 text-center lg:ml-6 lg:text-left">
@@ -207,11 +210,11 @@ export default async function Page() {
           <p className="text-base text-white/90 sm:text-lg lg:text-xl">
             {t("contactSection.description")}
           </p>
-          <div className="flex gap-8">
-            <Button className="mt-2 h-12 bg-white px-8 text-base text-red-800 sm:text-lg">
+          <div className="flex w-full flex-col gap-4 sm:w-auto sm:flex-row sm:gap-8">
+            <Button className="mt-2 h-12 w-full bg-white px-8 text-base text-red-800 sm:w-auto sm:text-lg">
               {t("contactSection.primaryCta")}
             </Button>
-            <Button className="mt-2 h-12 border-white bg-transparent px-8 text-base text-white sm:text-lg">
+            <Button className="mt-2 h-12 w-full border-white bg-transparent px-8 text-base text-white sm:w-auto sm:text-lg">
               {t("contactSection.secondaryCta")}
             </Button>
           </div>

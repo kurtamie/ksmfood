@@ -12,14 +12,10 @@ export default async function PrasmananPage() {
   const t = await getTranslations("prasmananPage");
 
   return (
-    <main className="w-full overflow-x-clip bg-white text-[#332929]">
+    <main className="w-full overflow-x-clip">
       <section
         id="hero"
-        className="scroll-mt-24 bg-cover bg-center"
-        style={{
-          backgroundImage:
-            "linear-gradient(180deg, rgba(30,19,14,0.55), rgba(30,19,14,0.52)), url('/images/services/prasmanan/prasmanan.webp')",
-        }}
+        className="scroll-mt-24 bg-[url('/images/services/prasmanan/prasmanan.webp')] bg-cover bg-center shadow-[inset_0_0_0_2000px_rgba(63,59,59,0.48)]"
       >
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-center px-6 py-16 text-center text-white sm:py-20 lg:min-h-[560px]">
           <p className="text-3xl font-bold sm:text-4xl lg:text-6xl">

@@ -50,7 +50,11 @@ function Header() {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-black/5 bg-white/95 shadow-sm backdrop-blur-xl">
       <div className="mx-auto flex w-full max-w-5xl items-center gap-4 px-4 py-2">
-        <Link href="/" className="flex items-center" aria-label="KSM Katering">
+        <Link
+          href="/"
+          className="flex shrink-0 items-center"
+          aria-label="KSM Katering"
+        >
           <Image
             src={logo}
             alt="KSM Katering"
@@ -101,7 +105,7 @@ function Header() {
 
         <button
           type="button"
-          className="flex size-11 items-center justify-center rounded-full border border-red-100 bg-red-50 text-[#8D0000] transition hover:bg-red-100 md:hidden"
+          className="ml-auto flex size-11 items-center justify-center rounded-full border border-red-100 bg-red-50 text-[#8D0000] transition hover:bg-red-100 md:hidden"
           aria-expanded={isMenuOpen}
           aria-controls="mobile-navigation"
           aria-label={isMenuOpen ? t("closeMenu") : t("openMenu")}

@@ -24,56 +24,52 @@ function Legal() {
   const secondary = t.raw("secondary") as string[];
 
   return (
-    <div className="flex w-full flex-col items-center gap-18 px-6 py-16 sm:py-20">
-      <div className="grid grid-cols-2 gap-18 max-w-xl">
+    <div className="flex w-full max-w-6xl flex-col items-center gap-8 px-0 py-12 sm:gap-12 sm:py-20">
+      <div className="grid w-full max-w-xl grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-8">
         {legalCards.map((card) => (
           <article
             key={card.id}
-            className="flex h-full flex-col items-center border border-black/10 bg-white p-2 text-center shadow-sm transition hover:-translate-y-1 hover:shadow-md"
+            className="flex h-full flex-col items-center border border-black/10 bg-white p-4 text-center shadow-sm transition hover:-translate-y-1 hover:shadow-md sm:p-2"
           >
-            `
             <div className="flex w-full items-end justify-center">
               <Image
                 src={card.image}
                 alt={card.title}
-                className="h-auto w-full max-w-56 object-contain"
+                className="h-auto w-full max-w-48 object-contain sm:max-w-56"
               />
             </div>
             <div className="flex grow flex-col justify-center py-4">
-              <h3 className="text-2xl font-bold text-[#332929]">
+              <h3 className="text-xl font-bold text-[#332929] sm:text-2xl">
                 {primary[card.id - 1] ?? card.title}
               </h3>
             </div>
-            <div className="mt-2 mb-6 flex w-[50%] flex-col gap-2 sm:flex-row">
+            <div className="mb-4 mt-2 flex w-1/2 flex-col gap-2 sm:mb-6 sm:flex-row">
               <div className="h-1 w-full bg-[#8D0000]" />
             </div>
-            `
           </article>
         ))}
       </div>
-      <div className="grid grid-cols-3 gap-18 max-w-8xl">
+      <div className="grid w-full max-w-5xl grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-8 lg:grid-cols-3">
         {legalCards2.map((card) => (
           <article
             key={card.id}
             className="flex h-full flex-col items-center border border-black/10 bg-white p-4 text-center shadow-sm transition hover:-translate-y-1 hover:shadow-md"
           >
-            `
-            <div className="flex w-full items-end justify-center mt-4">
+            <div className="mt-4 flex w-full items-end justify-center">
               <Image
                 src={card.image}
                 alt={card.title}
-                className="h-auto w-full max-w-34 object-contain"
+                className="h-auto w-full max-w-28 object-contain sm:max-w-34"
               />
             </div>
             <div className="mt-12 flex grow flex-col justify-center py-4">
-              <h3 className="text-2xl font-bold text-[#332929]">
+              <h3 className="text-xl font-bold text-[#332929] sm:text-2xl">
                 {secondary[card.id - 1] ?? card.title}
               </h3>
             </div>
-            <div className="mt-2 mb-6 flex w-[50%] flex-col gap-2 sm:flex-row">
+            <div className="mb-4 mt-2 flex w-1/2 flex-col gap-2 sm:mb-6 sm:flex-row">
               <div className="h-1 w-full bg-[#8D0000]" />
             </div>
-            `
           </article>
         ))}
       </div>

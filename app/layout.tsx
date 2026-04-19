@@ -1,9 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { NextIntlClientProvider } from "next-intl";
-import { cookies } from "next/headers";
 import { getMessages } from "next-intl/server";
 import SiteShell from "@/components/layout/site-shell";
-import { defaultLocale, hasLocale, localeCookieName } from "@/i18n/routing";
+import { defaultLocale } from "@/i18n/routing";
 import "./globals.css";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL?.startsWith("http")
@@ -43,6 +42,8 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
   themeColor: "#8D0000",
 };
 
@@ -51,15 +52,12 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const cookieStore = await cookies();
-  const cookieLocale = cookieStore.get(localeCookieName)?.value;
-  const locale =
-    cookieLocale && hasLocale(cookieLocale) ? cookieLocale : defaultLocale;
-  const messages = await getMessages();
+  const locale = defaultLocale;
+  const messages = await getMessages({ locale });
 
   return (
-    <html lang={locale} className="h-full antialiased">
-      <body className="min-h-full flex flex-col">
+    <html lang={locale} className="h-full w-full overflow-x-clip antialiased">
+      <body className="flex min-h-full w-full flex-col overflow-x-clip">
         <NextIntlClientProvider locale={locale} messages={messages}>
           <SiteShell>{children}</SiteShell>
         </NextIntlClientProvider>
