@@ -54,13 +54,13 @@ export default async function Page() {
 
           <div className="flex w-full flex-col justify-center gap-3 sm:w-auto sm:flex-row">
             <Link
-                href={whatsappLink}
-                target="_blank"
-                rel="noreferrer"
-                className="h-12 cursor-pointer border border-white bg-transparent px-8 text-sm font-bold text-white hover:border-red-800 hover:bg-red-800 hover:text-white"
-              >
-                {t("hero.secondaryCta")}
-              </Link>
+              href={whatsappLink}
+              target="_blank"
+              rel="noreferrer"
+              className="h-12 cursor-pointer border flex items-center border-white bg-transparent px-8 text-sm font-bold text-white hover:border-red-800 hover:bg-red-800 hover:text-white"
+            >
+              {t("hero.secondaryCta")}
+            </Link>
           </div>
         </div>
       </section>
@@ -94,14 +94,14 @@ export default async function Page() {
               </p>
               <div className="flex justify-center gap-4 lg:justify-start">
                 <Link
-                  href="/#kontak"
+                  href="https://www.instagram.com/ksmcateringbatam/"
                   aria-label="Instagram KSM Katering"
                   className="rounded-full border border-[#8D0000] p-2 text-xl text-[#8D0000] transition hover:bg-[#8D0000] hover:text-white"
                 >
                   <FaInstagram />
                 </Link>
                 <Link
-                  href="/#portofolio"
+                  href="https://www.youtube.com/@ksmkateringbatam2463"
                   aria-label="YouTube KSM Katering"
                   className="rounded-full border border-[#8D0000] p-2 text-xl text-[#8D0000] transition hover:bg-[#8D0000] hover:text-white"
                 >
@@ -211,11 +211,27 @@ export default async function Page() {
             {t("contactSection.description")}
           </p>
           <div className="flex w-full flex-col gap-4 sm:w-auto sm:flex-row sm:gap-8">
-            <Button className="mt-2 h-12 w-full bg-white px-8 text-base text-red-800 sm:w-auto sm:text-lg">
-              {t("contactSection.primaryCta")}
+            <Button
+              asChild
+              className="mt-2 h-12 w-full bg-white px-8 text-base text-red-800 sm:w-auto sm:text-lg"
+            >
+              <a
+                href="https://wa.me/628111171713?text=Halo%2C%20saya%20ingin%20memesan."
+                target="_blank"
+              >
+                {t("contactSection.primaryCta")}
+              </a>
             </Button>
-            <Button className="mt-2 h-12 w-full border-white bg-transparent px-8 text-base text-white sm:w-auto sm:text-lg">
-              {t("contactSection.secondaryCta")}
+            <Button
+              asChild
+              className="mt-2 h-12 w-full border-white bg-transparent px-8 text-base text-white sm:w-auto sm:text-lg"
+            >
+              <a
+                href="https://wa.me/628111171713?text=Halo%2C%20saya%20ingin%20konsultasi%20tentang%20pemesanan."
+                target="_blank"
+              >
+                {t("contactSection.secondaryCta")}
+              </a>
             </Button>
           </div>
         </div>

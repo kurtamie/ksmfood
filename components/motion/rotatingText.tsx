@@ -234,7 +234,10 @@ const RotatingText = forwardRef<RotatingTextRef, RotatingTextProps>(
               ref={(element) => {
                 measurementRefs.current[index] = element;
               }}
-              className={cn("absolute left-0 top-0 inline-flex whitespace-pre", mainClassName)}
+              className={cn(
+                "absolute left-0 top-0 inline-flex whitespace-pre",
+                mainClassName,
+              )}
             >
               {text}
             </span>

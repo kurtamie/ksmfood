@@ -9,6 +9,7 @@ import rendang from "@/public/images/menu/rendang.webp";
 import snackbox from "@/public/images/menu/snack-kotak.webp";
 import snacktam from "@/public/images/menu/snack-tampah.webp";
 import tumpeng from "@/public/images/menu/tumpeng.webp";
+import korporat from "@/public/images/menu/korporat.webp";
 
 const packageCards = [
   {
@@ -17,6 +18,7 @@ const packageCards = [
     title: "Prasmanan Pernikahan",
     price: "Mulai dari Rp:32.000/porsi",
     catalog: "/images/pdf/wedding.pdf",
+    url: "/services/wedding",
   },
   {
     id: 2,
@@ -24,6 +26,7 @@ const packageCards = [
     title: "Prasmanan",
     price: "Mulai dari Rp:32.000/porsi",
     catalog: "/images/pdf/prasmanan.pdf",
+    url: "/services/prasmanan",
   },
   {
     id: 3,
@@ -31,6 +34,7 @@ const packageCards = [
     title: "Nasi Kotak",
     price: "Mulai dari Rp:25.000/kotak",
     catalog: "/images/pdf/naskot.pdf",
+    url: "/services/nasi-kotak",
   },
   {
     id: 4,
@@ -38,6 +42,7 @@ const packageCards = [
     title: "Bento",
     price: "Mulai dari Rp:56.000/kotak",
     catalog: "/images/pdf/bento.pdf",
+    url: "/services/bento",
   },
   {
     id: 5,
@@ -45,6 +50,7 @@ const packageCards = [
     title: "Rendang Kemasan",
     price: "Mulai dari Rp:80.000/kemasan",
     catalog: "/images/pdf/aqiqah.pdf",
+    url: "/services/rendang-kemasan",
   },
   {
     id: 6,
@@ -52,19 +58,28 @@ const packageCards = [
     title: "Snack Kotak",
     price: "Mulai dari Rp:13.000",
     catalog: "/images/pdf/snackkot.pdf",
+    url: "/services/snack-kotak",
   },
-  { id: 7, image: snacktam, title: "Aqiqah", price: "Harga Disesuaikan" },
+  {
+    id: 7,
+    image: snacktam,
+    title: "Aqiqah",
+    price: "Harga Disesuaikan",
+    route: "/services/aqiqah",
+  },
   {
     id: 8,
     image: tumpeng,
-    title: "Coffee Break",
+    title: "Tumpeng",
     price: "Mulai dari Rp:700.000",
+    url: "/services/tumpeng",
   },
   {
     id: 9,
-    image: tumpeng,
+    image: korporat,
     title: "Katering Korporat",
     price: "Harga Disesuaikan",
+    url: "/services/korporat",
   },
 ];
 
@@ -105,8 +120,11 @@ function Menu() {
               </p>
             </div>
             <div className="mt-2 flex w-full flex-col gap-2 sm:flex-row">
-              <Button className="h-10 flex-1 bg-red-800 text-white hover:bg-red-900 cursor-pointer">
-                {t("viewPackage")}
+              <Button
+                asChild
+                className="h-10 flex-1 bg-red-800 text-white hover:bg-red-900 cursor-pointer"
+              >
+                <a href={card.url}>{t("viewPackage")}</a>
               </Button>
               {card.catalog && (
                 <Button

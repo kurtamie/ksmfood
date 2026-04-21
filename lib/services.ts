@@ -23,7 +23,7 @@ export const services = [
   {
     slug: "prasmanan-pernikahan",
     label: "Prasmanan Pernikahan",
-    href: "/services/prasmanan-pernikahan",
+    href: "/services/wedding",
     description:
       "Sajian prasmanan lengkap untuk acara keluarga, gathering, dan kebutuhan katering skala besar.",
   },

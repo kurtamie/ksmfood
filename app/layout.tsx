@@ -15,6 +15,11 @@ export const metadata: Metadata = {
     default: "KSM Katering",
     template: "%s | KSM Katering",
   },
+  icons: {
+    icon: [{ url: "/pt-ksm-logo.png", type: "image/png", sizes: "512x512" }],
+    shortcut: [{ url: "/pt-ksm-logo.png", type: "image/png" }],
+    apple: [{ url: "/pt-ksm-logo.png", type: "image/png", sizes: "512x512" }],
+  },
   description:
     "KSM Katering menyediakan layanan katering untuk pernikahan, aqiqah, prasmanan, snack box, dan acara perusahaan dengan sajian rapi dan profesional.",
   applicationName: "KSM Katering",

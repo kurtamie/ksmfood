@@ -171,7 +171,7 @@ const messages = {
       },
       { id: 6, title: "Snack Box", price: "Starting from Rp:13.000" },
       { id: 7, title: "Aqiqah", price: "Flexible pricing" },
-      { id: 8, title: "Coffee Break", price: "Starting from Rp:700.000" },
+      { id: 8, title: "Tumpeng", price: "Starting from Rp:700.000" },
       { id: 9, title: "Corporate Catering", price: "Flexible pricing" },
     ],
   },
@@ -448,6 +448,82 @@ const messages = {
     consultLink:
       "https://wa.me/628111171713?text=Hello%2C%20I%20want%20to%20consult%20about%20buffet%20catering.",
   },
+  weddingPage: {
+    hero: {
+      eyebrow: "Wedding Catering",
+      title: "Harmoni dalam pelayanan dan sajian yang terbaik",
+      cta: "Unduh Menu Prasmanan Pernikahan",
+      cta2: "Unduh Menu Katering Pondokan",
+    },
+    about: {
+      titleLead: "Layanan Terbaik, ",
+      titleAccent: "dari yang Terbaik",
+      paragraph1:
+        "Nikmati layanan penuh dari KSM Katering untuk acara pernikahan Anda. Kami menyediakan layanan prasmanan dengan beragam pilihan menu yang nikmat, serta didukung oleh tim pelayan yang siap melayani tamu undangan Anda dengan sigap.",
+    },
+    packages: {
+      titleLead: "Paket",
+      titleBrand: "Prasmanan Pernikahan",
+    },
+    orderingInfo: {
+      titleLead: "Informasi",
+      titleAccent: "Pemesanan",
+      deliveryTitle: "Gratis Pengiriman",
+      deliveryDescription: "Tersedia",
+      equipmentTitle: "Peralatan Prasmanan Tersedia",
+      equipmentDescription: "Untuk pelayanan stan dan kebersihan",
+      serviceTitle: "Layanan Pramusaji",
+      serviceDescription: "Minimal pemesanan 100 porsi",
+      toolsTitle: "Peralatan Makan",
+      toolsDescription: "Disediakan lengkap dan bersih",
+      minimumTitle: "Minimum Order",
+      minimumDescription: "150 Porsi",
+    },
+    menuSection: {
+      titleLead: "Pilihan",
+      titleBrand: "Menu",
+    },
+  },
+  weddingMenu: {
+    popular: "Paling Populer",
+  },
+  weddingMenuServices: {
+    mainTitle: "Lauk Utama",
+    sideTitle: "Pendamping",
+  },
+  weddingStand: {
+    mainTitle: "Katering Pondokan",
+    cards: [
+      {
+        id: 1,
+        title: "Batagor",
+      },
+      { id: 2, title: "Pempek Palembang" },
+      { id: 3, title: "Siomay" },
+      { id: 4, title: "Bakso" },
+      {
+        id: 5,
+        title: "Soto",
+      },
+      { id: 6, title: "Sate Ayam + Lontong" },
+      { id: 7, title: "Dimsum" },
+      { id: 8, title: "Surabi" },
+      { id: 9, title: "Ketan Srikaya" },
+      { id: 10, title: "Ketan Durian" },
+      { id: 11, title: "Bubur Sumsum" },
+      { id: 12, title: "Salad Buah" },
+      { id: 13, title: "Bubur Candil" },
+    ],
+  },
+  weddingCta: {
+    title: "Sajian Terbaik untuk Hari Istimewa Anda",
+    description:
+      "Nikmati layanan prasmanan lengkap dengan cita rasa istimewa dan tim profesional yang siap melayani setiap detail acara Anda.",
+    orderLink:
+      "https://wa.me/628111171713?text=Halo%2C%20saya%20ingin%20pesan%prasmanan%20pernikahan.",
+    consultLink:
+      "https://wa.me/628111171713?text=Halo%2C%20saya%20ingin%20konsultasi%20prasmanan%20pernikahan.",
+  },
   serviceDetail: {
     eyebrow: "KSM Katering Services",
     primaryCta: "Contact Us",
@@ -490,6 +566,32 @@ const messages = {
       title: "Reach the KSM Katering team",
       description:
         "This page is prepared to help prospective customers contact the KSM Katering team for consultation and ordering.",
+    },
+  },
+  aboutKsmPage: {
+    hero: {
+      eyebrow: "About KSM Katering",
+      title:
+        "Established in 2007, KSM Katering is a halal catering company committed to delivering excellent service and food quality. With a high-standard hygienic kitchen and production capacity of up to 8,000 portions per day, supported by modern equipment, we are also trusted to serve Garuda Indonesia airline catering in Batam.",
+    },
+    vision: {
+      titleLead: "Vision & Mission",
+      visionTitle: "Vision",
+      visionDescription:
+        "To become a quality catering company for events, industry, private institutions, and government institutions throughout Indonesia.",
+      missionTitle: "Mission",
+      missionDescription:
+        "To implement Good Production Practices (GPP) in achieving customer satisfaction.",
+    },
+    strategy: {
+      titleLead: "Strategy",
+      subtitle: "Improving customer satisfaction through:",
+      items: [
+        "Building and improving systems to ensure product and service quality stays aligned with established standards.",
+        "Improving service by maintaining the quality of the products and services provided.",
+        "Developing human resources.",
+        "Creating a conducive, harmonious, and humane work environment.",
+      ],
     },
   },
 } as const;

@@ -51,7 +51,7 @@ export default async function RiceboxPage() {
             <div className="w-full">
               <iframe
                 className="aspect-video w-full rounded-2xl"
-                src="https://www.youtube.com/embed/wkzB9INsRfY?autoplay=1&mute=1&controls=0&loop=1"
+                src="https://www.youtube.com/embed/s0bO6VngMck?autoplay=1&mute=1&controls=0&loop=1"
               ></iframe>
             </div>
             <div className="flex flex-col gap-4 text-center lg:ml-6 lg:gap-6 lg:text-left">

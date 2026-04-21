@@ -171,7 +171,7 @@ const messages = {
       },
       { id: 6, title: "Snack Kotak", price: "Mulai dari Rp:13.000" },
       { id: 7, title: "Aqiqah", price: "Harga disasuaikan" },
-      { id: 8, title: "Coffee Break", price: "Mulai dari Rp:700.000" },
+      { id: 8, title: "Tumpeng", price: "Mulai dari Rp:700.000" },
       { id: 9, title: "Katering Korporat", price: "Harga disasuaikan" },
     ],
   },
@@ -487,6 +487,32 @@ const messages = {
       title: "Hubungi tim KSM Katering",
       description:
         "Halaman ko disiapkan untuak mamuadahkan calon palanggan manghubungi tim KSM Katering untuak konsultasi jo pasanan.",
+    },
+  },
+  aboutKsmPage: {
+    hero: {
+      eyebrow: "Tentang KSM Katering",
+      title:
+        "Berdiri dari tahun 2007, KSM Katering adolah katering halal nan bardedikasi dalam mambarikan pelayanan jo kualitas makanan terbaik. Jo fasilitas dapur barstandar kabersihan tinggi jo kapasitas produksi sampai 8.000 porsi saban hari, didukung alat nan canggih jo modern, kami juo diparcayo malayani katering maskapai Garuda Indonesia di Batam.",
+    },
+    vision: {
+      titleLead: "Visi & Misi",
+      visionTitle: "Visi",
+      visionDescription:
+        "Manjadi perusahaan jasa boga bakualitas untuak acara, industri, instansi swasta, jo pamarintahan di saluruah Indonesia.",
+      missionTitle: "Misi",
+      missionDescription:
+        "Manarapkan Cara Produksi nan Baik untuak mancapaian kapuasan palanggan.",
+    },
+    strategy: {
+      titleLead: "Strategi",
+      subtitle: "Meningkekkan kapuasan palanggan malalui:",
+      items: [
+        "Mambangun jo mamperbaiki sistem untuak manjamin kualitas produk jo layanan tatap tajago sasuai standar nan ditatapkan.",
+        "Meningkekkan pelayanan jo manjago kualitas produk jo layanan nan dibarikan.",
+        "Mangambangkan sumber daya manusia.",
+        "Manciptakan lingkungan karajo nan kondusif, harmonis, jo manusiawi.",
+      ],
     },
   },
 } as const;

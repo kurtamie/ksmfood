@@ -1,4 +1,4 @@
-export const locales = ["id", "en", "min"] as const;
+export const locales = ["id", "en"] as const;
 export const defaultLocale = "id" as const;
 export const localeCookieName = "NEXT_LOCALE";
 

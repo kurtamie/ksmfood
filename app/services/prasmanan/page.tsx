@@ -6,7 +6,6 @@ import MenuServices from "@/components/landing/services/prasmanan/menuServices";
 import Cta from "@/components/landing/services/prasmanan/cta";
 import SectionRoutes from "@/components/landing/services/prasmanan/sectionRoutes";
 import OrderingInfo from "@/components/landing/services/prasmanan/orderingInfo";
-import prasmananImage from "@/public/images/services/prasmanan/prasmanan.webp";
 
 export default async function PrasmananPage() {
   const t = await getTranslations("prasmananPage");
@@ -17,7 +16,7 @@ export default async function PrasmananPage() {
         id="hero"
         className="scroll-mt-24 bg-[url('/images/services/prasmanan/prasmanan.webp')] bg-cover bg-center shadow-[inset_0_0_0_2000px_rgba(63,59,59,0.48)]"
       >
-        <div className="mx-auto flex max-w-7xl flex-col items-center justify-center px-6 py-16 text-center text-white sm:py-20 lg:min-h-[560px]">
+        <div className="mx-auto flex max-w-7xl flex-col items-center justify-center px-6 py-16 text-center text-white sm:py-20 lg:min-h-140">
           <p className="text-3xl font-bold sm:text-4xl lg:text-6xl">
             {t("hero.eyebrow")}
           </p>
@@ -39,32 +38,29 @@ export default async function PrasmananPage() {
 
       <section
         id="tentang"
-        className="scroll-mt-20 flex items-center justify-center bg-white px-4 py-16 sm:px-6 lg:py-20"
+        className="scroll-mt-24 flex items-center justify-center bg-white py-12"
       >
-        <div className="grid w-full max-w-7xl items-center gap-8 lg:grid-cols-[1.02fr_1fr] lg:gap-12">
-          <div className="relative overflow-hidden rounded-[26px] shadow-[0_28px_70px_-34px_rgba(29,28,30,0.35)]">
-            <div className="relative aspect-[16/10]">
-              <Image
-                src={prasmananImage}
-                alt="Pilihan hidangan prasmanan KSM Katering"
-                fill
-                sizes="(max-width: 1024px) 100vw, 50vw"
-                className="object-cover"
-              />
+        <div className="flex w-full max-w-7xl flex-col items-center gap-10 px-4 sm:px-6 lg:gap-10">
+          <div className="mt-6 flex flex-col gap-6 lg:mt-10 lg:flex-row">
+            <div className="w-full">
+              <iframe
+                className="aspect-video w-full rounded-2xl"
+                src="https://www.youtube.com/embed/mNaMK0c8C9w?autoplay=1&mute=1&controls=0&loop=1"
+              ></iframe>
             </div>
-          </div>
-
-          <div className="text-center lg:text-left">
-            <h2 className="text-3xl font-bold leading-tight text-[#332929] sm:text-4xl lg:text-[3rem]">
-              {t("about.titleLead")}{" "}
-              <span className="text-[#8D0000]">{t("about.titleAccent")}</span>
-            </h2>
-            <p className="mt-6 text-base leading-8 text-[#4C4040] sm:text-lg">
-              {t("about.paragraph1")}
-            </p>
-            <p className="mt-5 text-base leading-8 text-[#4C4040] sm:text-lg">
-              {t("about.paragraph2")}
-            </p>
+            <div className="flex flex-col gap-4 text-center lg:ml-6 lg:gap-6 lg:text-left">
+              <h2 className="text-2xl font-bold leading-snug text-black sm:text-3xl">
+                <span className="text-red-800">{t("about.titleLead")} </span>
+                {t("about.titleAccent")}
+                <br />
+              </h2>
+              <p className="text-sm leading-7 text-black sm:text-lg sm:leading-8">
+                {t("about.paragraph1")}
+              </p>
+              <p className="text-sm leading-7 text-black sm:text-lg sm:leading-8">
+                {t("about.paragraph2")}
+              </p>
+            </div>
           </div>
         </div>
       </section>
@@ -137,11 +133,9 @@ export default async function PrasmananPage() {
 
       <section
         id="hubungi-kami"
-        className="mt-6 mb-10 flex items-center justify-center px-4 scroll-mt-20 sm:px-8"
+        className="mt-12 mb-8 flex items-center justify-center px-4 sm:px-8 scroll-mt-24"
       >
-        <div className="w-full max-w-7xl">
-          <Cta />
-        </div>
+        <Cta />
       </section>
     </main>
   );

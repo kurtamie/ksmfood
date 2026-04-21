@@ -80,7 +80,7 @@
 
 :root {
   --font-montserrat: "Montserrat", "Segoe UI", Arial, Helvetica, sans-serif;
-  --header-height: 5rem;
+  --header-height: 72px;
   --primary-50: #fdf2f2;
   --primary-100: #fde5e5;
   --primary-200: #fbcaca;
@@ -143,6 +143,12 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+}
+
+@media (min-width: 640px) {
+  :root {
+    --header-height: 80px;
+  }
 }
 
 .dark {

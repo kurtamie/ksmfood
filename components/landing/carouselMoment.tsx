@@ -7,12 +7,12 @@ import { Button } from "@/components/ui/button";
 import pattern from "@/public/images/patternred.webp";
 
 const IMAGES = [
-  { src: "/images/prasmanan.webp", alt: "Momen KSM 1" },
-  { src: "/images/opor-ayam.webp", alt: "Momen KSM 2" },
-  { src: "/images/bg-hero.webp", alt: "Momen KSM 3" },
-  { src: "/images/about.webp", alt: "Momen KSM 4" },
-  { src: "/images/prasmanan.webp", alt: "Momen KSM 5" },
-  { src: "/images/selectMenu.webp", alt: "Momen KSM 6" },
+  { src: "/images/gallery/event/galeri-event6.webp", alt: "Momen KSM 1" },
+  { src: "/images/gallery/event/galeri-event8.webp", alt: "Momen KSM 2" },
+  { src: "/images/gallery/event/galeri-event3.webp", alt: "Momen KSM 3" },
+  { src: "/images/gallery/event/galeri-event4.webp", alt: "Momen KSM 4" },
+  { src: "/images/gallery/event/galeri-event3.webp", alt: "Momen KSM 5" },
+  { src: "/images/gallery/event/galeri-event1.webp", alt: "Momen KSM 6" },
 ];
 
 const SLIDE_WIDTH = 280;
@@ -101,10 +101,11 @@ export default function CarouselMoment() {
             {t("title")}
           </h2>
           <Button
+            asChild
             variant="outline"
             className="mt-8 h-12 border-white bg-transparent px-8 text-base font-bold text-white  hover:bg-white hover:text-[#8D0000] sm:mt-10 sm:text-lg lg:mt-14"
           >
-            {t("cta")}
+            <a href="/gallery/event">{t("cta")}</a>
           </Button>
         </div>
 

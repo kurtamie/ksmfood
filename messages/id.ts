@@ -171,7 +171,7 @@ const messages = {
       },
       { id: 6, title: "Snack Kotak", price: "Mulai dari Rp:13.000" },
       { id: 7, title: "Aqiqah", price: "Harga disesuaikan" },
-      { id: 8, title: "Coffee Break", price: "Mulai dari Rp:700.000" },
+      { id: 8, title: "Tumpeng", price: "Mulai dari Rp:700.000" },
       { id: 9, title: "Katering Korporat", price: "Harga disesuaikan" },
     ],
   },
@@ -445,6 +445,82 @@ const messages = {
     consultLink:
       "https://wa.me/628111171713?text=Halo%2C%20saya%20ingin%20konsultasi%20prasmanan.",
   },
+  weddingPage: {
+    hero: {
+      eyebrow: "Prasmanan Pernikahan",
+      title: "Harmoni dalam pelayanan dan sajian yang terbaik",
+      cta: "Unduh Menu Prasmanan Pernikahan",
+      cta2: "Unduh Menu Katering Pondokan",
+    },
+    about: {
+      titleLead: "Layanan Terbaik, ",
+      titleAccent: "dari yang Terbaik",
+      paragraph1:
+        "Nikmati layanan penuh dari KSM Katering untuk acara pernikahan Anda. Kami menyediakan layanan prasmanan dengan beragam pilihan menu yang nikmat, serta didukung oleh tim pelayan yang siap melayani tamu undangan Anda dengan sigap.",
+    },
+    packages: {
+      titleLead: "Paket",
+      titleBrand: "Prasmanan Pernikahan",
+    },
+    orderingInfo: {
+      titleLead: "Informasi",
+      titleAccent: "Pemesanan",
+      deliveryTitle: "Gratis Pengiriman",
+      deliveryDescription: "Tersedia",
+      equipmentTitle: "Peralatan Prasmanan Tersedia",
+      equipmentDescription: "Untuk pelayanan stan dan kebersihan",
+      serviceTitle: "Layanan Pramusaji",
+      serviceDescription: "Minimal pemesanan 100 porsi",
+      toolsTitle: "Peralatan Makan",
+      toolsDescription: "Disediakan lengkap dan bersih",
+      minimumTitle: "Minimum Order",
+      minimumDescription: "150 Porsi",
+    },
+    menuSection: {
+      titleLead: "Pilihan",
+      titleBrand: "Menu",
+    },
+  },
+  weddingMenu: {
+    popular: "Paling Populer",
+  },
+  weddingMenuServices: {
+    mainTitle: "Lauk Utama",
+    sideTitle: "Pendamping",
+  },
+  weddingStand: {
+    mainTitle: "Katering Pondokan",
+    cards: [
+      {
+        id: 1,
+        title: "Batagor",
+      },
+      { id: 2, title: "Pempek Palembang" },
+      { id: 3, title: "Siomay" },
+      { id: 4, title: "Bakso" },
+      {
+        id: 5,
+        title: "Soto",
+      },
+      { id: 6, title: "Sate Ayam + Lontong" },
+      { id: 7, title: "Dimsum" },
+      { id: 8, title: "Surabi" },
+      { id: 9, title: "Ketan Srikaya" },
+      { id: 10, title: "Ketan Durian" },
+      { id: 11, title: "Bubur Sumsum" },
+      { id: 12, title: "Salad Buah" },
+      { id: 13, title: "Bubur Candil" },
+    ],
+  },
+  weddingCta: {
+    title: "Sajian Terbaik untuk Hari Istimewa Anda",
+    description:
+      "Nikmati layanan prasmanan lengkap dengan cita rasa istimewa dan tim profesional yang siap melayani setiap detail acara Anda.",
+    orderLink:
+      "https://wa.me/628111171713?text=Halo%2C%20saya%20ingin%20pesan%prasmanan%20pernikahan.",
+    consultLink:
+      "https://wa.me/628111171713?text=Halo%2C%20saya%20ingin%20konsultasi%20prasmanan%20pernikahan.",
+  },
   serviceDetail: {
     eyebrow: "Layanan KSM Katering",
     primaryCta: "Hubungi Kami",
@@ -475,13 +551,40 @@ const messages = {
         "Halaman ini disiapkan untuk menampilkan video promosi, dokumentasi acara, dan konten visual KSM Katering.",
     },
   },
-  aboutPages: {
-    ksm: {
-      eyebrow: "Tentang KSM",
-      title: "Profil singkat KSM Katering",
-      description:
-        "Halaman ini disiapkan untuk menampilkan profil perusahaan, sejarah, dan nilai utama KSM Katering secara lebih lengkap.",
+  aboutKsmPage: {
+    hero: {
+      eyebrow: "Tentang KSM Katering",
+      title:
+        "Berdiri sejak 2007, KSM Katering merupakan katering halal yang berdedikasi dalam memberikan pelayanan dan kualitas makanan terbaik. Dengan fasilitas dapur berstandar kebersihan tinggi dan kapasitas produksi hingga 8.000 porsi per hari, didukung oleh peralatan canggih dan modern, kami juga dipercaya untuk melayani katering maskapai Garuda Indonesia di Batam.",
     },
+    vision: {
+      titleLead: "Visi & Misi",
+      visionTitle: "Visi",
+      visionDescription:
+        "Menjadi perusahaan jasa boga berkualitas untuk acara, industri, instansi swasta, dan pemerintahan di seluruh Indonesia.",
+      missionTitle: "Misi",
+      missionDescription:
+        "Menerapkan Cara Produksi yang Baik (CPB) dalam mencapai kepuasan pelanggan.",
+    },
+    strategy: {
+      titleLead: "Strategi",
+      subtitle: "Meningkatkan kepuasan pelanggan melalui:",
+      items: [
+        "Membangun dan memperbaiki sistem untuk menjamin kualitas produk dan layanan tetap terjaga sesuai standar yang ditetapkan.",
+        "Meningkatkan pelayanan dengan menjaga kualitas produk dan layanan yang diberikan.",
+        "Mengembangkan sumber daya manusia.",
+        "Menciptakan lingkungan kerja yang kondusif, harmonis, dan manusiawi.",
+      ],
+    },
+    contactSection: {
+      title: "Siap Menyediakan Katering untuk Acara Anda",
+      description:
+        "Diskusikan kebutuhan acara Anda bersama kami dan dapatkan solusi katering yang sesuai.",
+      primaryCta: "Mulai Pesan",
+      secondaryCta: "Konsultasi Sekarang",
+    },
+  },
+  aboutPages: {
     contact: {
       eyebrow: "Kontak KSM",
       title: "Hubungi tim KSM Katering",

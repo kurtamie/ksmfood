@@ -40,7 +40,7 @@ export default function OrderingInfo() {
         const Icon = item.icon;
 
         return (
-          <article key={item.titleKey} className="flex items-start gap-4">
+          <article key={item.titleKey} className="flex items-center gap-4">
             <div className="rounded-2xl bg-white/60 p-3 text-[#6F0000] shadow-sm ring-1 ring-[#6F0000]/10">
               <Icon className="size-6" />
             </div>

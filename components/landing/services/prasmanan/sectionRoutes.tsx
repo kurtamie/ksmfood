@@ -11,7 +11,7 @@ export default function SectionRoutes() {
   }>;
 
   return (
-    <section className="sticky top-0 z-30 border-b border-black/5 bg-white/95 px-4 py-3 backdrop-blur md:hidden">
+    <section className="sticky top-(--header-height) z-30 border-b border-black/5 bg-white/95 px-4 py-3 backdrop-blur md:hidden">
       <div className="mx-auto flex max-w-7xl gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {sectionLinks.map((link) => (
           <Link

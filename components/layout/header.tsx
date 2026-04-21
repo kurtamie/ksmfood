@@ -48,8 +48,8 @@ function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-black/5 bg-white/95 shadow-sm backdrop-blur-xl">
-      <div className="mx-auto flex w-full max-w-5xl items-center gap-4 px-4 py-2">
+    <header className="fixed inset-x-0 top-0 z-60 w-full border-b border-black/5 bg-white/95 shadow-sm backdrop-blur-xl">
+      <div className="mx-auto flex min-h-(--header-height) w-full max-w-5xl items-center gap-4 px-4 py-2">
         <Link
           href="/"
           className="flex shrink-0 items-center"
@@ -138,7 +138,7 @@ function Header() {
           className={`absolute inset-x-0 top-full bg-black/20 transition-opacity duration-300 ${
             isMenuOpen ? "opacity-100" : "opacity-0"
           }`}
-          style={{ height: "calc(100dvh - 72px)" }}
+          style={{ height: "calc(100dvh - var(--header-height))" }}
           onClick={closeMenu}
         />
         <div
@@ -204,8 +204,16 @@ function Header() {
               />
             </div>
 
-            <Button className="mt-4 h-12 rounded-2xl bg-[#8D0000] text-base">
-              {commonT("orderNow")}
+            <Button
+              asChild
+              className="mt-4 h-12 rounded-2xl bg-[#8D0000] text-base"
+            >
+              <a
+                href="https://wa.me/628111171713?text=Halo%2C%20saya%20ingin%20memesan."
+                target="_blank"
+              >
+                {commonT("orderNow")}
+              </a>
             </Button>
           </nav>
         </div>

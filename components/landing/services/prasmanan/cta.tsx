@@ -15,7 +15,7 @@ export default function Cta() {
   return (
     <div className="w-full overflow-hidden rounded-[28px] bg-[#A40000] text-white shadow-[0_28px_60px_-30px_rgba(111,0,0,0.65)]">
       <div className="flex flex-col lg:flex-row lg:items-center">
-        <div className="relative h-52 w-full overflow-hidden rounded-b-[40px] rounded-r-[40px] lg:h-[210px] lg:w-[390px] lg:shrink-0 lg:rounded-b-[999px] lg:rounded-r-[999px]">
+        <div className="relative h-52 w-full overflow-hidden rounded-b-[40px] rounded-r-[40px] lg:h-52.5 lg:w-97.5 lg:shrink-0 lg:rounded-b-[999px] lg:rounded-r-[999px]">
           <Image
             src={prasmananImage}
             alt="Hidangan prasmanan KSM Katering"

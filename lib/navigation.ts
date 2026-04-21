@@ -2,7 +2,7 @@ export const galleryNavItems = [
   {
     key: "event",
     labelKey: "event",
-    href: "/gallery/acara",
+    href: "/gallery/event",
   },
   {
     key: "menu",

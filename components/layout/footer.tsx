@@ -24,9 +24,9 @@ const Footer = () => {
           <div className="space-y-5 lg:col-span-1">
             <h2 className="text-lg font-bold leading-tight">{t("company")}</h2>
 
-            <div className="w-fit rounded-lg bg-[#c0392b] p-3">
+            <div className="w-fit">
               <Image
-                src="/ksm-logo.svg"
+                src="/pt-ksm-logo.png"
                 alt="KSM Logo"
                 width={80}
                 height={80}
