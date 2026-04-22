@@ -4,7 +4,7 @@ import { useTranslations } from "next-intl";
 import { FaWhatsapp } from "react-icons/fa";
 import { LuMessagesSquare } from "react-icons/lu";
 import { Button } from "@/components/ui/button";
-import riceBoxImage from "@/public/images/services/riceBox/naskot.webp";
+import aqiqImage from "@/public/images/services/aqiqah/aqiq.webp";
 
 function Cta() {
   const t = useTranslations("aqiqahCta");
@@ -13,9 +13,9 @@ function Cta() {
   return (
     <div className="w-full overflow-hidden rounded-[24px] bg-[#8D0000] text-white shadow-lg sm:rounded-[28px]">
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
-        <div className="relative h-48 w-full overflow-hidden rounded-b-[32px] rounded-r-[32px] sm:h-56 sm:rounded-b-[48px] sm:rounded-r-[48px] lg:h-[160px] lg:w-[360px] lg:shrink-0 lg:rounded-b-[999px] lg:rounded-r-[999px]">
+        <div className="relative h-48 w-full overflow-hidden rounded-b-[32px] rounded-r-[32px] sm:h-56 sm:rounded-b-[48px] sm:rounded-r-[48px] lg:h-40 lg:w-90 lg:shrink-0 lg:rounded-b-[999px] lg:rounded-r-[999px]">
           <Image
-            src={riceBoxImage}
+            src={aqiqImage}
             alt="Nasi kotak KSM Katering"
             fill
             sizes="(max-width: 1024px) 100vw, 360px"

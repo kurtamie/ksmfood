@@ -117,11 +117,11 @@ const messages = {
       titleLead: "About",
       titleBrand: "KSM Katering",
       paragraph1:
-        "KSM Katering has served since 2007 as a halal catering provider that delivers tasty, healthy, and hygienic meals. We support companies, hospitals, schools, government institutions, ministries, banks, and airlines in Batam.",
+        "KSM Catering is a halal catering service provider in Batam since 2007, with experience serving various clients and high-scale events with a capacity of up to 8000 portions/day.",
       paragraph2:
-        "We also serve many kinds of events such as weddings, meetings, hajj support, and other occasions.",
+        "We continuously improve our services to always present classy dishes, special taste, elegant appearance and maintained hygienic standards to perfect every moment of your event.",
       paragraph3:
-        "With more than 17 years of experience, KSM Katering is ready to be the right catering solution for your events.",
+        "With over 19 years of experience, we have served various catering needs ranging from Weddings, Government & Ministry Events, Banks, Hospitals, and large companies in Batam.",
       cta: "See More",
     },
     servicesSection: {
@@ -221,24 +221,25 @@ const messages = {
         id: "minimal",
         question: "What is the minimum catering order?",
         answer:
-          "Our minimum catering order is 20 portions for each event type.",
+          "The minimum order is 50 portions. For buffets, the minimum is 100 portions; for food stalls at wedding buffets, the minimum is 150 portions; and for bento, the minimum is 25 boxes.",
       },
       {
         id: "support",
-        question: "How can I reach customer service?",
+        question: "Can the menu be customized to the event's needs?",
         answer:
-          "You can contact us by email, live chat, or phone. We respond within 24 hours on working days.",
+          "You can choose a menu according to the options available on our website. If you have special requirements, please click the “Consult Now” button and fill out the provided form. Our team will contact you shortly.",
       },
       {
         id: "price",
-        question: "Do prices include equipment and service?",
-        answer: "Yes, our quoted prices already include equipment and service.",
+        question: "Does the price include equipment and service?",
+        answer:
+          "For buffet services, the price includes buffet equipment, cutlery, and waiter service.",
       },
       {
         id: "order",
         question: "How do I place an order?",
         answer:
-          "You can place an order by email, live chat, or phone. We respond within 24 hours on working days.",
+          "You can place an order by contacting our team via the “Order Now” button.",
       },
     ],
     title: "Still Have Questions?",
@@ -523,6 +524,47 @@ const messages = {
       "https://wa.me/628111171713?text=Halo%2C%20saya%20ingin%20pesan%prasmanan%20pernikahan.",
     consultLink:
       "https://wa.me/628111171713?text=Halo%2C%20saya%20ingin%20konsultasi%20prasmanan%20pernikahan.",
+  },
+  weddingFaq: {
+    items: [
+      {
+        id: "service",
+        question: "Does KSM provide full-service weddings?",
+        answer:
+          "Yes. KSM offers full-service weddings with a team size tailored to the scale of the event. For events with large guest numbers, we deploy a complete and structured team to ensure optimal operation. Each team consists of stall staff, food handlers, food distribution runners, fruit handlers, and a cleaning team who work in a coordinated manner. With this system, the entire catering process is well-managed, so you can enjoy your wedding without having to worry about the details on the ground.",
+      },
+      {
+        id: "family",
+        question:
+          "Does the family need to be involved in managing the catering during the event?",
+        answer:
+          "No. The entire catering process—from serving and refilling food to cleaning the area—is handled entirely by the KSM team. You and your family can focus on enjoying the moment without distractions.",
+      },
+      {
+        id: "empty",
+        question: "What if the food runs out during the event?",
+        answer:
+          "You don't have to worry about running out of dishes at a crucial moment. KSM keeps a dedicated kitchen team and ingredients on standby throughout the event as a precaution. If there's a surge in guests or additional needs, dishes can be processed and delivered to the event location quickly. This system ensures the event runs smoothly, allowing you to enjoy your event with peace of mind.",
+      },
+      {
+        id: "wash",
+        question: "Does KSM wash tableware on-site?",
+        answer:
+          "No. To maintain efficiency and cleanliness of the event area, all tableware is not washed on-site. We prepare the number of utensils according to the total number of guests, ensuring smooth service without disrupting the event.",
+      },
+      {
+        id: "total",
+        question: "Is there enough tableware for all guests?",
+        answer:
+          "Yes. KSM provides plates, spoons, and forks according to the number of guests ordered. This ensures each guest has a comfortable dining experience without having to wait for their turn.",
+      },
+      {
+        id: "price",
+        question: "Does the price include buffet equipment?",
+        answer:
+          "Yes. The entire package includes buffet equipment such as buffet tables, chafing dishes, and other supporting equipment. You don't need to provide additional equipment—we have everything completely and professionally prepared.",
+      },
+    ],
   },
   serviceDetail: {
     eyebrow: "KSM Katering Services",

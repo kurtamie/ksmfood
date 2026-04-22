@@ -19,7 +19,7 @@ const reasons = [
     icon: <FaHistory />,
     title: "Berpengalaman",
     description:
-      "KSM memiliki pengalaman 17 tahun dalam melayani berbagai jenis acara (pernikahan, acara peresmian, serah terima jabatan) dan puluhan tahun melayani kebutuhan kantin perusahaan industri yang ada di Batam.",
+      "KSM memiliki pengalaman 19 tahun dalam melayani berbagai jenis acara (pernikahan, acara peresmian, serah terima jabatan) dan puluhan tahun melayani kebutuhan kantin perusahaan industri yang ada di Batam.",
   },
   {
     id: 3,

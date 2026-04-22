@@ -1,10 +1,10 @@
 export const services = [
   {
-    slug: "aqiqah",
-    label: "Aqiqah",
-    href: "/services/aqiqah",
+    slug: "prasmanan-pernikahan",
+    label: "Prasmanan Pernikahan",
+    href: "/services/wedding",
     description:
-      "Layanan aqiqah praktis dengan menu yang terjaga kualitas rasa, kebersihan, dan kehalalannya.",
+      "Sajian prasmanan lengkap untuk acara keluarga, gathering, dan kebutuhan katering skala besar.",
   },
   {
     slug: "nasi-kotak",
@@ -21,11 +21,11 @@ export const services = [
       "Sajian prasmanan lengkap untuk acara keluarga, gathering, dan kebutuhan katering skala besar.",
   },
   {
-    slug: "prasmanan-pernikahan",
-    label: "Prasmanan Pernikahan",
-    href: "/services/wedding",
+    slug: "aqiqah",
+    label: "Aqiqah",
+    href: "/services/aqiqah",
     description:
-      "Sajian prasmanan lengkap untuk acara keluarga, gathering, dan kebutuhan katering skala besar.",
+      "Layanan aqiqah praktis dengan menu yang terjaga kualitas rasa, kebersihan, dan kehalalannya.",
   },
   {
     slug: "bento",

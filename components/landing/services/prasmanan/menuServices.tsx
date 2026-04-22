@@ -6,14 +6,22 @@ import { BsPlusCircleFill } from "react-icons/bs";
 import { FaCarrot } from "react-icons/fa";
 import { GiBanana, GiChicken, GiChiliPepper, GiShrimp } from "react-icons/gi";
 import { IoFish } from "react-icons/io5";
+import { LuDot } from "react-icons/lu";
 import { PiCowBold } from "react-icons/pi";
+
+type DishGroup = {
+  subName: string;
+  subMainDish: string[];
+};
+
+type MenuItem = string | DishGroup;
 
 type MenuCard = {
   id: string;
   icon: React.ReactNode;
   name: string;
   accent?: string;
-  items: string[];
+  items: MenuItem[];
 };
 
 const mainDishCards: MenuCard[] = [
@@ -156,9 +164,28 @@ const companionCards: MenuCard[] = [
     icon: <BsPlusCircleFill />,
     name: "Menu Tambahan",
     accent: "+Rp 2.000/porsi",
-    items: ["Nasi", "Nasi Kuning", "Nasi Lemak"],
+    items: [
+      {
+        subName: "Nasi",
+        subMainDish: ["Nasi Kuning", "Nasi Lemak"],
+      },
+      {
+        subName: "Sayur",
+        subMainDish: [
+          "Capcay",
+          "Sayur Asem",
+          "Tumis Kailan Muda",
+          "Tumis Bunga Kol",
+          "Tumis Sawi Minyak",
+        ],
+      },
+    ],
   },
 ];
+
+function isDishGroup(item: MenuItem): item is DishGroup {
+  return typeof item !== "string";
+}
 
 function MenuCard({ card }: { card: MenuCard }) {
   return (
@@ -176,12 +203,35 @@ function MenuCard({ card }: { card: MenuCard }) {
       </div>
 
       <ul className="mt-5 space-y-2.5 text-sm leading-6 text-[#463B3B]">
-        {card.items.map((item) => (
-          <li key={`${card.id}-${item}`} className="flex gap-2">
-            <span className="mt-[0.45rem] size-1.5 shrink-0 rounded-full bg-[#332929]" />
-            <span>{item}</span>
-          </li>
-        ))}
+        {card.items.map((item) => {
+          if (isDishGroup(item)) {
+            return (
+              <li key={`${card.id}-${item.subName}`} className="space-y-1.5">
+                <p className="text-sm font-bold uppercase tracking-wide text-[#332929]">
+                  {item.subName}
+                </p>
+                <ul className="space-y-2">
+                  {item.subMainDish.map((subItem) => (
+                    <li
+                      key={`${card.id}-${item.subName}-${subItem}`}
+                      className="flex gap-2"
+                    >
+                      <LuDot className="mt-[0.1rem] shrink-0 text-xl text-[#332929]" />
+                      <span>{subItem}</span>
+                    </li>
+                  ))}
+                </ul>
+              </li>
+            );
+          }
+
+          return (
+            <li key={`${card.id}-${item}`} className="flex gap-2">
+              <span className="mt-[0.45rem] size-1.5 shrink-0 rounded-full bg-[#332929]" />
+              <span>{item}</span>
+            </li>
+          );
+        })}
       </ul>
     </article>
   );
@@ -191,11 +241,11 @@ export default function MenuServices() {
   const t = useTranslations("prasmananMenuServices");
 
   return (
-    <div className="mt-14 flex w-full max-w-7xl flex-col items-center">
+    <div className="mt-14 flex w-full flex-col items-center">
       <h3 className="text-center text-3xl font-bold uppercase tracking-tight text-[#332929]">
         {t("mainTitle")}
       </h3>
-      <div className="mt-10 grid w-full grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
+      <div className="mt-10 grid w-full max-w-7xl grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
         {mainDishCards.map((card) => (
           <MenuCard key={card.id} card={card} />
         ))}
@@ -204,7 +254,7 @@ export default function MenuServices() {
       <h3 className="mt-14 text-center text-3xl font-bold uppercase tracking-tight text-[#332929]">
         {t("sideTitle")}
       </h3>
-      <div className="mt-10 grid w-full grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-5">
+      <div className="mt-10 grid w-full max-w-8xl grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-5">
         {companionCards.map((card) => (
           <MenuCard key={card.id} card={card} />
         ))}

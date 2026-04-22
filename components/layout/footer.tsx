@@ -26,7 +26,7 @@ const Footer = () => {
 
             <div className="w-fit">
               <Image
-                src="/pt-ksm-logo.png"
+                src="/logo-pt.png"
                 alt="KSM Logo"
                 width={80}
                 height={80}
@@ -50,14 +50,28 @@ const Footer = () => {
                 <FaPhoneAlt className="shrink-0 text-gray-400" size={13} />
                 <div>
                   <p className="font-medium text-white">Yuni</p>
-                  <p>0813-7179-0122</p>
+                  <a
+                    href="https://wa.me/6281371790122"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:underline"
+                  >
+                    0813-7179-0122
+                  </a>
                 </div>
               </div>
               <div className="flex items-center gap-3 pt-1">
                 <FaPhoneAlt className="shrink-0 text-gray-400" size={13} />
                 <div>
                   <p className="font-medium text-white">Sucipto</p>
-                  <p>0852-6549-6567</p>
+                  <a
+                    href="https://wa.me/6285265496567"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:underline"
+                  >
+                    0852-6549-6567
+                  </a>
                 </div>
               </div>
             </div>
@@ -146,7 +160,7 @@ const Footer = () => {
             <div className="space-y-3">
               <div className="overflow-hidden rounded-lg border border-gray-700">
                 <iframe
-                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3989.0155!2d104.0!3d1.1!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMcKwMDYnMDAuMCJOIDEwNMKwMDAnMDAuMCJF!5e0!3m2!1sen!2sid!4v1234567890"
+                  src="https://www.google.com/maps/embed?pb=!1m17!1m12!1m3!1d3111.3322120880466!2d104.04687607363678!3d1.0457173624807141!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m2!1m1!2zMcKwMDInNDQuNiJOIDEwNMKwMDInNTguMCJF!5e1!3m2!1sen!2sid!4v1776857581596!5m2!1sen!2sid"
                   width="100%"
                   height="130"
                   style={{ border: 0 }}
@@ -159,7 +173,7 @@ const Footer = () => {
               </div>
 
               <Link
-                href="https://maps.google.com/?q=Jl+S+Parman+Komp+Ruko+Nusa+Indah+Blok+M+16+Mangsang+Batam"
+                href="https://maps.app.goo.gl/5BYfT71ckEsFpLKPA"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex w-full items-center justify-between rounded-lg border border-gray-600 px-4 py-3 text-sm text-gray-200 transition hover:border-gray-400 hover:text-white"

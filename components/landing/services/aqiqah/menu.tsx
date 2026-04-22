@@ -2,66 +2,135 @@ import { Button } from "@/components/ui/button";
 import { useTranslations } from "next-intl";
 import { LuAward, LuCheck, LuPackageOpen } from "react-icons/lu";
 
-const packageCards = [
+const femalePackageCards = [
   {
     id: 1,
-    title: "Paket A",
-    subTitle: "(Menu Ayam/Ikan)",
+    title: "Betina 20KG",
+    subTitle: "Prasmanan",
     badge: "Paling Populer",
     dish: [
-      "Nasi Putih",
-      "1 Lauk Utama",
-      "1 Lauk Tambahan",
-      "Sambal",
-      "Kerupuk",
-      "Buah",
-      "Air Mineral Gelas",
+      "1 Termos Nasi (80 Porsi)",
+      "40 Porsi Makanan Gulai",
+      "200 Tusuk Sate",
+      "Gratis:",
+      "Acar Mentimun",
+      "Sertifikat Aqiqah",
+      "Alat-alat Prasmanan",
     ],
-    price: "Rp:26.500/Kotak",
+    price: "Rp 3.200.000",
   },
   {
     id: 2,
-    title: "Paket A",
-    subTitle: "(Menu Daging/Seafood)",
+    title: "Betina 20KG",
+    subTitle: "Nasi Kotak (80 Kotak)",
     dish: [
-      "Nasi",
-      "1 Lauk Utama",
-      "1 Lauk Tambahan",
-      "Sayur",
-      "Sambal",
+      "Rincian Per Kotak:",
+      "Nasi Putih",
+      "Gulai Kambing",
+      "Sate Kambing (2 Tusuk)",
       "Kerupuk",
-      "Buah",
-      "Air Mineral Gelas",
+      "Gratis:",
+      "Acar Mentimun",
+      "Sertifikat Aqiqah",
     ],
-    price: "Rp:28.500/Kotak",
+    price: "Rp 3.650.000",
   },
   {
     id: 3,
-    title: "Paket B",
+    title: "Betina 30KG",
+    subTitle: "Prasmanan",
     dish: [
-      "Nasi",
-      "2 Lauk Utama",
-      "1 Lauk Tambahan",
-      "Sayur",
-      "Sambal",
-      "Buah",
-      "Air Mineral Gelas",
+      "1 Termos Nasi (100 Porsi)",
+      "60 Porsi Makanan Gulai",
+      "240 Tusuk Sate",
+      "Gratis:",
+      "Acar Mentimun",
+      "Sertifikat Aqiqah",
+      "Alat-alat Prasmanan",
     ],
-    price: "Rp:34.500/Kotak",
+    price: "Rp 4.850.000",
   },
   {
     id: 4,
-    title: "Paket C",
+    title: "Betina 30KG",
+    subTitle: "Nasi Kotak (120 Kotak)",
     dish: [
-      "Nasi",
-      "3 Lauk Utama",
-      "1 Lauk Tambahan",
-      "Sayur",
-      "Sambal",
-      "Buah",
-      "Air Mineral Gelas",
+      "Rincian Per Kotak:",
+      "Nasi Putih",
+      "Gulai Kambing",
+      "Sate Kambing (2 Tusuk)",
+      "Kerupuk",
+      "Gratis:",
+      "Acar Mentimun",
+      "Sertifikat Aqiqah",
     ],
-    price: "Rp:44.000/Kotak",
+    price: "Rp 5.200.000",
+  },
+];
+
+const malePackageCards = [
+  {
+    id: 1,
+    title: "Jantan 20KG",
+    subTitle: "Prasmanan",
+    badge: "Paling Populer",
+    dish: [
+      "1 Termos Nasi (80 Porsi)",
+      "40 Porsi Makanan Gulai",
+      "200 Tusuk Sate",
+      "Gratis:",
+      "Acar Mentimun",
+      "Sertifikat Aqiqah",
+      "Alat-alat Prasmanan",
+    ],
+    price: "Rp 4.600.000",
+  },
+  {
+    id: 2,
+    title: "Jantan 20KG",
+    subTitle: "Nasi Kotak (80 Kotak)",
+    dish: [
+      "Rincian Per Kotak:",
+      "Nasi Putih",
+      "Gulai Kambing",
+      "Sate Kambing (2 Tusuk)",
+      "Kerupuk",
+      "Gratis:",
+      "Acar Mentimun",
+      "Sertifikat Aqiqah",
+    ],
+    price: "Rp 4.900.000",
+  },
+  {
+    id: 3,
+    title: "Jantan 30KG",
+    subTitle: "Prasmanan",
+    dish: [
+      "1 Termos Nasi (100 Porsi)",
+      "60 Porsi Makanan Gulai",
+      "240 Tusuk Sate",
+      "Gratis:",
+      "Acar Mentimun",
+      "Sertifikat Aqiqah",
+      "Alat-alat Prasmanan",
+    ],
+    price: "Rp 6.600.000",
+  },
+  {
+    id: 4,
+    title: "Jantan 30KG",
+    subTitle: "Nasi Kotak (120 Kotak)",
+    dish: [
+      "Rincian Per Kotak:",
+      "Nasi Putih",
+      "Gulai Kambing",
+      "Sate Kambing (2 Tusuk)",
+      "Kerupuk",
+      "Gratis:",
+      "Acar Mentimun",
+      "Sertifikat Aqiqah",
+    ],
+    price: "Rp 7.200.000",
   },
 ];
 
@@ -79,9 +148,10 @@ function Menu() {
         </h2>
       </div>
       <div className="mt-12 grid w-full max-w-7xl grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4">
-        {packageCards.map((card, index) => {
+        {femalePackageCards.map((card, index) => {
           const isLastOddItem =
-            packageCards.length % 2 !== 0 && index === packageCards.length - 1;
+            femalePackageCards.length % 2 !== 0 &&
+            index === femalePackageCards.length - 1;
           return (
             <article
               key={card.id}
@@ -146,9 +216,10 @@ function Menu() {
         </h2>
       </div>
       <div className="mt-12 grid w-full max-w-7xl grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4">
-        {packageCards.map((card, index) => {
+        {malePackageCards.map((card, index) => {
           const isLastOddItem =
-            packageCards.length % 2 !== 0 && index === packageCards.length - 1;
+            malePackageCards.length % 2 !== 0 &&
+            index === malePackageCards.length - 1;
           return (
             <article
               key={card.id}

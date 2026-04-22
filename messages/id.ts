@@ -117,11 +117,11 @@ const messages = {
       titleLead: "Tentang",
       titleBrand: "KSM Katering",
       paragraph1:
-        "KSM Katering berdiri sejak tahun 2007 sebagai penyedia layanan katering halal yang menghadirkan sajian lezat, sehat, dan higienis. Kami telah melayani berbagai kebutuhan dari perusahaan, rumah sakit, sekolah, instansi pemerintahan, kementerian, perbankan, hingga maskapai penerbangan di Batam.",
+        "KSM Katering adalah penyedia layanan katering halal di Batam sejak 2007, dengan pengalaman melayani berbagai klien dan acara berskala tinggi dengan kapasitas hingga 8000 porsi/hari.",
       paragraph2:
-        "Kami juga melayani berbagai jenis acara seperti pernikahan, pertemuan, ibadah haji, dan acara lainnya.",
+        "Kami terus menerus melakukan penyempurnaan layanan untuk selalu menyajikan sajian berkelas, citarasa istimewa, tampilan elegan dan standar higienis yang terjaga untuk menyempurnakan setiap moment acara anda.",
       paragraph3:
-        "Dengan pengalaman lebih dari 17 tahun, KSM Katering siap menjadi solusi katering terbaik untuk berbagai jenis acara Anda.",
+        "Dengan pengalaman lebih dari 19 tahun, kami telah melayani berbagai kebutuhan catering mulai dari Wedding, Event Pemerintah & Kementrian, Bank, Rumah Sakit, dan Perusahaan-Perusahaan besar di Batam.",
       cta: "Lihat Lebih Banyak",
     },
     servicesSection: {
@@ -221,25 +221,25 @@ const messages = {
         id: "minimal",
         question: "Berapa minimal pemesanan katering?",
         answer:
-          "Minimal pemesanan katering kami adalah 20 porsi untuk setiap jenis acara.",
+          "Minimal pemesanan adalah 50 porsi. Untuk prasmanan minimal 100 porsi, katering pondokan pada prasmanan pernikahan minimal 150 porsi, dan untuk bento minimal 25 kotak.",
       },
       {
         id: "support",
-        question: "Bagaimana cara menghubungi layanan pelanggan?",
+        question: "Apakah menu bisa disesuaikan dengan kebutuhan acara?",
         answer:
-          "Anda dapat menghubungi kami melalui email, obrolan langsung, atau telepon. Kami akan merespons dalam waktu 24 jam pada hari kerja.",
+          "Anda dapat memilih menu sesuai dengan pilihan yang tersedia di website kami. Jika memiliki kebutuhan khusus, silakan klik tombol “Konsultasi Sekarang” dan isi formulir yang tersedia. Tim kami akan segera menghubungi Anda.",
       },
       {
         id: "price",
         question: "Apakah harga sudah termasuk perlengkapan dan pelayanan?",
         answer:
-          "Ya, harga yang kami tawarkan sudah termasuk perlengkapan dan pelayanan.",
+          "Untuk layanan prasmanan, harga sudah termasuk perlengkapan prasmanan, peralatan makan, serta layanan pramusaji.",
       },
       {
         id: "order",
         question: "Bagaimana cara melakukan pemesanan?",
         answer:
-          "Anda dapat melakukan pemesanan melalui email, obrolan langsung, atau telepon. Kami akan merespons dalam waktu 24 jam pada hari kerja.",
+          "Anda dapat melakukan pemesanan dengan menghubungi tim kami melalui tombol “Pesan Sekarang”.",
       },
     ],
     title: "Masih Memiliki Pertanyaan?",
@@ -520,6 +520,47 @@ const messages = {
       "https://wa.me/628111171713?text=Halo%2C%20saya%20ingin%20pesan%prasmanan%20pernikahan.",
     consultLink:
       "https://wa.me/628111171713?text=Halo%2C%20saya%20ingin%20konsultasi%20prasmanan%20pernikahan.",
+  },
+  weddingFaq: {
+    items: [
+      {
+        id: "service",
+        question: "Apakah KSM menyediakan layanan full service untuk wedding?",
+        answer:
+          "Ya. KSM menghadirkan layanan full service dengan jumlah tim yang disesuaikan dengan skala acara. Untuk acara dengan jumlah tamu besar, kami menyiapkan tim yang lengkap dan terstruktur guna memastikan seluruh operasional berjalan dengan optimal. Setiap tim terdiri dari petugas stall, penjaga lauk, runner distribusi makanan, petugas buah, hingga tim kebersihan yang bekerja secara terkoordinasi. Dengan sistem ini, seluruh alur catering tertangani dengan baik, sehingga Anda dapat menikmati momen pernikahan tanpa perlu mengkhawatirkan detail di lapangan.",
+      },
+      {
+        id: "family",
+        question:
+          "Apakah pihak keluarga perlu terlibat dalam pengelolaan catering saat acara?",
+        answer:
+          "Tidak perlu. Seluruh alur catering—mulai dari penyajian, pengisian ulang makanan, hingga kebersihan area—ditangani sepenuhnya oleh tim KSM. Anda dan keluarga bisa fokus menikmati momen tanpa distraksi.",
+      },
+      {
+        id: "empty",
+        question: "Bagaimana jika makanan hampir habis saat acara berlangsung?",
+        answer:
+          "Anda tidak perlu khawatir kehabisan hidangan di momen penting. KSM menyiagakan tim dapur beserta ketersediaan bahan baku selama acara berlangsung sebagai langkah antisipasi. Jika terjadi lonjakan tamu atau kebutuhan tambahan, hidangan dapat segera diproses dan dikirim ke lokasi acara dalam waktu cepat. Dengan sistem ini, kelancaran jamuan tetap terjaga dan Anda dapat menikmati acara dengan tenang.",
+      },
+      {
+        id: "wash",
+        question: "Apakah KSM mencuci peralatan makan di lokasi acara?",
+        answer:
+          "Tidak. Untuk menjaga efisiensi dan kebersihan area acara, seluruh peralatan makan tidak dicuci di lokasi. Kami menyiapkan jumlah peralatan sesuai dengan total tamu, sehingga alur pelayanan tetap lancar tanpa mengganggu jalannya acara.",
+      },
+      {
+        id: "total",
+        question: "Apakah jumlah peralatan makan mencukupi untuk semua tamu?",
+        answer:
+          "Ya. KSM menyediakan piring, sendok, dan garpu sesuai dengan jumlah pesanan tamu. Hal ini memastikan setiap tamu mendapatkan pengalaman makan yang nyaman tanpa harus menunggu giliran peralatan.",
+      },
+      {
+        id: "price",
+        question: "Apakah harga sudah termasuk peralatan prasmanan?",
+        answer:
+          "Ya. Seluruh paket sudah termasuk perlengkapan prasmanan seperti meja buffet, chafing dish, dan peralatan pendukung lainnya. Anda tidak perlu menyediakan peralatan tambahan—semuanya telah kami siapkan secara lengkap dan profesional.",
+      },
+    ],
   },
   serviceDetail: {
     eyebrow: "Layanan KSM Katering",

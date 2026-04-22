@@ -7,7 +7,6 @@ const packageCards = [
     id: 1,
     title: "Paket A",
     subTitle: "(Menu Ayam/Ikan)",
-    badge: "Paling Populer",
     dish: [
       "Nasi Putih",
       "1 Lauk Utama",
@@ -38,6 +37,7 @@ const packageCards = [
   {
     id: 3,
     title: "Paket B",
+    badge: "Paling Populer",
     dish: [
       "Nasi",
       "2 Lauk Utama",

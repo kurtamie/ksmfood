@@ -9,7 +9,6 @@ const packageCards = [
   {
     id: "a",
     title: "Paket A",
-    badge: true,
     items: [
       "Nasi Putih",
       "1 Lauk Utama",
@@ -25,6 +24,7 @@ const packageCards = [
   {
     id: "b",
     title: "Paket B",
+    badge: true,
     items: [
       "Nasi Putih",
       "2 Lauk Utama",

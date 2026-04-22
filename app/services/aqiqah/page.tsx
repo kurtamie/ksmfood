@@ -87,9 +87,9 @@ export default async function AqiqahPage() {
           <h2>{t("bonus.badge")}</h2>
         </div>
         <div className="flex flex-col items-center justify-center gap-2 text-center sm:flex-row sm:gap-4">
-          <h2 className="text-3xl font-bold text-[#332929] sm:text-4xl lg:text-5xl">
+          {/* <h2 className="text-3xl font-bold text-[#332929] sm:text-4xl lg:text-5xl">
             {t("bonus.titleLead")}
-          </h2>
+          </h2> */}
           <h2 className="text-3xl font-bold text-red-800 sm:text-4xl lg:text-5xl">
             {t("bonus.titleBrand")}
           </h2>
