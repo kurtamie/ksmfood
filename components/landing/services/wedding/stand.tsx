@@ -112,9 +112,12 @@ function Stand() {
                 alt={translatedCard?.title ?? card.title}
                 className="h-36 w-full max-w-56"
               />
-              <div className="flex grow flex-col justify-center py-4">
+              <div className="flex grow flex-col justify-center py-4 gap-2">
                 <h3 className="text-2xl font-bold text-[#332929]">
                   {translatedCard?.title ?? card.title}
+                </h3>
+                <h3 className="text-2xl font-semibold text-red-800">
+                  Rp 10.000
                 </h3>
               </div>
             </article>

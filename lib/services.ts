@@ -9,7 +9,7 @@ export const services = [
   {
     slug: "nasi-kotak",
     label: "Nasi Kotak",
-    href: "/services/nasi-kotak",
+    href: "/services/ricebox",
     description:
       "Paket nasi kotak untuk rapat, acara kantor, sekolah, dan berbagai kebutuhan harian maupun event khusus.",
   },
