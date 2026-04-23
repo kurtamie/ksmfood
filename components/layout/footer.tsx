@@ -78,7 +78,7 @@ const Footer = () => {
 
             <div className="flex gap-3 pt-1">
               <Link
-                href="https://youtube.com"
+                href="https://www.youtube.com/@ksmkateringbatam2463"
                 aria-label="YouTube KSM Katering"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -87,7 +87,7 @@ const Footer = () => {
                 <FaYoutube size={16} />
               </Link>
               <Link
-                href="https://instagram.com"
+                href="https://www.instagram.com/ksmcateringbatam"
                 aria-label="Instagram KSM Katering"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -96,7 +96,7 @@ const Footer = () => {
                 <FaInstagram size={16} />
               </Link>
               <Link
-                href="https://facebook.com"
+                href="https://www.facebook.com/KSMKateringBatam"
                 aria-label="Facebook KSM Katering"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -168,7 +168,6 @@ const Footer = () => {
                   loading="lazy"
                   referrerPolicy="no-referrer-when-downgrade"
                   title="Lokasi KSM Katering"
-                  className="grayscale"
                 />
               </div>
 

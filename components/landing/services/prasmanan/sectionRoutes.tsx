@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 
 export default function SectionRoutes() {
   const t = useTranslations("sectionRoutes");
-  const sectionLinks = t.raw("prasmanan") as Array<{
+  const sectionLinks = t.raw("wedding") as Array<{
     href: string;
     label: string;
   }>;

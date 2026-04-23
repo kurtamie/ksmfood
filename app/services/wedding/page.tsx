@@ -7,6 +7,7 @@ import Cta from "@/components/landing/services/wedding/cta";
 import SectionRoutes from "@/components/landing/services/wedding/sectionRoutes";
 import OrderingInfo from "@/components/landing/services/wedding/orderingInfo";
 import Stand from "@/components/landing/services/wedding/stand";
+import Faq from "@/components/landing/services/wedding/faq";
 
 export default async function WeddingPage() {
   const t = await getTranslations("weddingPage");
@@ -138,10 +139,17 @@ export default async function WeddingPage() {
       </section>
 
       <section
-        id="layanan"
+        id="stand"
         className="flex w-full flex-col items-center px-6 py-16 sm:py-20"
       >
         <Stand />
+      </section>
+
+      <section
+        id="faq"
+        className="flex w-full flex-col items-center px-6 py-16 sm:py-20"
+      >
+        <Faq />
       </section>
 
       <section

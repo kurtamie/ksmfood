@@ -16,7 +16,7 @@ const packageCards = [
       "Buah",
       "Air Mineral Gelas",
     ],
-    price: "Rp:26.500/Kotak",
+    price: "Rp 26.500/Kotak",
   },
   {
     id: 2,
@@ -32,7 +32,7 @@ const packageCards = [
       "Buah",
       "Air Mineral Gelas",
     ],
-    price: "Rp:28.500/Kotak",
+    price: "Rp 28.500/Kotak",
   },
   {
     id: 3,
@@ -47,7 +47,7 @@ const packageCards = [
       "Buah",
       "Air Mineral Gelas",
     ],
-    price: "Rp:34.500/Kotak",
+    price: "Rp 34.500/Kotak",
   },
   {
     id: 4,
@@ -61,7 +61,7 @@ const packageCards = [
       "Buah",
       "Air Mineral Gelas",
     ],
-    price: "Rp:44.000/Kotak",
+    price: "Rp 44.000/Kotak",
   },
   {
     id: 5,
@@ -77,7 +77,7 @@ const packageCards = [
       "Air Mineral 330ml",
       "Puding",
     ],
-    price: "Rp:31.500/Kotak",
+    price: "Rp 31.500/Kotak",
   },
   {
     id: 6,
@@ -93,7 +93,7 @@ const packageCards = [
       "Air Mineral 330ml",
       "Puding",
     ],
-    price: "Rp:33.000/Kotak",
+    price: "Rp 33.000/Kotak",
   },
   {
     id: 7,
@@ -108,7 +108,7 @@ const packageCards = [
       "Air Mineral 330ml",
       "Puding",
     ],
-    price: "Rp:39.500/Kotak",
+    price: "Rp 39.500/Kotak",
   },
   {
     id: 8,
@@ -123,7 +123,7 @@ const packageCards = [
       "Air Mineral 330ml",
       "Puding",
     ],
-    price: "Rp:49.000/Kotak",
+    price: "Rp 49.000/Kotak",
   },
 ];
 

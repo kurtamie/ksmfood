@@ -44,7 +44,7 @@ export const services = [
   {
     slug: "snack-kotak",
     label: "Snack Kotak",
-    href: "/services/snack-kotak",
+    href: "/services/snackbox",
     description:
       "Pilihan snack kotak untuk meeting, seminar, pelatihan, dan acara formal maupun informal.",
   },
@@ -58,7 +58,7 @@ export const services = [
   {
     slug: "katering-korporat",
     label: "Katering Korporat",
-    href: "/services/katering-korporat",
+    href: "/services/korporat",
     description:
       "Solusi katering korporat untuk perusahaan, instansi, dan kebutuhan operasional dengan standar layanan profesional.",
   },

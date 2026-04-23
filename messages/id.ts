@@ -159,19 +159,19 @@ const messages = {
       {
         id: 1,
         title: "Prasmanan Pernikahan",
-        price: "Mulai dari Rp:32.000/porsi",
+        price: "Mulai dari Rp 32.000/porsi",
       },
-      { id: 2, title: "Prasmanan", price: "Mulai dari Rp:32.000/porsi" },
-      { id: 3, title: "Nasi Kotak", price: "Mulai dari Rp:25.000/kotak" },
-      { id: 4, title: "Bento", price: "Mulai dari Rp:56.000/kotak" },
+      { id: 2, title: "Prasmanan", price: "Mulai dari Rp 32.000/porsi" },
+      { id: 3, title: "Nasi Kotak", price: "Mulai dari Rp 25.000/kotak" },
+      { id: 4, title: "Bento", price: "Mulai dari Rp 56.000/kotak" },
       {
         id: 5,
         title: "Rendang Kemasan",
-        price: "Mulai dari Rp:80.000/kemasan",
+        price: "Mulai dari Rp 80.000/kemasan",
       },
-      { id: 6, title: "Snack Kotak", price: "Mulai dari Rp:13.000" },
+      { id: 6, title: "Snack Kotak", price: "Mulai dari Rp 13.000" },
       { id: 7, title: "Aqiqah", price: "Harga disesuaikan" },
-      { id: 8, title: "Tumpeng", price: "Mulai dari Rp:700.000" },
+      { id: 8, title: "Tumpeng", price: "Mulai dari Rp 700.000" },
       { id: 9, title: "Katering Korporat", price: "Harga disesuaikan" },
     ],
   },
@@ -304,10 +304,44 @@ const messages = {
       { href: "#pilihan-menu", label: "Pilihan Menu" },
       { href: "#hubungi-kami", label: "Hubungi" },
     ],
+    wedding: [
+      { href: "#tentang", label: "Tentang" },
+      { href: "#layanan", label: "Paket" },
+      { href: "#informasi-pemesanan", label: "Info Pesan" },
+      { href: "#pilihan-menu", label: "Pilihan Menu" },
+      { href: "#stand", label: "Pondokan" },
+      { href: "#faq", label: "Faq" },
+      { href: "#hubungi-kami", label: "Hubungi" },
+    ],
     aqiqah: [
       { href: "#tentang", label: "Tentang" },
       { href: "#menu", label: "Paket" },
       { href: "#bonus", label: "Bonus" },
+      { href: "#hubungi-kami", label: "Hubungi" },
+    ],
+    snackBox: [
+      { href: "#tentang", label: "Tentang" },
+      { href: "#layanan", label: "Paket" },
+      { href: "#pilihan-menu", label: "Pilihan Menu" },
+      { href: "#hubungi-kami", label: "Hubungi" },
+    ],
+    bento: [
+      { href: "#tentang", label: "Tentang" },
+      { href: "#layanan", label: "Paket" },
+      { href: "#informasi-pemesanan", label: "Info Pesan" },
+      { href: "#pilihan-menu", label: "Pilihan Menu" },
+      { href: "#galeri", label: "Galeri" },
+      { href: "#hubungi-kami", label: "Hubungi" },
+    ],
+    tumpeng: [
+      { href: "#tentang", label: "Tentang" },
+      { href: "#layanan", label: "Paket" },
+      { href: "#hubungi-kami", label: "Hubungi" },
+    ],
+    korporat: [
+      { href: "#tentang", label: "Tentang" },
+      { href: "#layanan", label: "Paket" },
+      { href: "testimonial", label: "Testimoni" },
       { href: "#hubungi-kami", label: "Hubungi" },
     ],
   },
@@ -330,8 +364,7 @@ const messages = {
       titleLead: "Paket",
       titleBrand: "Nasi Kotak",
     },
-    minimumOrder:
-      "Minimum order 50 kotak diantar, di bawah 50 kotak dijemput ke dapur kami.",
+    minimumOrder: "Minimum order 25 kotak",
     menuSection: {
       titleLead: "Pilihan",
       titleBrand: "Menu",
@@ -561,6 +594,179 @@ const messages = {
           "Ya. Seluruh paket sudah termasuk perlengkapan prasmanan seperti meja buffet, chafing dish, dan peralatan pendukung lainnya. Anda tidak perlu menyediakan peralatan tambahan—semuanya telah kami siapkan secara lengkap dan profesional.",
       },
     ],
+    title: "Masih Memiliki Pertanyaan?",
+    cta: "Konsultasi Sekarang",
+  },
+  bentoPage: {
+    hero: {
+      eyebrow: "Snack Kotak",
+      title: "Lengkapi momen spesial dengan kelezatan",
+      cta: "Unduh Menu",
+    },
+    about: {
+      titleHighlight: "Nasi Kotak",
+      titleBody: "Premium",
+      paragraph1:
+        "Nasi kotak Bento cocok untuk anda yang ingin menyajikan nasi kotak dengan pilihan menu masakan dan kemasan kotak premium untuk para tamu dan relasi spesial.",
+      paragraph2:
+        "Cocok dihidang untuk makan siang, pertemuan, rapat, acara gathering, fun day dan event lainnya.",
+    },
+    packages: {
+      titleLead: "Paket",
+      titleBrand: "Bento",
+    },
+    minimumOrder:
+      "Minimum order 50 kotak diantar, di bawah 50 kotak dijemput ke dapur kami.",
+    gallerySection: {
+      title: "Pilihan Bento Kami",
+    },
+    menuSection: {
+      titleLead: "Pilihan",
+      titleBrand: "Menu",
+    },
+  },
+  bentoMenu: {
+    popular: "Paling Populer",
+    orderNow: "Pesan Sekarang",
+  },
+  bentoMenuServices: {
+    mainTitle: "Lauk Utama",
+    sideTitle: "Pendamping",
+  },
+  bentoCta: {
+    title: "Bento Berkualitas, Temani Setiap Acara",
+    description:
+      "Hidangan praktis, higienis, dan penuh rasa untuk pengalaman yang tak terlupakan.",
+    orderLink:
+      "https://wa.me/628111171713?text=Halo%2C%20saya%20ingin%20pesan%20Bento.",
+    consultLink:
+      "https://wa.me/628111171713?text=Halo%2C%20saya%20ingin%20konsultasi%20Bento.",
+  },
+  snackBoxPage: {
+    hero: {
+      eyebrow: "Snack Kotak",
+      title: "Lengkapi momen spesial dengan kelezatan",
+      cta: "Unduh Menu",
+    },
+    about: {
+      titleHighlight: "Lezat dalam",
+      titleBody: "setiap kotak",
+      paragraph1:
+        "Lengkapi momen spesial anda dengan kelezatan yang tak terlupakan. Snack kotak KSM Katering dirancang khusus untuk memberikan cita rasa istimewa dalam setiap gigitan, menjadikan setiap acara lebih berkesan.",
+      paragraph2:
+        "Dengan pilihan menu yang variatif dan berkualitas, kami siap memanjakan lidah para tamu Anda. Sempurnakan kebersamaan dan buat setiap momen lebih berarti dengan sajian praktis yang penuh kenikmatan.",
+    },
+    packages: {
+      titleLead: "Paket",
+      titleBrand: "Snack Kotak",
+    },
+    minimumOrder:
+      "Minimum order 50 kotak diantar, di bawah 50 kotak dijemput ke dapur kami.",
+    gallerySection: {
+      title: "Pilihan Bento Kami",
+    },
+    menuSection: {
+      titleLead: "Pilihan",
+      titleBrand: "Menu",
+    },
+  },
+  snackBoxMenu: {
+    popular: "Paling Populer",
+    orderNow: "Pesan Sekarang",
+  },
+  snackBoxMenuServices: {
+    mainTitle: "Pilihan Snack",
+    sideTitle: "Pendamping",
+  },
+  snackBoxCta: {
+    title: "Snack Kotak Praktis untuk Berbagai Acara",
+    description:
+      "lezat dan higienis yang siap melengkapi setiap acara Anda, dari rapat hingga kegiatan spesial.",
+    orderLink:
+      "https://wa.me/628111171713?text=Halo%2C%20saya%20ingin%20pesan%20Snack%20Box.",
+    consultLink:
+      "https://wa.me/628111171713?text=Halo%2C%20saya%20ingin%20konsultasi%20Snack%20Box.",
+  },
+  tumpengPage: {
+    hero: {
+      eyebrow: "Tumpeng",
+      title: " Lebih dari sekadar nasi kuning, lebih dari sekadar perayaan",
+      cta: "Unduh Menu",
+    },
+    about: {
+      titleHighlight: "Tumpeng lezat,",
+      titleBody: "Doa dan Harapan yang Hangat",
+      paragraph1:
+        "Lebih dari sekadar nasi kuning, tumpeng katering kami menghadirkan makna mendalam dalam setiap perayaan. Dengan susunan lauk yang menggugah selera dan cita rasa autentik, kami tidak hanya menyajikan hidangan, tetapi juga menyampaikan harapan dan doa untuk kebahagiaan serta kesuksesan.",
+      paragraph2:
+        "Setiap elemen dalam tumpeng kami dipilih dengan cermat untuk melengkapi makna simbolis yang terkandung di dalamnya. Jadikan momen spesial Anda lebih berkesan dengan tumpeng yang penuh arti dan kelezatan.",
+    },
+    packages: {
+      titleLead: "Paket",
+      titleBrand: "Tumpeng",
+    },
+    minimumOrder:
+      "Minimum order 50 kotak diantar, di bawah 50 kotak dijemput ke dapur kami.",
+    gallerySection: {
+      title: "Pilihan Bento Kami",
+    },
+    menuSection: {
+      titleLead: "Pilihan",
+      titleBrand: "Menu",
+    },
+  },
+  tumpengMenu: {
+    popular: "Paling Populer",
+    orderNow: "Pesan Sekarang",
+  },
+  tumpengCta: {
+    title: "Tumpeng untuk Setiap Momen Bermakna",
+    description:
+      "Disajikan dengan penuh kehangatan dan cita rasa autentik untuk merayakan kebersamaan Anda.",
+    orderLink:
+      "https://wa.me/628111171713?text=Halo%2C%20saya%20ingin%20pesan%20Tumpeng.",
+    consultLink:
+      "https://wa.me/628111171713?text=Halo%2C%20saya%20ingin%20konsultasi%20Tumpeng.",
+  },
+  korporatPage: {
+    hero: {
+      eyebrow: "Katering Korporat",
+      title: "Produktivitas Lebih Tinggi dengan Sajian Berkualitas",
+      cta: "Unduh Menu",
+    },
+    about: {
+      titleHighlight: "Solusi Katering Terbaik untuk Perusahaan Anda",
+      paragraph1:
+        "KSM Katering hadir untuk memenuhi kebutuhan katering perusahaan dengan menu yang sehat, lezat, dan higienis.",
+      paragraph2:
+        "Kami menyediakan berbagai pilihan menu yang dapat disesuaikan dengan selera dan kebutuhan perusahaan Anda. Mulai dari makan siang karyawan, meeting, hingga acara perusahaan, kami siap menjadi mitra kuliner terpercaya.",
+    },
+    packages: {
+      titleLead: "Paket",
+      titleBrand: "Katering Korporat",
+    },
+    minimumOrder:
+      "Minimum order 50 kotak diantar, di bawah 50 kotak dijemput ke dapur kami.",
+    gallerySection: {
+      title: "Pilihan Bento Kami",
+    },
+    menuSection: {
+      titleLead: "Pilihan",
+      titleBrand: "Menu",
+    },
+  },
+  korporatMenu: {
+    popular: "Paling Populer",
+    orderNow: "Pesan Sekarang",
+  },
+  korporatCta: {
+    title: "Solusi Katering Profesional untuk Kebutuhan Perusahaan Anda",
+    description:
+      "Dukung setiap kegiatan perusahaan dengan layanan katering berkualitas, menu beragam, dan pelayanan yang terpercaya.",
+    orderLink:
+      "https://wa.me/628111171713?text=Halo%2C%20saya%20ingin%20pesan%Katering%20Korporat.",
+    consultLink:
+      "https://wa.me/628111171713?text=Halo%2C%20saya%20ingin%20konsultasi%Katering%20Korporat.",
   },
   serviceDetail: {
     eyebrow: "Layanan KSM Katering",
