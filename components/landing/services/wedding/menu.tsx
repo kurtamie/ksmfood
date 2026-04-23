@@ -1,9 +1,9 @@
 "use client";
 
-import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { LuAward, LuCheck, LuPackageOpen } from "react-icons/lu";
 import { Button } from "@/components/ui/button";
+import { createWhatsappLink } from "@/const/whatsapp";
 
 const packageCards = [
   {
@@ -108,7 +108,7 @@ const packageCards = [
 export default function Menu() {
   const t = useTranslations("weddingMenu");
   const commonT = useTranslations("common");
-  const ctaT = useTranslations("weddingCta");
+  const serviceName = "Prasmanan Pernikahan";
 
   return (
     <div className="mt-12 grid w-full max-w-6xl grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
@@ -153,13 +153,15 @@ export default function Menu() {
               asChild
               className="mt-4 h-11 rounded-lg bg-[#9F0404] font-bold text-white hover:bg-[#870000]"
             >
-              <Link
-                href={ctaT("orderLink")}
+              <a
+                href={createWhatsappLink(
+                  `Halo, saya ingin memesan ${serviceName} dengan ${card.title}.`,
+                )}
                 target="_blank"
                 rel="noopener noreferrer"
               >
                 {commonT("orderNowShort")}
-              </Link>
+              </a>
             </Button>
           </div>
         </article>

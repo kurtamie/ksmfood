@@ -11,11 +11,11 @@ import {
 } from "react-icons/fa";
 import { HiMap } from "react-icons/hi";
 import { aboutNavItems, galleryNavItems } from "@/lib/navigation";
+import { services } from "@/lib/services";
 
 const Footer = () => {
   const t = useTranslations("footer");
   const navT = useTranslations("navigation");
-  const serviceLinks = t.raw("serviceLinks") as string[];
 
   return (
     <footer className="bg-[#1a1a1a] px-6 pb-8 pt-14 text-white md:px-12 lg:px-20">
@@ -110,13 +110,13 @@ const Footer = () => {
           <div className="lg:col-span-1">
             <h2 className="mb-5 text-base font-bold">{t("servicesTitle")}</h2>
             <ul className="space-y-3 text-sm text-gray-300">
-              {serviceLinks.map((item) => (
-                <li key={item}>
+              {services.map((services) => (
+                <li key={services.slug}>
                   <Link
-                    href="/#layanan"
+                    href={services.href}
                     className="transition hover:text-white"
                   >
-                    {item}
+                    {services.label}
                   </Link>
                 </li>
               ))}

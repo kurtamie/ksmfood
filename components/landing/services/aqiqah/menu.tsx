@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { createWhatsappLink } from "@/const/whatsapp";
 import { useTranslations } from "next-intl";
 import { LuAward, LuCheck, LuPackageOpen } from "react-icons/lu";
 
@@ -136,6 +137,10 @@ const malePackageCards = [
 
 function Menu() {
   const t = useTranslations("aqiqahMenu");
+  const serviceName = "Paket Aqiqah";
+
+  const getPackageName = (title: string, subTitle?: string) =>
+    [title, subTitle].filter(Boolean).join(" ");
 
   return (
     <div className="flex flex-col items-center justify-center gap-2 text-center sm:gap-4">
@@ -198,8 +203,16 @@ function Menu() {
                   {card.price}
                 </p>
 
-                <Button className="mt-3 h-11 w-full bg-red-800 text-white hover:bg-red-900">
-                  {t("orderNow")}
+                <Button asChild className="mt-3 h-11 w-full bg-red-800 text-white hover:bg-red-900">
+                  <a
+                    href={createWhatsappLink(
+                      `Halo, saya ingin memesan ${serviceName} dengan ${getPackageName(card.title, card.subTitle)}.`,
+                    )}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {t("orderNow")}
+                  </a>
                 </Button>
               </div>
             </article>
@@ -266,8 +279,16 @@ function Menu() {
                   {card.price}
                 </p>
 
-                <Button className="mt-3 h-11 w-full bg-red-800 text-white hover:bg-red-900">
-                  {t("orderNow")}
+                <Button asChild className="mt-3 h-11 w-full bg-red-800 text-white hover:bg-red-900">
+                  <a
+                    href={createWhatsappLink(
+                      `Halo, saya ingin memesan ${serviceName} dengan ${getPackageName(card.title, card.subTitle)}.`,
+                    )}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {t("orderNow")}
+                  </a>
                 </Button>
               </div>
             </article>

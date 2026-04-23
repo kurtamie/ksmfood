@@ -187,7 +187,7 @@ const messages = {
         id: 2,
         title: "Experienced",
         description:
-          "KSM has 17 years of experience serving many event types and industrial company canteen operations in Batam.",
+          "KSM has 19 years of experience serving many event types and industrial company canteen operations in Batam.",
       },
       {
         id: 3,

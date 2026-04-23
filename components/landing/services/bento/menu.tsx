@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { createWhatsappLink } from "@/const/whatsapp";
 import { useTranslations } from "next-intl";
 import { LuAward, LuCheck, LuPackageOpen } from "react-icons/lu";
 
@@ -40,6 +41,7 @@ const packageCards = [
 
 function Menu() {
   const t = useTranslations("bentoMenu");
+  const serviceName = "Bento";
 
   return (
     <div className="mt-12 grid w-full max-w-3xl grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-2">
@@ -87,8 +89,16 @@ function Menu() {
                 {card.price}
               </p>
 
-              <Button className="mt-3 h-11 w-full bg-red-800 text-white hover:bg-red-900">
-                {t("orderNow")}
+              <Button asChild className="mt-3 h-11 w-full bg-red-800 text-white hover:bg-red-900">
+                <a
+                  href={createWhatsappLink(
+                    `Halo, saya ingin memesan ${serviceName} dengan ${card.title}.`,
+                  )}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {t("orderNow")}
+                </a>
               </Button>
             </div>
           </article>

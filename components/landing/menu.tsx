@@ -7,7 +7,7 @@ import nasi from "@/public/images/menu/nasi-kotak.webp";
 import bento from "@/public/images/menu/bento.webp";
 import rendang from "@/public/images/menu/rendang.webp";
 import snackbox from "@/public/images/menu/snack-kotak.webp";
-import snacktam from "@/public/images/menu/snack-tampah.webp";
+import aqiqah from "@/public/images/services/aqiqah/aqiq.webp";
 import tumpeng from "@/public/images/menu/tumpeng.webp";
 import korporat from "@/public/images/menu/korporat.webp";
 
@@ -62,9 +62,10 @@ const packageCards = [
   },
   {
     id: 7,
-    image: snacktam,
+    image: aqiqah,
     title: "Aqiqah",
     price: "Harga Disesuaikan",
+    catalog: "/images/pdf/aqiqah.pdf",
     route: "/services/aqiqah",
   },
   {

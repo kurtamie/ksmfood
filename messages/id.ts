@@ -187,7 +187,7 @@ const messages = {
         id: 2,
         title: "Berpengalaman",
         description:
-          "KSM memiliki pengalaman 17 tahun dalam melayani berbagai jenis acara dan kebutuhan kantin perusahaan industri di Batam.",
+          "KSM memiliki pengalaman 19 tahun dalam melayani berbagai jenis acara dan kebutuhan kantin perusahaan industri di Batam.",
       },
       {
         id: 3,
@@ -803,6 +803,39 @@ const messages = {
       eyebrow: "Tentang KSM Katering",
       title:
         "Berdiri sejak 2007, KSM Katering merupakan katering halal yang berdedikasi dalam memberikan pelayanan dan kualitas makanan terbaik. Dengan fasilitas dapur berstandar kebersihan tinggi dan kapasitas produksi hingga 8.000 porsi per hari, didukung oleh peralatan canggih dan modern, kami juga dipercaya untuk melayani katering maskapai Garuda Indonesia di Batam.",
+    },
+    vision: {
+      titleLead: "Visi & Misi",
+      visionTitle: "Visi",
+      visionDescription:
+        "Menjadi perusahaan jasa boga berkualitas untuk acara, industri, instansi swasta, dan pemerintahan di seluruh Indonesia.",
+      missionTitle: "Misi",
+      missionDescription:
+        "Menerapkan Cara Produksi yang Baik (CPB) dalam mencapai kepuasan pelanggan.",
+    },
+    strategy: {
+      titleLead: "Strategi",
+      subtitle: "Meningkatkan kepuasan pelanggan melalui:",
+      items: [
+        "Membangun dan memperbaiki sistem untuk menjamin kualitas produk dan layanan tetap terjaga sesuai standar yang ditetapkan.",
+        "Meningkatkan pelayanan dengan menjaga kualitas produk dan layanan yang diberikan.",
+        "Mengembangkan sumber daya manusia.",
+        "Menciptakan lingkungan kerja yang kondusif, harmonis, dan manusiawi.",
+      ],
+    },
+    contactSection: {
+      title: "Siap Menyediakan Katering untuk Acara Anda",
+      description:
+        "Diskusikan kebutuhan acara Anda bersama kami dan dapatkan solusi katering yang sesuai.",
+      primaryCta: "Mulai Pesan",
+      secondaryCta: "Konsultasi Sekarang",
+    },
+  },
+  contactPage: {
+    hero: {
+      eyebrow: "Hubungi KSM Katering",
+      title:
+        "Kami siap membantu kebuKami siap membantu Anda. Untuk informasi lebih lanjut mengenai layanan dan penawaran terbaik dari kami, silakan hubungi tim kami. Kami berkomitmen memberikan pelayanan yang cepat, responsif, dan profesional untuk memenuhi kebutuhan Anda.tuhan katering Anda.",
     },
     vision: {
       titleLead: "Visi & Misi",
