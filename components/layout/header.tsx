@@ -99,7 +99,12 @@ function Header() {
         <div className="hidden items-center gap-3 md:flex">
           <LanguageSwitcher />
           <Button className="cursor-pointer bg-[#8D0000] px-5 py-5">
-            {commonT("orderNow")}
+            <a
+                href="https://wa.me/628111171713?text=Halo%2C%20saya%20ingin%20memesan."
+                target="_blank"
+              >
+              {commonT("orderNow")}
+            </a>
           </Button>
         </div>
 

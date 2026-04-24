@@ -57,7 +57,7 @@ export default async function Page() {
               href={whatsappLink}
               target="_blank"
               rel="noreferrer"
-              className="h-12 cursor-pointer border flex items-center border-white bg-transparent px-8 text-sm font-bold text-white hover:border-red-800 hover:bg-red-800 hover:text-white"
+              className="h-12 cursor-pointer border flex items-center justify-center border-white bg-transparent px-8 text-sm font-bold text-white hover:border-red-800 hover:bg-red-800 hover:text-white"
             >
               {t("hero.secondaryCta")}
             </Link>
@@ -213,7 +213,7 @@ export default async function Page() {
           <div className="flex w-full flex-col gap-4 sm:w-auto sm:flex-row sm:gap-8">
             <Button
               asChild
-              className="mt-2 h-12 w-full bg-white px-8 text-base text-red-800 sm:w-auto sm:text-lg"
+              className="mt-2 h-12 w-full bg-white px-8 text-base text-red-800 sm:w-auto sm:text-lg hover:bg-red-800 hover:text-white"
             >
               <a
                 href="https://wa.me/628111171713?text=Halo%2C%20saya%20ingin%20memesan."

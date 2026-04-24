@@ -141,7 +141,9 @@ function Testimonial() {
         style={{
           scrollbarWidth: "none",
           WebkitUserSelect: "none",
-          touchAction: "pan-y",
+          touchAction: "auto",
+          WebkitOverflowScrolling: "touch",
+          overscrollBehaviorX: "contain",
         }}
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
