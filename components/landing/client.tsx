@@ -57,7 +57,7 @@ function Client() {
         direction="left"
         logoHeight={48}
         gap={40}
-        hoverSpeed={0}
+        hoverSpeed={50}
         fadeOut
         fadeOutColor="#ffffff"
         ariaLabel="Client logos top"
@@ -69,7 +69,7 @@ function Client() {
         direction="right"
         logoHeight={48}
         gap={40}
-        hoverSpeed={0}
+        hoverSpeed={50}
         fadeOut
         fadeOutColor="#ffffff"
         ariaLabel="Client logos bottom"

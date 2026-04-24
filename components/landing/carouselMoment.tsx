@@ -19,6 +19,7 @@ const SLIDE_WIDTH = 280;
 const SLIDE_HEIGHT = 500;
 const GAP = 36;
 const SPEED = 50;
+const HOVER_SPEED = 50;
 
 const CLONED = [...IMAGES, ...IMAGES, ...IMAGES];
 const LOOP_LENGTH = IMAGES.length * (SLIDE_WIDTH + GAP);
@@ -30,6 +31,7 @@ export default function CarouselMoment() {
   const rafRef = useRef<number | null>(null);
   const lastTimeRef = useRef<number | null>(null);
   const isPausedRef = useRef(false);
+  const speedRef = useRef(SPEED);
   const animateFnRef = useRef<(ts: number) => void>(() => {});
 
   const [activeDot, setActiveDot] = useState(0);
@@ -41,7 +43,7 @@ export default function CarouselMoment() {
       lastTimeRef.current = ts;
 
       if (!isPausedRef.current) {
-        offsetRef.current += (SPEED * delta) / 1000;
+        offsetRef.current += (speedRef.current * delta) / 1000;
         if (offsetRef.current >= LOOP_LENGTH) {
           offsetRef.current -= LOOP_LENGTH;
         }
@@ -113,11 +115,10 @@ export default function CarouselMoment() {
           <div
             className="overflow-hidden rounded-md"
             onMouseEnter={() => {
-              isPausedRef.current = true;
+              speedRef.current = HOVER_SPEED;
             }}
             onMouseLeave={() => {
-              isPausedRef.current = false;
-              lastTimeRef.current = null;
+              speedRef.current = SPEED;
             }}
           >
             <div

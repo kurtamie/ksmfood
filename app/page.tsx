@@ -70,11 +70,12 @@ export default async function Page() {
         className="flex items-center justify-center bg-white py-16"
       >
         <div className="flex w-full max-w-7xl flex-col items-center gap-10 px-6 lg:gap-12">
-          <div className="flex gap-4 text-3xl font-bold sm:text-4xl lg:text-5xl">
-            <h1 className="text-black">{t("about.titleLead")}</h1>
-            <h1 className="text-[#8D0000]">{t("about.titleBrand")}</h1>
+          <div className="flex gap-4 text-3xl font-bold sm:text-4xl lg:text-5xl text-center">
+            <h1 className="text-black">{t("about.titleLead")}{(" ")}
+              <span className="text-[#8D0000]">{t("about.titleBrand")}</span>
+            </h1>
           </div>
-          <div className="mt-10 flex flex-col gap-10 lg:flex-row">
+          <div className="mt-10 flex flex-col gap-10 lg:flex-row items-center">
             <div className="w-full max-w-xl bg-[#8D0000] px-6 py-10 sm:px-12 sm:py-24">
               <iframe
                 title="Profil KSM Katering"
