@@ -20,7 +20,17 @@ const imageLogosTop = [
   },
   { src: "/images/client/Garuda-Indonesia.webp", alt: "Garuda Indonesia" },
   { src: "/images/client/images.webp", alt: "Client Logo" },
-  { src: "/images/client/Infineon.webp", alt: "Infineon" },
+  { src: "/images/client/baker-hughes.webp", alt: "baker-hughes" },
+  { src: "/images/client/dynacast.webp", alt: "dynacast" },
+  { src: "/images/client/eaton.webp", alt: "eaton" },
+  { src: "/images/client/Ecogreen.webp", alt: "Ecogreen" },
+  { src: "/images/client/epson.webp", alt: "epson" },
+  { src: "/images/client/excelitas.webp", alt: "excelitas" },
+  { src: "/images/client/Flex.webp", alt: "Flex" },
+  { src: "/images/client/Honeywell.webp", alt: "Honeywell" },
+  { src: "/images/client/inmarsat.webp", alt: "inmarsat" },
+  { src: "/images/client/nissinkogyobatam.webp", alt: "nissinkogyobatam" },
+  { src: "/images/client/nittoh.webp", alt: "nittoh" },
 ];
 
 const imageLogosBottom = [
@@ -46,6 +56,18 @@ const imageLogosBottom = [
   { src: "/images/client/PT-SMOE-Indonesia.webp", alt: "PT SMOE Indonesia" },
   { src: "/images/client/PT-Timas.webp", alt: "PT Timas" },
   { src: "/images/client/Yonif-Batam.webp", alt: "Yonif Batam" },
+  { src: "/images/client/Panasonic.webp", alt: "Panasonic" },
+  { src: "/images/client/patlite.webp", alt: "patlite" },
+  { src: "/images/client/Rigspek.webp", alt: "Rigspek" },
+  { src: "/images/client/rubycon.webp", alt: "rubycon" },
+  { src: "/images/client/siix.webp", alt: "siix" },
+  { src: "/images/client/sumitomo.webp", alt: "sumitomo" },
+  { src: "/images/client/tdk.webp", alt: "tdk" },
+  { src: "/images/client/tec.webp", alt: "tec" },
+  { src: "/images/client/triplus.webp", alt: "triplus" },
+  { src: "/images/client/varta.webp", alt: "varta" },
+  { src: "/images/client/WIK.webp", alt: "WIK" },
+  { src: "/images/client/yokogawa.webp", alt: "yokogawa" },
 ];
 
 function Client() {

@@ -766,6 +766,9 @@ const messages = {
       paragraph2:
         "Dengan standar mutu yang tinggi, menerapkan standar CPB (Cara Produksi yang Baik) dengan skala yang besar, menjadikan KSM Catering menjadi catering yang dipercaya!",
     },
+    clientsSection: {
+      title: "Dipercaya Oleh Klien Kami",
+    },
     packages: {
       titleLead: "Paket",
       titleBrand: "Katering Korporat",
