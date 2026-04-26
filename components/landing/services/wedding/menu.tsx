@@ -19,7 +19,7 @@ const packageCards = [
       "Buah",
       "Air Mineral Gelas",
     ],
-    price: "Rp 32.000/porsi",
+    price: "Rp 34.000/porsi",
   },
   {
     id: "b",
@@ -35,7 +35,7 @@ const packageCards = [
       "Buah",
       "Air Mineral Gelas",
     ],
-    price: "Rp 40.000/porsi",
+    price: "Rp 42.000/porsi",
   },
   {
     id: "c",
@@ -50,7 +50,7 @@ const packageCards = [
       "Buah",
       "Air Mineral Gelas",
     ],
-    price: "Rp 48.000/porsi",
+    price: "Rp 50.000/porsi",
   },
   {
     id: "a-plus",
@@ -67,7 +67,7 @@ const packageCards = [
       "Sup Sayur",
       "Puding",
     ],
-    price: "Rp 43.000/porsi",
+    price: "Rp 45.000/porsi",
   },
   {
     id: "b-plus",
@@ -84,7 +84,7 @@ const packageCards = [
       "Sup Sayur",
       "Puding",
     ],
-    price: "Rp 49.000/porsi",
+    price: "Rp 51.000/porsi",
   },
   {
     id: "c-plus",
@@ -101,7 +101,7 @@ const packageCards = [
       "Sup Sayur",
       "Puding",
     ],
-    price: "Rp 57.000/porsi",
+    price: "Rp 59.000/porsi",
   },
 ];
 

@@ -24,13 +24,13 @@ export default async function PrasmananPage() {
             {t("hero.title")}
           </h1>
 
-          <a
+          {/* <a
             href="/images/pdf/prasmanan.pdf"
             download
             className="mt-10 inline-flex h-12 items-center justify-center rounded-lg border border-white px-8 text-sm font-bold text-white transition hover:border-[#8D0000] hover:bg-[#8D0000]"
           >
             {t("hero.cta")}
-          </a>
+          </a> */}
         </div>
       </section>
 

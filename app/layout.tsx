@@ -1,8 +1,9 @@
 import type { Metadata, Viewport } from "next";
+import { cookies } from "next/headers";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
 import SiteShell from "@/components/layout/site-shell";
-import { defaultLocale } from "@/i18n/routing";
+import { defaultLocale, hasLocale, localeCookieName } from "@/i18n/routing";
 import "./globals.css";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL?.startsWith("http")
@@ -57,7 +58,9 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const locale = defaultLocale;
+  const cookieLocale = (await cookies()).get(localeCookieName)?.value;
+  const locale =
+    cookieLocale && hasLocale(cookieLocale) ? cookieLocale : defaultLocale;
   const messages = await getMessages({ locale });
 
   return (

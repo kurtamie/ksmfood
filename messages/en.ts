@@ -75,6 +75,7 @@ const messages = {
     gallery: {
       event: "Events",
       menu: "Menu",
+      testimonial: "Testimonial",
       video: "Video",
     },
     about: {
@@ -137,6 +138,7 @@ const messages = {
     },
     testimonialsSection: {
       title: "Hear It From Our Customers",
+      cta: "See Another Real Testimonials",
     },
     faqSection: {
       title: "Frequently Asked Questions",
@@ -257,35 +259,56 @@ const messages = {
     items: [
       {
         id: 1,
-        name: "Rina Maharani",
-        text: "Our family event order arrived on time, looked neat, and tasted consistently good from start to finish.",
+        name: "Nurlela0900 Joenjklelha 97",
+        text: "Suka kali pesan di disini, makananan nya enak fast respon, ramah. Solusi sih kalau ada acara mendadak",
       },
       {
         id: 2,
-        name: "Fajar Nugroho",
-        text: "The KSM team was easy to coordinate with. The buffet menu was complete and many office guests asked for the recommendation.",
+        name: "my doni",
+        text: "Kemaren aku pesan untuk acara syukuran kata tetangga makanan nya enak, next acara aku mau pesan di catering ini lagi 😄",
       },
       {
         id: 3,
-        name: "Dewi Lestari",
-        text: "I liked the portion size, the seasoning, and the presentation. It made our engagement event feel more refined.",
+        name: "Cahaya Butarbutar",
+        text: "Saya senang pesan catering di ksm dilayani dengan baik saat pesta langsung gercep tim nya, terimakasih ksm atas pelayanan nya🥰",
       },
       {
         id: 4,
-        name: "Aldo Pratama",
-        text: "Both the snack box and lunch were satisfying. Clean packaging and every order arrived as requested.",
+        name: "Maulya Safa",
+        text: "Catering mantap rasa nyaa enak dan worth it, abang2 di lapangan pada baik2, mantapp",
       },
       {
         id: 5,
-        name: "Nadia Permata",
-        text: "The menu choices were flexible and worked well for guests of different ages. That really helped for a big family event.",
+        name: "Darwinto Winto",
+        text: "Nasi kotak murah dan worth it enak masakannya ges",
       },
       {
         id: 6,
-        name: "Rizky Ananda",
-        text: "Service was fast when we needed portion changes. The admin response was clear and efficient.",
+        name: "Riski Gulo",
+        text: "Rekomendasi untuk acara rumahan enakk",
+      },
+      {
+        id: 7,
+        name: "Thienna San",
+        text: "pelayanan nya bagus",
+      },
+      {
+        id: 8,
+        name: "Andra Yunisa",
+        text: "enak lengkap🌸",
+      },
+      {
+        id: 9,
+        name: "virlo sitorus",
+        text: "Ksm mantap👍",
+      },
+      {
+        id: 10,
+        name: "Marta Endarwati",
+        text: "Great company",
       },
     ],
+    cta: "See Another Real Testimonial",
   },
   portfolio: {
     title: "Moments With KSM Katering",
@@ -305,7 +328,14 @@ const messages = {
       { href: "#layanan", label: "Packages" },
       { href: "#informasi-pemesanan", label: "Ordering Info" },
       { href: "#pilihan-menu", label: "Menu Choices" },
-      { href: "#stand", label: "Stand" },
+      { href: "#hubungi-kami", label: "Contact" },
+    ],
+    wedding: [
+      { href: "#tentang", label: "About" },
+      { href: "#layanan", label: "Packages" },
+      { href: "#informasi-pemesanan", label: "Ordering Info" },
+      { href: "#pilihan-menu", label: "Menu Choices" },
+      { href: "#stand", label: "Food Stalls" },
       { href: "#faq", label: "Faq" },
       { href: "#hubungi-kami", label: "Contact" },
     ],
@@ -317,8 +347,8 @@ const messages = {
     ],
     snackBox: [
       { href: "#tentang", label: "About" },
-      { href: "#menu", label: "Packages" },
-      { href: "#bonus", label: "Bonus" },
+      { href: "#layanan", label: "Packages" },
+      { href: "#pilihan-menu", label: "Menu Choices" },
       { href: "#hubungi-kami", label: "Contact" },
     ],
     bento: [
@@ -329,11 +359,16 @@ const messages = {
       { href: "#galeri", label: "Gallery" },
       { href: "#hubungi-kami", label: "Contact" },
     ],
+    tumpeng: [
+      { href: "#tentang", label: "About" },
+      { href: "#layanan", label: "Packages" },
+      { href: "#hubungi-kami", label: "Contact" },
+    ],
     korporat: [
-      { href: "#tentang", label: "Tentang" },
-      { href: "#layanan", label: "Paket" },
-      { href: "testimonial", label: "Testimoni" },
-      { href: "#hubungi-kami", label: "Hubungi" },
+      { href: "#tentang", label: "About" },
+      { href: "#layanan", label: "Packages" },
+      { href: "testimonial", label: "Testimonials" },
+      { href: "#hubungi-kami", label: "Contact" },
     ],
   },
   riceboxPage: {
@@ -357,9 +392,6 @@ const messages = {
     },
     minimumOrder:
       "Minimum delivery order is 50 boxes. Orders below 50 boxes can be picked up from our kitchen.",
-    gallerySection: {
-      title: "Our Bento Selection",
-    },
     menuSection: {
       titleLead: "Menu",
       titleBrand: "Choices",
@@ -477,48 +509,48 @@ const messages = {
   weddingPage: {
     hero: {
       eyebrow: "Wedding Catering",
-      title: "Harmoni dalam pelayanan dan sajian yang terbaik",
-      cta: "Unduh Menu Prasmanan Pernikahan",
-      cta2: "Unduh Menu Katering Pondokan",
+      title: "Harmony in service and exceptional dishes",
+      cta: "Download Wedding Buffet Menu",
+      cta2: "Download Food Stall Menu",
     },
     about: {
-      titleLead: "Layanan Terbaik, ",
-      titleAccent: "dari yang Terbaik",
+      titleLead: "The Best Service, ",
+      titleAccent: "from the Best",
       paragraph1:
-        "Nikmati layanan penuh dari KSM Katering untuk acara pernikahan Anda. Kami menyediakan layanan prasmanan dengan beragam pilihan menu yang nikmat, serta didukung oleh tim pelayan yang siap melayani tamu undangan Anda dengan sigap.",
+        "Enjoy full-service catering from KSM Katering for your wedding. We provide buffet service with a variety of delicious menu options, supported by a service team ready to attend to your guests promptly.",
     },
     packages: {
-      titleLead: "Paket",
-      titleBrand: "Prasmanan Pernikahan",
+      titleLead: "Wedding Buffet",
+      titleBrand: "Packages",
     },
     orderingInfo: {
-      titleLead: "Informasi",
-      titleAccent: "Pemesanan",
-      deliveryTitle: "Gratis Pengiriman",
-      deliveryDescription: "Tersedia",
-      equipmentTitle: "Peralatan Prasmanan Tersedia",
-      equipmentDescription: "Untuk pelayanan stan dan kebersihan",
-      serviceTitle: "Layanan Pramusaji",
-      serviceDescription: "Minimal pemesanan 100 porsi",
-      toolsTitle: "Peralatan Makan",
-      toolsDescription: "Disediakan lengkap dan bersih",
+      titleLead: "Ordering",
+      titleAccent: "Information",
+      deliveryTitle: "Free Delivery",
+      deliveryDescription: "Available",
+      equipmentTitle: "Buffet Equipment Available",
+      equipmentDescription: "For stall service and cleanliness.",
+      serviceTitle: "Serving Staff",
+      serviceDescription: "Minimum order 100 portions",
+      toolsTitle: "Tableware",
+      toolsDescription: "Provided complete and clean",
       minimumTitle: "Minimum Order",
-      minimumDescription: "150 Porsi",
+      minimumDescription: "150 Portions",
     },
     menuSection: {
-      titleLead: "Pilihan",
-      titleBrand: "Menu",
+      titleLead: "Menu",
+      titleBrand: "Choices",
     },
   },
   weddingMenu: {
-    popular: "Paling Populer",
+    popular: "Most Popular",
   },
   weddingMenuServices: {
-    mainTitle: "Lauk Utama",
-    sideTitle: "Pendamping",
+    mainTitle: "Main Dishes",
+    sideTitle: "Sides",
   },
   weddingStand: {
-    mainTitle: "Katering Pondokan",
+    mainTitle: "Food Stall Catering",
     cards: [
       {
         id: 1,
@@ -542,13 +574,13 @@ const messages = {
     ],
   },
   weddingCta: {
-    title: "Sajian Terbaik untuk Hari Istimewa Anda",
+    title: "The Best Dishes for Your Special Day",
     description:
-      "Nikmati layanan prasmanan lengkap dengan cita rasa istimewa dan tim profesional yang siap melayani setiap detail acara Anda.",
+      "Enjoy complete buffet service with special flavors and a professional team ready to handle every detail of your event.",
     orderLink:
-      "https://wa.me/628111171713?text=Halo%2C%20saya%20ingin%20pesan%prasmanan%20pernikahan.",
+      "https://wa.me/628111171713?text=Hello%2C%20I%20want%20to%20order%20wedding%20buffet%20catering.",
     consultLink:
-      "https://wa.me/628111171713?text=Halo%2C%20saya%20ingin%20konsultasi%20prasmanan%20pernikahan.",
+      "https://wa.me/628111171713?text=Hello%2C%20I%20want%20to%20consult%20about%20wedding%20buffet%20catering.",
   },
   weddingFaq: {
     items: [
@@ -596,177 +628,173 @@ const messages = {
   bentoPage: {
     hero: {
       eyebrow: "Bento",
-      title: "Praktis, higienis dengan menu bervariasi",
-      cta: "Unduh Menu",
+      title: "Practical and hygienic with varied menu options",
+      cta: "Download Menu",
     },
     about: {
-      titleHighlight: "Nasi Kotak",
+      titleHighlight: "Premium",
       titleBody: "Premium",
       paragraph1:
-        "Nasi kotak Bento cocok untuk anda yang ingin menyajikan nasi kotak dengan pilihan menu masakan dan kemasan kotak premium untuk para tamu dan relasi spesial.",
+        "Bento rice boxes are ideal when you want to serve rice boxes with varied dish choices and premium packaging for special guests and relations.",
       paragraph2:
-        "Cocok dihidang untuk makan siang, pertemuan, rapat, acara gathering, fun day dan event lainnya.",
+        "Suitable for lunch, meetings, gatherings, fun days, and other events.",
     },
     packages: {
-      titleLead: "Paket",
-      titleBrand: "Bento",
+      titleLead: "Bento",
+      titleBrand: "Packages",
     },
     minimumOrder:
-      "Minimum order 50 kotak diantar, di bawah 50 kotak dijemput ke dapur kami.",
+      "Minimum order is 25 boxes for pickup from our kitchen. Orders of 50 boxes or more include free delivery.",
     gallerySection: {
-      title: "Pilihan Bento Kami",
+      title: "Our Bento Selection",
     },
     menuSection: {
-      titleLead: "Pilihan",
-      titleBrand: "Menu",
+      titleLead: "Menu",
+      titleBrand: "Choices",
     },
   },
   bentoMenu: {
-    popular: "Paling Populer",
-    orderNow: "Pesan Sekarang",
+    popular: "Most Popular",
+    orderNow: "Order Now",
   },
   bentoMenuServices: {
-    mainTitle: "Lauk Utama",
-    sideTitle: "Pendamping",
+    mainTitle: "Main Dishes",
+    sideTitle: "Sides",
   },
   bentoCta: {
-    title: "Bento Berkualitas, Temani Setiap Acara",
+    title: "Quality Bento for Every Event",
     description:
-      "Hidangan praktis, higienis, dan penuh rasa untuk pengalaman yang tak terlupakan.",
+      "Practical, hygienic, and flavorful meals for a memorable experience.",
     orderLink:
-      "https://wa.me/628111171713?text=Halo%2C%20saya%20ingin%20pesan%20Bento.",
+      "https://wa.me/628111171713?text=Hello%2C%20I%20want%20to%20order%20Bento.",
     consultLink:
-      "https://wa.me/628111171713?text=Halo%2C%20saya%20ingin%20konsultasi%20Bento.",
+      "https://wa.me/628111171713?text=Hello%2C%20I%20want%20to%20consult%20about%20Bento.",
   },
   snackBoxPage: {
     hero: {
-      eyebrow: "Snack Kotak",
-      title: "Lengkapi momen spesial dengan kelezatan",
-      cta: "Unduh Menu",
+      eyebrow: "Snack Box",
+      title: "Complete special moments with delicious treats",
+      cta: "Download Menu",
     },
     about: {
-      titleHighlight: "Lezat dalam",
-      titleBody: "setiap kotak",
+      titleHighlight: "Delicious in",
+      titleBody: "every box",
       paragraph1:
-        "Lengkapi momen spesial anda dengan kelezatan yang tak terlupakan. Snack kotak KSM Katering dirancang khusus untuk memberikan cita rasa istimewa dalam setiap gigitan, menjadikan setiap acara lebih berkesan.",
+        "Complete your special moments with unforgettable treats. KSM Katering snack boxes are specially prepared to deliver a special taste in every bite, making every event more memorable.",
       paragraph2:
-        "Dengan pilihan menu yang variatif dan berkualitas, kami siap memanjakan lidah para tamu Anda. Sempurnakan kebersamaan dan buat setiap momen lebih berarti dengan sajian praktis yang penuh kenikmatan.",
+        "With varied and high-quality menu choices, we are ready to delight your guests. Make every gathering more meaningful with practical servings full of enjoyment.",
     },
     packages: {
-      titleLead: "Paket",
-      titleBrand: "Snack Kotak",
+      titleLead: "Snack Box",
+      titleBrand: "Packages",
     },
     minimumOrder:
-      "Minimum order 50 kotak diantar, di bawah 50 kotak dijemput ke dapur kami.",
+      "Minimum delivery order is 50 boxes. Orders below 50 boxes can be picked up from our kitchen.",
     gallerySection: {
-      title: "Pilihan Bento Kami",
+      title: "Our Snack Box Selection",
     },
     menuSection: {
-      titleLead: "Pilihan",
-      titleBrand: "Menu",
+      titleLead: "Menu",
+      titleBrand: "Choices",
     },
   },
   snackBoxMenu: {
-    popular: "Paling Populer",
-    orderNow: "Pesan Sekarang",
+    popular: "Most Popular",
+    orderNow: "Order Now",
   },
   snackBoxMenuServices: {
-    mainTitle: "Pilihan Snack",
-    sideTitle: "Pendamping",
+    mainTitle: "Snack Choices",
+    sideTitle: "Sides",
   },
   snackBoxCta: {
-    title: "Snack Kotak Praktis untuk Berbagai Acara",
+    title: "Practical Snack Boxes for Every Event",
     description:
-      "lezat dan higienis yang siap melengkapi setiap acara Anda, dari rapat hingga kegiatan spesial.",
+      "Delicious and hygienic options ready to complete every event, from meetings to special activities.",
     orderLink:
-      "https://wa.me/628111171713?text=Halo%2C%20saya%20ingin%20pesan%20Snack%20Box.",
+      "https://wa.me/628111171713?text=Hello%2C%20I%20want%20to%20order%20Snack%20Box.",
     consultLink:
-      "https://wa.me/628111171713?text=Halo%2C%20saya%20ingin%20konsultasi%20Snack%20Box.",
+      "https://wa.me/628111171713?text=Hello%2C%20I%20want%20to%20consult%20about%20Snack%20Box.",
   },
   tumpengPage: {
     hero: {
-      eyebrow: "Snack Kotak",
-      title: "Lengkapi momen spesial dengan kelezatan",
-      cta: "Unduh Menu",
+      eyebrow: "Tumpeng",
+      title: "More than yellow rice, more than a celebration",
+      cta: "Download Menu",
     },
     about: {
-      titleHighlight: "Tumpeng lezat,",
-      titleBody: "Doa dan Harapan yang Hangat",
+      titleHighlight: "Delicious tumpeng,",
+      titleBody: "warm prayers and hopes",
       paragraph1:
-        "Lebih dari sekadar nasi kuning, tumpeng katering kami menghadirkan makna mendalam dalam setiap perayaan. Dengan susunan lauk yang menggugah selera dan cita rasa autentik, kami tidak hanya menyajikan hidangan, tetapi juga menyampaikan harapan dan doa untuk kebahagiaan serta kesuksesan.",
+        "More than just yellow rice, our tumpeng catering brings deeper meaning to every celebration. With appetizing side dishes and authentic flavors, we do not only serve food, but also share hopes and prayers for happiness and success.",
       paragraph2:
-        "Setiap elemen dalam tumpeng kami dipilih dengan cermat untuk melengkapi makna simbolis yang terkandung di dalamnya. Jadikan momen spesial Anda lebih berkesan dengan tumpeng yang penuh arti dan kelezatan.",
+        "Every element in our tumpeng is carefully selected to complete its symbolic meaning. Make your special moment more memorable with tumpeng full of meaning and flavor.",
     },
     packages: {
-      titleLead: "Paket",
-      titleBrand: "Tumpeng",
+      titleLead: "Tumpeng",
+      titleBrand: "Packages",
     },
     minimumOrder:
-      "Minimum order 50 kotak diantar, di bawah 50 kotak dijemput ke dapur kami.",
+      "Minimum delivery order is 50 boxes. Orders below 50 boxes can be picked up from our kitchen.",
     gallerySection: {
-      title: "Pilihan Bento Kami",
+      title: "Our Tumpeng Selection",
     },
     menuSection: {
-      titleLead: "Pilihan",
-      titleBrand: "Menu",
+      titleLead: "Menu",
+      titleBrand: "Choices",
     },
   },
   tumpengMenu: {
-    popular: "Paling Populer",
-    orderNow: "Pesan Sekarang",
-  },
-  tumpengMenuServices: {
-    mainTitle: "Pilihan Snack",
-    sideTitle: "Pendamping",
+    popular: "Most Popular",
+    orderNow: "Order Now",
   },
   tumpengCta: {
-    title: "Tumpeng untuk Setiap Momen Bermakna",
+    title: "Tumpeng for Every Meaningful Moment",
     description:
-      "Disajikan dengan penuh kehangatan dan cita rasa autentik untuk merayakan kebersamaan Anda.",
+      "Served with warmth and authentic flavor to celebrate your togetherness.",
     orderLink:
-      "https://wa.me/628111171713?text=Halo%2C%20saya%20ingin%20pesan%20Tumpeng.",
+      "https://wa.me/628111171713?text=Hello%2C%20I%20want%20to%20order%20Tumpeng.",
     consultLink:
-      "https://wa.me/628111171713?text=Halo%2C%20saya%20ingin%20konsultasi%20Tumpeng.",
+      "https://wa.me/628111171713?text=Hello%2C%20I%20want%20to%20consult%20about%20Tumpeng.",
   },
   korporatPage: {
     hero: {
-      eyebrow: "Katering Korporat",
-      title: "Produktivitas Lebih Tinggi dengan Sajian Berkualitas",
-      cta: "Unduh Menu",
+      eyebrow: "Corporate Catering",
+      title: "Higher productivity with quality meals",
+      cta: "Download Menu",
     },
     about: {
-      titleHighlight: "Solusi Katering Terbaik untuk Perusahaan Anda",
+      titleHighlight: "The best catering solution for your company",
       paragraph1:
-        "KSM Katering hadir untuk memenuhi kebutuhan katering perusahaan dengan menu yang sehat, lezat, dan higienis.",
+        "KSM Katering is here to meet corporate catering needs with healthy, delicious, and hygienic menus.",
       paragraph2:
-        "Kami menyediakan berbagai pilihan menu yang dapat disesuaikan dengan selera dan kebutuhan perusahaan Anda. Mulai dari makan siang karyawan, meeting, hingga acara perusahaan, kami siap menjadi mitra kuliner terpercaya.",
+        "We provide various menu choices that can be adjusted to your company's tastes and needs. From employee lunches and meetings to corporate events, we are ready to be your trusted culinary partner.",
     },
     packages: {
-      titleLead: "Paket",
-      titleBrand: "Katering Korporat",
+      titleLead: "Corporate Catering",
+      titleBrand: "Packages",
     },
     minimumOrder:
-      "Minimum order 50 kotak diantar, di bawah 50 kotak dijemput ke dapur kami.",
+      "Minimum delivery order is 50 boxes. Orders below 50 boxes can be picked up from our kitchen.",
     gallerySection: {
-      title: "Pilihan Bento Kami",
+      title: "Our Corporate Catering Selection",
     },
     menuSection: {
-      titleLead: "Pilihan",
-      titleBrand: "Menu",
+      titleLead: "Menu",
+      titleBrand: "Choices",
     },
   },
   korporatMenu: {
-    popular: "Paling Populer",
-    orderNow: "Pesan Sekarang",
+    popular: "Most Popular",
+    orderNow: "Order Now",
   },
   korporatCta: {
-    title: "Solusi Katering Profesional untuk Kebutuhan Perusahaan Anda",
+    title: "Professional Catering Solutions for Your Company",
     description:
-      "Dukung setiap kegiatan perusahaan dengan layanan katering berkualitas, menu beragam, dan pelayanan yang terpercaya.",
+      "Support every company activity with quality catering service, varied menus, and dependable service.",
     orderLink:
-      "https://wa.me/628111171713?text=Halo%2C%20saya%20ingin%20pesan%Katering%20Korporat.",
+      "https://wa.me/628111171713?text=Hello%2C%20I%20want%20to%20order%20Corporate%20Catering.",
     consultLink:
-      "https://wa.me/628111171713?text=Halo%2C%20saya%20ingin%20konsultasi%Katering%20Korporat.",
+      "https://wa.me/628111171713?text=Hello%2C%20I%20want%20to%20consult%20about%20Corporate%20Catering.",
   },
   serviceDetail: {
     eyebrow: "KSM Katering Services",
@@ -799,12 +827,6 @@ const messages = {
     },
   },
   aboutPages: {
-    ksm: {
-      eyebrow: "About KSM",
-      title: "A brief profile of KSM Katering",
-      description:
-        "This page is prepared to present the company profile, history, and core values of KSM Katering in more detail.",
-    },
     contact: {
       eyebrow: "KSM Contact",
       title: "Reach the KSM Katering team",
@@ -836,6 +858,46 @@ const messages = {
         "Developing human resources.",
         "Creating a conducive, harmonious, and humane work environment.",
       ],
+    },
+    contactSection: {
+      title: "Ready to Cater Your Event",
+      description:
+        "Discuss your event needs with us and get a catering solution that fits.",
+      primaryCta: "Start Ordering",
+      secondaryCta: "Consult Now",
+    },
+  },
+  contactPage: {
+    hero: {
+      eyebrow: "Contact KSM Katering",
+      title:
+        "We are ready to help you. For more information about our services and best offers, please contact our team. We are committed to providing fast, responsive, and professional service for your catering needs.",
+    },
+    vision: {
+      titleLead: "Vision & Mission",
+      visionTitle: "Vision",
+      visionDescription:
+        "To become a quality catering company for events, industry, private institutions, and government institutions throughout Indonesia.",
+      missionTitle: "Mission",
+      missionDescription:
+        "To implement Good Production Practices (GPP) in achieving customer satisfaction.",
+    },
+    strategy: {
+      titleLead: "Strategy",
+      subtitle: "Improving customer satisfaction through:",
+      items: [
+        "Building and improving systems to ensure product and service quality stays aligned with established standards.",
+        "Improving service by maintaining the quality of the products and services provided.",
+        "Developing human resources.",
+        "Creating a conducive, harmonious, and humane work environment.",
+      ],
+    },
+    contactSection: {
+      title: "Ready to Cater Your Event",
+      description:
+        "Discuss your event needs with us and get a catering solution that fits.",
+      primaryCta: "Start Ordering",
+      secondaryCta: "Consult Now",
     },
   },
 } as const;

@@ -14,7 +14,7 @@ export default async function SnackBoxPage() {
     <main className="w-full overflow-x-clip">
       <section
         id="hero"
-        className="scroll-mt-24 bg-[url('/images/snack_kotak-header.webp')] bg-cover bg-center shadow-[inset_0_0_0_2000px_rgba(63,59,59,0.48)]"
+        className="scroll-mt-24 bg-[url('/images/services/snackBox/snack_kotak-header.webp')] bg-cover bg-center shadow-[inset_0_0_0_2000px_rgba(63,59,59,0.48)]"
       >
         <div className="mx-auto flex min-h-auto max-w-8xl flex-col items-center justify-center gap-10 px-6 py-16 text-center sm:gap-14 sm:py-20">
           <div className="w-full text-white">
@@ -28,14 +28,14 @@ export default async function SnackBoxPage() {
             </div>
           </div>
 
-          <Button
+          {/* <Button
             asChild
             className="h-12 w-full max-w-xs cursor-pointer border border-white bg-transparent px-8 text-sm font-bold text-white hover:border-red-800 hover:bg-red-800 hover:text-white sm:w-auto"
           >
             <a href="/images/pdf/snackkot.pdf" download>
               {t("hero.cta")}
             </a>
-          </Button>
+          </Button> */}
         </div>
       </section>
 

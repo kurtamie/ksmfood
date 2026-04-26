@@ -26,7 +26,7 @@ export default async function WeddingPage() {
             {t("hero.title")}
           </h1>
 
-          <div className="flex flex-col gap-8 md:flex md:flex-row">
+          {/* <div className="flex flex-col gap-8 md:flex md:flex-row">
             <a
               href="/images/pdf/wedding.pdf"
               download
@@ -41,7 +41,7 @@ export default async function WeddingPage() {
             >
               {t("hero.cta2")}
             </a>
-          </div>
+          </div> */}
         </div>
       </section>
 
@@ -56,7 +56,7 @@ export default async function WeddingPage() {
             <div className="w-full">
               <iframe
                 className="aspect-video w-full rounded-2xl"
-                src="https://www.youtube.com/embed/nxJ3_mBdZI8?autoplay=1&mute=1&controls=0&loop=1"
+                src="https://www.youtube.com/embed/wkzB9INsRfY?autoplay=1&mute=1&controls=0&loop=1"
               ></iframe>
             </div>
             <div className="flex flex-col gap-4 text-center lg:ml-6 lg:gap-6 lg:text-left">
@@ -150,6 +150,26 @@ export default async function WeddingPage() {
         className="flex w-full flex-col items-center px-6 py-16 sm:py-20"
       >
         <Faq />
+      </section>
+
+      <section
+        id="bts"
+        className="flex w-full flex-col items-center px-6 py-16 sm:py-20"
+      >
+        <div className="mx-auto w-full max-w-7xl">
+          <div className="space-y-4 sm:space-y-6">
+            <div className="overflow-hidden rounded-2xl bg-neutral-950 shadow-sm">
+              <iframe
+                title="behind-the-scene"
+                src="https://www.youtube.com/embed/nxJ3_mBdZI8?autoplay=1&mute=1&controls=0&loop=1"
+                className="aspect-video w-full"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                referrerPolicy="strict-origin-when-cross-origin"
+                allowFullScreen
+              />
+            </div>
+          </div>
+        </div>
       </section>
 
       <section

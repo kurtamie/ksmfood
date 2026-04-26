@@ -75,6 +75,7 @@ const messages = {
     gallery: {
       event: "Acara",
       menu: "Menu",
+      testimonial: "Testimoni",
       video: "Video",
     },
     about: {
@@ -137,6 +138,7 @@ const messages = {
     },
     testimonialsSection: {
       title: "Biarkan Pelanggan Kami yang Bercerita",
+      cta: "Lihat Lebih Banyak Testimoni Asli",
     },
     faqSection: {
       title: "Yang Sering Ditanyakan",
@@ -254,35 +256,56 @@ const messages = {
     items: [
       {
         id: 1,
-        name: "Rina Maharani",
-        text: "Pesanan untuk acara keluarga datang tepat waktu, tampilannya rapi, dan rasanya konsisten enak dari awal sampai akhir.",
+        name: "Nurlela0900 Joenjklelha 97",
+        text: "Suka kali pesan di disini, makananan nya enak fast respon, ramah. Solusi sih kalau ada acara mendadak",
       },
       {
         id: 2,
-        name: "Fajar Nugroho",
-        text: "Tim KSM sangat mudah diajak koordinasi. Menu prasmanannya lengkap dan tamu kantor kami banyak yang minta rekomendasinya.",
+        name: "my doni",
+        text: "Kemaren aku pesan untuk acara syukuran kata tetangga makanan nya enak, next acara aku mau pesan di catering ini lagi 😄",
       },
       {
         id: 3,
-        name: "Dewi Lestari",
-        text: "Saya suka karena porsinya pas, bumbunya terasa, dan penyajiannya bikin acara lamaran kami terlihat lebih berkelas.",
+        name: "Cahaya Butarbutar",
+        text: "Saya senang pesan catering di ksm dilayani dengan baik saat pesta langsung gercep tim nya, terimakasih ksm atas pelayanan nya🥰",
       },
       {
         id: 4,
-        name: "Aldo Pratama",
-        text: "Snack box dan makan siangnya sama-sama memuaskan. Packaging bersih dan semua pesanan diterima sesuai permintaan.",
+        name: "Maulya Safa",
+        text: "Catering mantap rasa nyaa enak dan worth it, abang2 di lapangan pada baik2, mantapp",
       },
       {
         id: 5,
-        name: "Nadia Permata",
-        text: "Pilihan menunya fleksibel dan rasanya cocok untuk tamu dari berbagai usia. Ini sangat membantu saat acara besar keluarga.",
+        name: "Darwinto Winto",
+        text: "Nasi kotak murah dan worth it enak masakannya ges",
       },
       {
         id: 6,
-        name: "Rizky Ananda",
-        text: "Pelayanannya cepat saat kami butuh revisi jumlah porsi. Respons admin juga jelas dan tidak bertele-tele.",
+        name: "Riski Gulo",
+        text: "Rekomendasi untuk acara rumahan enakk",
+      },
+      {
+        id: 7,
+        name: "Thienna San",
+        text: "pelayanan nya bagus",
+      },
+      {
+        id: 8,
+        name: "Andra Yunisa",
+        text: "enak lengkap🌸",
+      },
+      {
+        id: 9,
+        name: "virlo sitorus",
+        text: "Ksm mantap👍",
+      },
+      {
+        id: 10,
+        name: "Marta Endarwati",
+        text: "Great company",
       },
     ],
+    cta: "Lihat Lebih Banyak Testimoni Asli",
   },
   portfolio: {
     title: "Momen Bersama KSM Katering",
@@ -364,7 +387,8 @@ const messages = {
       titleLead: "Paket",
       titleBrand: "Nasi Kotak",
     },
-    minimumOrder: "Minimum order 25 kotak",
+    minimumOrder:
+      "Minimum order 50 kotak diantar, di bawah 50 kotak dijemput ke dapur kami.",
     menuSection: {
       titleLead: "Pilihan",
       titleBrand: "Menu",
@@ -405,7 +429,7 @@ const messages = {
     bonus: {
       badge: "Bonus Eksklusif",
       titleLead: "Video Undangan",
-      titleBrand: "& Sertifikat Aqiqah",
+      titleBrand: "Sertifikat Aqiqah",
     },
   },
   aqiqahMenu: {
@@ -599,8 +623,8 @@ const messages = {
   },
   bentoPage: {
     hero: {
-      eyebrow: "Snack Kotak",
-      title: "Lengkapi momen spesial dengan kelezatan",
+      eyebrow: "Bento",
+      title: "Praktis, HIgienis ddengan menu bervariasi",
       cta: "Unduh Menu",
     },
     about: {
@@ -616,7 +640,7 @@ const messages = {
       titleBrand: "Bento",
     },
     minimumOrder:
-      "Minimum order 50 kotak diantar, di bawah 50 kotak dijemput ke dapur kami.",
+      "Minimal pemesanan 25 kotak (diambil di dapur kami). Pemesanan 50 kotak atau lebih mendapatkan layanan antar gratis.",
     gallerySection: {
       title: "Pilihan Bento Kami",
     },

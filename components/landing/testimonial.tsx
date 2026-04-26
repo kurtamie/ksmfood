@@ -4,47 +4,58 @@ import React, { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
 import testimonialImage from "@/public/images/bubbleChat.webp";
+import { Button } from "../ui/button";
 
 const testimonials = [
   {
     id: 1,
-    name: "Rina Maharani",
-    text: "Pesanan untuk acara keluarga datang tepat waktu, tampilannya rapi, dan rasanya konsisten enak dari awal sampai akhir.",
+    name: "Nurlela0900 Joenjklelha 97",
+    text: "Suka kali pesan di disini, makananan nya enak fast respon, ramah. Solusi sih kalau ada acara mendadak",
   },
   {
     id: 2,
-    name: "Fajar Nugroho",
-    text: "Tim KSM sangat mudah diajak koordinasi. Menu prasmanannya lengkap dan tamu kantor kami banyak yang minta rekomendasinya.",
+    name: "my doni",
+    text: "Kemaren aku pesan untuk acara syukuran kata tetangga makanan nya enak, next acara aku mau pesan di catering ini lagi 😄",
   },
   {
     id: 3,
-    name: "Dewi Lestari",
-    text: "Saya suka karena porsinya pas, bumbunya terasa, dan penyajiannya bikin acara lamaran kami terlihat lebih berkelas.",
+    name: "Cahaya Butarbutar",
+    text: "Saya senang pesan catering di ksm dilayani dengan baik saat pesta langsung gercep tim nya, terimakasih ksm atas pelayanan nya🥰",
   },
   {
     id: 4,
-    name: "Aldo Pratama",
-    text: "Snack box dan makan siangnya sama-sama memuaskan. Packaging bersih dan semua pesanan diterima sesuai permintaan.",
+    name: "Maulya Safa",
+    text: "Catering mantap rasa nyaa enak dan worth it, abang2 di lapangan pada baik2, mantapp",
   },
   {
     id: 5,
-    name: "Nadia Permata",
-    text: "Pilihan menunya fleksibel dan rasanya cocok untuk tamu dari berbagai usia. Ini sangat membantu saat acara besar keluarga.",
+    name: "Darwinto Winto",
+    text: "Nasi kotak murah dan worth it enak masakannya ges",
   },
   {
     id: 6,
-    name: "Rizky Ananda",
-    text: "Pelayanannya cepat saat kami butuh revisi jumlah porsi. Respons admin juga jelas dan tidak bertele-tele.",
+    name: "Riski Gulo",
+    text: "Rekomendasi untuk acara rumahan enakk",
   },
   {
     id: 7,
-    name: "Salsa Kirana",
-    text: "Saya paling suka kualitas lauk dan sayurnya tetap fresh walaupun untuk jumlah tamu yang banyak. Sangat layak dipakai lagi.",
+    name: "Thienna San",
+    text: "pelayanan nya bagus",
   },
   {
     id: 8,
-    name: "Bagas Saputra",
-    text: "KSM bantu bikin acara syukuran kami jauh lebih tenang. Makanannya enak, penyajiannya rapi, dan tamu banyak yang puas.",
+    name: "Andra Yunisa",
+    text: "enak lengkap🌸",
+  },
+  {
+    id: 9,
+    name: "virlo sitorus",
+    text: "Ksm mantap👍",
+  },
+  {
+    id: 10,
+    name: "Marta Endarwati",
+    text: "Great company",
   },
 ];
 
@@ -202,6 +213,15 @@ function Testimonial() {
           className="h-2 w-full cursor-pointer appearance-none rounded-full bg-red-200 accent-red-800"
           aria-label={t("sliderLabel")}
         />
+      </div>
+      <div className="flex items-center justify-center py-6">
+        <Button
+          asChild
+          variant="outline"
+          className="mt-8 h-12 border-[#8D0000] bg-transparent px-8 text-base font-bold text-[#8D0000] hover:bg-[#8D0000] hover:text-white sm:mt-10 sm:text-lg lg:mt-14"
+        >
+          <a href="/gallery/testimonial">{t("cta")}</a>
+        </Button>
       </div>
     </div>
   );

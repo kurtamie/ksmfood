@@ -117,7 +117,10 @@ function Menu() {
                 {card.price}
               </p>
 
-              <Button asChild className="mt-3 h-11 w-full bg-red-800 text-white hover:bg-red-900">
+              <Button
+                asChild
+                className="mt-3 h-11 w-full bg-red-800 text-white hover:bg-red-900"
+              >
                 <a
                   href={createWhatsappLink(
                     `Halo, saya ingin memesan ${serviceName} dengan ${card.title}.`,

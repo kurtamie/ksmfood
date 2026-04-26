@@ -77,7 +77,7 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
             </div>
             {/* Item name label */}
             <div className="px-3 py-2">
-              <p className="text-lg font-medium text-black truncate font-bold text-center capitalize">
+              <p className="text-lg text-black truncate font-bold text-center capitalize">
                 {item.caption}
               </p>
             </div>
@@ -89,7 +89,7 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
         activeItem &&
         createPortal(
           <div
-            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/88 p-4 sm:p-6"
+            className="fixed inset-0 z-100 flex items-center justify-center bg-black/88 p-4 sm:p-6"
             onClick={() => setActiveIndex(null)}
           >
             <button

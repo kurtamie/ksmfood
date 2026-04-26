@@ -4,7 +4,8 @@ import { useTranslations } from "next-intl";
 import { BiSolidDish } from "react-icons/bi";
 import { BsPlusCircleFill } from "react-icons/bs";
 import { FaCarrot } from "react-icons/fa";
-import { GiBanana, GiChicken, GiChiliPepper, GiShrimp } from "react-icons/gi";
+import { FaAppleWhole } from "react-icons/fa6";
+import { GiChicken, GiChiliPepper, GiShrimp } from "react-icons/gi";
 import { IoFish } from "react-icons/io5";
 import { LuDot } from "react-icons/lu";
 import { PiCowBold } from "react-icons/pi";
@@ -155,7 +156,7 @@ const companionCards: MenuCard[] = [
   },
   {
     id: "buah",
-    icon: <GiBanana />,
+    icon: <FaAppleWhole />,
     name: "Buah",
     items: ["Buah Tampah", "(Semangka, Melon)"],
   },
@@ -168,16 +169,6 @@ const companionCards: MenuCard[] = [
       {
         subName: "Nasi",
         subMainDish: ["Nasi Kuning", "Nasi Lemak"],
-      },
-      {
-        subName: "Sayur",
-        subMainDish: [
-          "Capcay",
-          "Sayur Asem",
-          "Tumis Kailan Muda",
-          "Tumis Bunga Kol",
-          "Tumis Sawi Minyak",
-        ],
       },
     ],
   },

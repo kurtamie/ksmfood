@@ -63,14 +63,14 @@ const Footer = () => {
               <div className="flex items-center gap-3 pt-1">
                 <FaPhoneAlt className="shrink-0 text-gray-400" size={13} />
                 <div>
-                  <p className="font-medium text-white">Sucipto</p>
+                  <p className="font-medium text-white">Ksm Admin</p>
                   <a
-                    href="https://wa.me/6285265496567"
+                    href="https://wa.me/6282288175957"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="hover:underline"
                   >
-                    0852-6549-6567
+                    0822-8817-5957
                   </a>
                 </div>
               </div>

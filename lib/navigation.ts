@@ -10,6 +10,11 @@ export const galleryNavItems = [
     href: "/gallery/menu",
   },
   {
+    key: "testimonial",
+    labelKey: "testimonial",
+    href: "/gallery/testimonial",
+  },
+  {
     key: "video",
     labelKey: "video",
     href: "/gallery/video",

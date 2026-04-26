@@ -17,7 +17,7 @@ const packageCards = [
       "Buah",
       "Air Mineral Gelas",
     ],
-    price: "Rp 26.500/Kotak",
+    price: "Rp 27.000/Kotak",
   },
   {
     id: 2,
@@ -62,7 +62,7 @@ const packageCards = [
       "Buah",
       "Air Mineral Gelas",
     ],
-    price: "Rp 44.000/Kotak",
+    price: "Rp 42.500/Kotak",
   },
   {
     id: 5,
@@ -78,7 +78,7 @@ const packageCards = [
       "Air Mineral 330ml",
       "Puding",
     ],
-    price: "Rp 31.500/Kotak",
+    price: "Rp 32.000/Kotak",
   },
   {
     id: 6,
@@ -94,7 +94,7 @@ const packageCards = [
       "Air Mineral 330ml",
       "Puding",
     ],
-    price: "Rp 33.000/Kotak",
+    price: "Rp 34.000/Kotak",
   },
   {
     id: 7,
@@ -109,7 +109,7 @@ const packageCards = [
       "Air Mineral 330ml",
       "Puding",
     ],
-    price: "Rp 39.500/Kotak",
+    price: "Rp 40.000/Kotak",
   },
   {
     id: 8,
@@ -124,7 +124,7 @@ const packageCards = [
       "Air Mineral 330ml",
       "Puding",
     ],
-    price: "Rp 49.000/Kotak",
+    price: "Rp 48.000/Kotak",
   },
 ];
 
@@ -186,7 +186,10 @@ function Menu() {
                 {card.price}
               </p>
 
-              <Button asChild className="mt-3 h-11 w-full bg-red-800 text-white hover:bg-red-900">
+              <Button
+                asChild
+                className="mt-3 h-11 w-full bg-red-800 text-white hover:bg-red-900"
+              >
                 <a
                   href={createWhatsappLink(
                     `Halo, saya ingin memesan ${serviceName} dengan ${getPackageName(card.title, card.subTitle)}.`,

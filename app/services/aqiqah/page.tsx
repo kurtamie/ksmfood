@@ -27,14 +27,14 @@ export default async function AqiqahPage() {
             </div>
           </div>
 
-          <Button
+          {/* <Button
             asChild
             className="h-12 w-full max-w-xs cursor-pointer border border-white bg-transparent px-8 text-sm font-bold text-white hover:border-red-800 hover:bg-red-800 hover:text-white sm:w-auto"
           >
             <a href="/images/pdf/aqiqah.pdf" download>
               {t("hero.cta")}
             </a>
-          </Button>
+          </Button> */}
         </div>
       </section>
 
@@ -90,7 +90,7 @@ export default async function AqiqahPage() {
           {/* <h2 className="text-3xl font-bold text-[#332929] sm:text-4xl lg:text-5xl">
             {t("bonus.titleLead")}
           </h2> */}
-          <h2 className="text-3xl font-bold text-red-800 sm:text-4xl lg:text-5xl">
+          <h2 className="text-3xl font-bold text-black sm:text-4xl lg:text-5xl">
             {t("bonus.titleBrand")}
           </h2>
         </div>

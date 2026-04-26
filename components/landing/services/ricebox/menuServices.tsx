@@ -3,10 +3,11 @@ import { useTranslations } from "next-intl";
 import { BiSolidDish } from "react-icons/bi";
 import { BsPlusCircleFill } from "react-icons/bs";
 import { FaCarrot } from "react-icons/fa";
-import { GiBanana, GiChicken, GiChiliPepper, GiShrimp } from "react-icons/gi";
+import { GiChicken, GiChiliPepper, GiShrimp } from "react-icons/gi";
 import { IoFish } from "react-icons/io5";
 import { LuDot } from "react-icons/lu";
 import { PiCowBold } from "react-icons/pi";
+import { FaAppleWhole } from "react-icons/fa6";
 
 type DishGroup = {
   subName: string;
@@ -131,7 +132,7 @@ const sideDish: MenuCard[] = [
   },
   {
     id: 4,
-    icon: <GiBanana />,
+    icon: <FaAppleWhole />,
     name: "Buah",
     subMainDish: ["Jeruk", "Pisang"],
   },
@@ -245,7 +246,7 @@ function MenuServices() {
               key={card.id}
               className="flex h-full flex-col rounded-xl border border-black/10 bg-white px-5 py-6 text-left shadow-sm transition hover:-translate-y-1 hover:shadow-md sm:px-6 sm:pr-10"
             >
-              <div className="flex items-start gap-4 sm:items-center">
+              <div className="flex items-start gap-4">
                 <div className="text-3xl text-red-800 sm:text-4xl">
                   {card.icon}
                 </div>

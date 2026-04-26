@@ -14,20 +14,20 @@ const MAPS_EMBED_URL =
 
 const contacts = [
   {
-    name: "Yuni Ridwanti",
-    role: "Staf Pemasaran",
+    name: "Yuni Irdayanti",
+    role: "Marketing",
     phoneLabel: "0813-7179-0122",
     phoneHref: "https://wa.me/6281371790122",
     emailLabel: "ksmpromotionbatam@gmail.com",
     emailHref: "mailto:service@ksmpromotionbatam@gmail.com",
   },
   {
-    name: "Sucipto",
-    role: "Staf Pemasaran",
-    phoneLabel: "0852-6549-6567",
-    phoneHref: "https://wa.me/6285265496567",
-    emailLabel: "sucipto.ghikoen@gmail.com",
-    emailHref: "mailto:service@sucipto.ghikoen@gmail.com",
+    name: "Ksm Admin",
+    role: "Admin",
+    phoneLabel: "0822-8817-5957",
+    phoneHref: "https://wa.me/6282288175957",
+    emailLabel: "-",
+    emailHref: "-",
   },
 ] as const;
 
@@ -157,9 +157,8 @@ export default async function ContactPage() {
                         size={18}
                       />
                       <p className="leading-relaxed text-[#8D0000]">
-                        Jl. S.Parman, Komp. Ruko Nusa Indah Blok M 16,
-                        Mangsang, Kec. Sei Beduk, Kota Batam, Kepulauan Riau
-                        29433
+                        Jl. S.Parman, Komp. Ruko Nusa Indah Blok M 16, Mangsang,
+                        Kec. Sei Beduk, Kota Batam, Kepulauan Riau 29433
                       </p>
                     </div>
 
@@ -173,7 +172,8 @@ export default async function ContactPage() {
                       <p className="leading-relaxed text-[#8D0000]">
                         <span className="font-bold text-[#1A1A1A]">
                           Jam Operasional:
-                        </span><br/>
+                        </span>
+                        <br />
                         Senin - Minggu, 08.00 - 17.00
                       </p>
                     </div>

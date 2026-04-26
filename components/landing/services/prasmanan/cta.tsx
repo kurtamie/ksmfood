@@ -39,7 +39,7 @@ export default function Cta() {
           <div className="flex flex-col gap-3 sm:flex-row lg:shrink-0">
             <Button
               asChild
-              className="h-12 rounded-xl bg-white px-6 text-sm font-bold text-[#8D0000] hover:bg-white/90"
+              className="h-12 rounded-xl bg-white px-6 text-sm font-bold text-[#8D0000] hover:bg-transparent hover:border hover:border-white hover:text-white sm:w-auto"
             >
               <Link
                 href={t("orderLink")}

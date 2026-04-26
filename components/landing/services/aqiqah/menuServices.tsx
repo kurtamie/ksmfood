@@ -2,7 +2,8 @@ import React from "react";
 import { BiSolidDish } from "react-icons/bi";
 import { BsPlusCircleFill } from "react-icons/bs";
 import { FaCarrot } from "react-icons/fa";
-import { GiBanana, GiChicken, GiChiliPepper, GiShrimp } from "react-icons/gi";
+import { FaAppleWhole } from "react-icons/fa6";
+import { GiChicken, GiChiliPepper, GiShrimp } from "react-icons/gi";
 import { IoFish } from "react-icons/io5";
 import { LuDot } from "react-icons/lu";
 import { PiCowBold } from "react-icons/pi";
@@ -130,7 +131,7 @@ const sideDish: MenuCard[] = [
   },
   {
     id: 4,
-    icon: <GiBanana />,
+    icon: <FaAppleWhole />,
     name: "Buah",
     subMainDish: ["Jeruk", "Pisang"],
   },

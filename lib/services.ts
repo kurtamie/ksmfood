@@ -44,7 +44,7 @@ export const services = [
   {
     slug: "snack-kotak",
     label: "Snack Kotak",
-    href: "/services/snackbox",
+    href: "/services/snackBox",
     description:
       "Pilihan snack kotak untuk meeting, seminar, pelatihan, dan acara formal maupun informal.",
   },

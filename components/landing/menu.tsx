@@ -16,32 +16,32 @@ const packageCards = [
     id: 1,
     image: prasnikah,
     title: "Prasmanan Pernikahan",
-    price: "Mulai dari Rp 32.000/porsi",
-    catalog: "/images/pdf/wedding.pdf",
+    price: "Mulai dari Rp 34.000/porsi",
+    // catalog: "/images/pdf/wedding.pdf",
     url: "/services/wedding",
   },
   {
     id: 2,
     image: prasmanan,
     title: "Prasmanan",
-    price: "Mulai dari Rp 32.000/porsi",
-    catalog: "/images/pdf/prasmanan.pdf",
+    price: "Mulai dari Rp 34.000/porsi",
+    // catalog: "/images/pdf/prasmanan.pdf",
     url: "/services/prasmanan",
   },
   {
     id: 3,
     image: nasi,
     title: "Nasi Kotak",
-    price: "Mulai dari Rp 25.000/kotak",
-    catalog: "/images/pdf/naskot.pdf",
+    price: "Mulai dari Rp 27.000/kotak",
+    // catalog: "/images/pdf/naskot.pdf",
     url: "/services/riceBox",
   },
   {
     id: 4,
     image: bento,
     title: "Bento",
-    price: "Mulai dari Rp 56.000/kotak",
-    catalog: "/images/pdf/bento.pdf",
+    price: "Mulai dari Rp 58.000/kotak",
+    // catalog: "/images/pdf/bento.pdf",
     url: "/services/bento",
   },
   {
@@ -49,7 +49,7 @@ const packageCards = [
     image: rendang,
     title: "Rendang Kemasan",
     price: "Mulai dari Rp 80.000/kemasan",
-    catalog: "/images/pdf/aqiqah.pdf",
+    // catalog: "/images/pdf/aqiqah.pdf",
     url: "/services/rendang-kemasan",
   },
   {
@@ -57,7 +57,7 @@ const packageCards = [
     image: snackbox,
     title: "Snack Kotak",
     price: "Mulai dari Rp 13.000",
-    catalog: "/images/pdf/snackkot.pdf",
+    // catalog: "/images/pdf/snackkot.pdf",
     url: "/services/snackBox",
   },
   {
@@ -65,14 +65,14 @@ const packageCards = [
     image: aqiqah,
     title: "Aqiqah",
     price: "Harga Disesuaikan",
-    catalog: "/images/pdf/aqiqah.pdf",
+    // catalog: "/images/pdf/aqiqah.pdf",
     route: "/services/aqiqah",
   },
   {
     id: 8,
     image: tumpeng,
     title: "Tumpeng",
-    price: "Mulai dari Rp 700.000",
+    price: "Mulai dari Rp 900.000",
     url: "/services/tumpeng",
   },
   {
@@ -127,7 +127,7 @@ function Menu() {
               >
                 <a href={card.url}>{t("viewPackage")}</a>
               </Button>
-              {card.catalog && (
+              {/* {card.catalog && (
                 <Button
                   asChild
                   className="h-10 flex-1 border border-red-800 bg-white text-red-800 hover:bg-red-800 hover:text-white cursor-pointer"
@@ -136,7 +136,7 @@ function Menu() {
                     {t("downloadMenu")}
                   </a>
                 </Button>
-              )}
+              )} */}
             </div>
           </article>
         );

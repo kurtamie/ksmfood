@@ -14,6 +14,7 @@ import RotatingText from "@/components/motion/rotatingText";
 import { Button } from "@/components/ui/button";
 import pattern from "@/public/images/pattern.webp";
 import { whatsappLink } from "@/const/whatsapp";
+import profile from "@/public/images/about.webp";
 
 export default async function Page() {
   const t = await getTranslations("home");
@@ -71,16 +72,17 @@ export default async function Page() {
       >
         <div className="flex w-full max-w-7xl flex-col items-center gap-10 px-6 lg:gap-12">
           <div className="flex gap-4 text-3xl font-bold sm:text-4xl lg:text-5xl text-center">
-            <h1 className="text-black">{t("about.titleLead")}{(" ")}
+            <h1 className="text-black">
+              {t("about.titleLead")}{" "}
               <span className="text-[#8D0000]">{t("about.titleBrand")}</span>
             </h1>
           </div>
           <div className="mt-10 flex flex-col gap-10 lg:flex-row items-center">
-            <div className="w-full max-w-xl bg-[#8D0000] px-6 py-10 sm:px-12 sm:py-24">
-              <iframe
-                title="Profil KSM Katering"
-                src="https://www.youtube.com/embed/wkzB9INsRfY?autoplay=1&mute=1&controls=0&loop=1"
-                className="aspect-video w-full"
+            <div className="w-full">
+              <Image
+                src={profile}
+                alt="Profile Section"
+                className="aspect-square w-full rounded-2xl object-cover"
               />
             </div>
             <div className="flex flex-col gap-6 text-center lg:ml-6 lg:text-left">

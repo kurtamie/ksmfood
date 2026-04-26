@@ -18,7 +18,7 @@ const femalePackageCards = [
       "Sertifikat Aqiqah",
       "Alat-alat Prasmanan",
     ],
-    price: "Rp 3.200.000",
+    price: "Rp 3.400.000",
   },
   {
     id: 2,
@@ -34,7 +34,7 @@ const femalePackageCards = [
       "Acar Mentimun",
       "Sertifikat Aqiqah",
     ],
-    price: "Rp 3.650.000",
+    price: "Rp 3.850.000",
   },
   {
     id: 3,
@@ -49,7 +49,7 @@ const femalePackageCards = [
       "Sertifikat Aqiqah",
       "Alat-alat Prasmanan",
     ],
-    price: "Rp 4.850.000",
+    price: "Rp 5.050.000",
   },
   {
     id: 4,
@@ -65,7 +65,7 @@ const femalePackageCards = [
       "Acar Mentimun",
       "Sertifikat Aqiqah",
     ],
-    price: "Rp 5.200.000",
+    price: "Rp 5.400.000",
   },
 ];
 
@@ -84,7 +84,7 @@ const malePackageCards = [
       "Sertifikat Aqiqah",
       "Alat-alat Prasmanan",
     ],
-    price: "Rp 4.600.000",
+    price: "Rp 4.800.000",
   },
   {
     id: 2,
@@ -100,7 +100,7 @@ const malePackageCards = [
       "Acar Mentimun",
       "Sertifikat Aqiqah",
     ],
-    price: "Rp 4.900.000",
+    price: "Rp 5.100.000",
   },
   {
     id: 3,
@@ -115,7 +115,7 @@ const malePackageCards = [
       "Sertifikat Aqiqah",
       "Alat-alat Prasmanan",
     ],
-    price: "Rp 6.600.000",
+    price: "Rp 6.800.000",
   },
   {
     id: 4,
@@ -131,7 +131,7 @@ const malePackageCards = [
       "Acar Mentimun",
       "Sertifikat Aqiqah",
     ],
-    price: "Rp 7.200.000",
+    price: "Rp 7.400.000",
   },
 ];
 
@@ -203,7 +203,10 @@ function Menu() {
                   {card.price}
                 </p>
 
-                <Button asChild className="mt-3 h-11 w-full bg-red-800 text-white hover:bg-red-900">
+                <Button
+                  asChild
+                  className="mt-3 h-11 w-full bg-red-800 text-white hover:bg-red-900"
+                >
                   <a
                     href={createWhatsappLink(
                       `Halo, saya ingin memesan ${serviceName} dengan ${getPackageName(card.title, card.subTitle)}.`,
@@ -279,7 +282,10 @@ function Menu() {
                   {card.price}
                 </p>
 
-                <Button asChild className="mt-3 h-11 w-full bg-red-800 text-white hover:bg-red-900">
+                <Button
+                  asChild
+                  className="mt-3 h-11 w-full bg-red-800 text-white hover:bg-red-900"
+                >
                   <a
                     href={createWhatsappLink(
                       `Halo, saya ingin memesan ${serviceName} dengan ${getPackageName(card.title, card.subTitle)}.`,
