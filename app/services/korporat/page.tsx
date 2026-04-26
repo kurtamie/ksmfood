@@ -6,6 +6,7 @@ import Cta from "@/components/landing/services/korporat/cta";
 import SectionRoutes from "@/components/landing/services/korporat/sectionRoutes";
 import Testimonial from "@/components/landing/services/korporat/testimonial";
 import korporatSec from "@/public/images/services/korporat/katering_korporat-hero_section.webp";
+import Client from "@/components/landing/services/korporat/client";
 
 export default async function KorporatPage() {
   const t = await getTranslations("korporatPage");
@@ -67,6 +68,16 @@ export default async function KorporatPage() {
             </div>
           </div>
         </div>
+      </section>
+
+      <section
+        id="klien"
+        className="flex w-full flex-col items-center px-6 py-16 sm:py-20"
+      >
+        <h2 className="text-3xl font-bold text-[#332929] sm:text-4xl lg:text-5xl">
+          {t("clientsSection.title")}
+        </h2>
+        <Client />
       </section>
 
       <section
