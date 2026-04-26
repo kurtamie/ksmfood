@@ -273,8 +273,7 @@ export default function CarouselMoment() {
                 />
               </div>
               {/* Counter */}
-              <div className="mt-3 flex items-center justify-between gap-4 text-sm text-white/85">
-                <p className="truncate">{IMAGES[currentIndex].alt}</p>
+              <div className="mt-3 flex items-center justify-center gap-4 text-sm text-white/85">
                 <p className="shrink-0">
                   {currentIndex + 1} / {IMAGES.length}
                 </p>

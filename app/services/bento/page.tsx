@@ -92,7 +92,10 @@ export default async function BentoPage() {
       >
         <div className="flex w-full max-w-7xl flex-col items-center justify-center gap-4 bg-[#F5E5D1] px-5 py-5 text-center text-black sm:flex-row sm:gap-10 sm:px-16">
           <FaClipboardList className="text-3xl sm:text-4xl" />
-          <p className="text-sm leading-6 sm:text-lg">{t("minimumOrder")}</p>
+          <div className="flex flex-col">
+            <p className="text-sm leading-6 sm:text-lg">{t("minimumOrder")}</p>
+            <p className="text-sm leading-6 sm:text-lg">{t("minimumOrder2")}</p>
+          </div>
         </div>
       </section>
 
