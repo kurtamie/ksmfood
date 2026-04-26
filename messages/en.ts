@@ -770,6 +770,9 @@ const messages = {
       paragraph2:
         "With high quality standards and the implementation of Good Manufacturing Practices (CPB) on a large scale, KSM Catering has become a trusted catering service!",
     },
+    clientsSection: {
+      title: "Trusted By Our Clients",
+    },
     packages: {
       titleLead: "Corporate Catering",
       titleBrand: "Packages",
