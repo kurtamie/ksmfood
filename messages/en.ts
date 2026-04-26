@@ -796,6 +796,7 @@ const messages = {
       "https://wa.me/6281371790122?text=Hello%2C%20I%20want%20to%20order%20Corporate%20Catering.",
     consultLink:
       "https://wa.me/6282288175957?text=Hello%2C%20I%20want%20to%20consult%20about%20Corporate%20Catering.",
+    consultEmail: "For orders via email, contact:",
   },
   serviceDetail: {
     eyebrow: "KSM Katering Services",

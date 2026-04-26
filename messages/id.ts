@@ -792,6 +792,7 @@ const messages = {
       "https://wa.me/6281371790122?text=Halo%2C%20saya%20ingin%20pesan%Katering%20Korporat.",
     consultLink:
       "https://wa.me/6282288175957?text=Halo%2C%20saya%20ingin%20konsultasi%Katering%20Korporat.",
+    consultEmail: "Untuk pemesanan melalui email, hubungi:",
   },
   serviceDetail: {
     eyebrow: "Layanan KSM Katering",

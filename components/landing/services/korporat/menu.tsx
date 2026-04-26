@@ -6,35 +6,36 @@ import { LuCheck, LuPackageOpen } from "react-icons/lu";
 const packageCards = [
   {
     id: 1,
-    title: "Katering Acara",
+    title: "Nasi Kotak / Rantang",
     dish: [
-      "Meningkatkan kualitas acara perusahaan",
-      "Menyajikan pengalaman kuliner terbaik untuk tamu",
-      "Cocok untuk acara kantor, rapat, hingga perayaan khusus",
-      "Pelayanan profesional tanpa repot",
+      "Kami menawarkan service Nasi Kotak dan Rantang untuk makan  karyawan, dengan harga disesuaikan dengan budget perusahaan anda.",
     ],
   },
   {
     id: 2,
-    title: "Katering Karyawan",
+    title: "Prasmanan Kantin Perusahaan",
     dish: [
-      "Hidangan lezat dan sehat setiap hari",
-      "Menjaga produktivitas dan semangat kerja",
-      "Menu variatif dan bergizi",
-      "Nutrisi terpenuhi tanpa mengorbankan cita rasa",
+      "Kami juga melayani service untuk kantin perusahaan dengan budget, jenis service dan jam service sesuai dengan kebijakan perusahaan anda.",
+    ],
+  },
+  {
+    id: 3,
+    title: "Nasi Kotak / Prasmanan Event / Coffee Break",
+    dish: [
+      "Pastikan event yang diadakan seperti meeting, perayaan, dll di perusahaan anda menjadi lebih spesial dengan sajian dari KSM Katering."
     ],
   },
 ];
 
 function Menu() {
-  const t = useTranslations("tumpengMenu");
+  const t = useTranslations("korporatMenu");
   const serviceName = "Katering Korporat";
 
   return (
-    <div className="mt-12 grid w-full max-w-7xl grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-2">
+    <div className="mt-12 grid w-full max-w-7xl grid-cols-1 gap-4 sm:grid-cols-3 md:grid-cols-3">
       {packageCards.map((card, index) => {
         const isLastOddItem =
-          packageCards.length % 2 !== 0 && index === packageCards.length - 1;
+          packageCards.length % 3 !== 0 && index === packageCards.length - 1;
         return (
           <article
             key={card.id}
@@ -71,21 +72,6 @@ function Menu() {
                   </div>
                 ))}
               </div>
-
-              <Button
-                asChild
-                className="mt-8 h-11 w-full bg-red-800 text-white hover:bg-red-900"
-              >
-                <a
-                  href={createWhatsappLink(
-                    `Halo, saya ingin memesan ${serviceName} dengan ${card.title}.`,
-                  )}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {t("orderNow")}
-                </a>
-              </Button>
             </div>
           </article>
         );

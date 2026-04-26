@@ -26,8 +26,8 @@ const contacts = [
     role: "Admin",
     phoneLabel: "0822-8817-5957",
     phoneHref: "https://wa.me/6282288175957",
-    emailLabel: "-",
-    emailHref: "-",
+    emailLabel: "ksmpromotionbatam@gmail.com",
+    emailHref: "mailto:service@ksmpromotionbatam@gmail.com",
   },
 ] as const;
 

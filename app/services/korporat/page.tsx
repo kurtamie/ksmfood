@@ -84,9 +84,9 @@ export default async function KorporatPage() {
         <Menu />
       </section>
 
-      <section id="testimonial" className="mt-12 scroll-mt-24">
+      {/* <section id="testimonial" className="mt-12 scroll-mt-24">
         <Testimonial />
-      </section>
+      </section> */}
 
       <section
         id="hubungi-kami"

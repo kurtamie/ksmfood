@@ -34,35 +34,47 @@ function Cta() {
             </p>
           </div>
 
-          <div className="flex flex-col gap-3 sm:flex-row lg:shrink-0">
-            <Button
-              asChild
-              className="h-12 w-full rounded-xl bg-white px-6 text-sm font-bold text-[#8D0000] hover:bg-transparent hover:border hover:border-white hover:text-white sm:w-auto"
-            >
-              <Link
-                href={t("orderLink")}
-                target="_blank"
-                rel="noopener noreferrer"
+          <div className="flex flex-col gap-2 items-center justify-center">
+            <div className="flex flex-col gap-3 sm:flex-row lg:shrink-0">
+              <Button
+                asChild
+                className="h-12 w-full rounded-xl bg-white px-6 text-sm font-bold text-[#8D0000] hover:bg-transparent hover:border hover:border-white hover:text-white sm:w-auto"
               >
-                <FaWhatsapp className="size-4" />
-                {commonT("orderNowShort")}
-              </Link>
-            </Button>
+                <Link
+                  href={t("orderLink")}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <FaWhatsapp className="size-4" />
+                  {commonT("orderNowShort")}
+                </Link>
+              </Button>
 
-            <Button
-              asChild
-              variant="outline"
-              className="h-12 w-full rounded-xl border-white/60 bg-transparent px-6 text-sm font-bold text-white hover:bg-white/10 hover:text-white sm:w-auto"
-            >
-              <Link
-                href={t("consultLink")}
-                target="_blank"
-                rel="noopener noreferrer"
+              <Button
+                asChild
+                variant="outline"
+                className="h-12 w-full rounded-xl border-white/60 bg-transparent px-6 text-sm font-bold text-white hover:bg-white/10 hover:text-white sm:w-auto"
               >
-                <LuMessagesSquare className="size-4" />
-                {commonT("consultNow")}
-              </Link>
-            </Button>
+                <Link
+                  href={t("consultLink")}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <LuMessagesSquare className="size-4" />
+                  {commonT("consultNow")}
+                </Link>
+              </Button>
+            </div>
+            <div className="flex flex-col text-center">
+              <p>{t("consultEmail")} </p>
+              <a
+                href="mailto:service@ksmpromotionbatam@gmail.com"
+              >
+                <span className="break-all font-medium underline">
+                  ksmpromotionbatam@gmail.com
+                </span>
+              </a>
+            </div>
           </div>
         </div>
       </div>
