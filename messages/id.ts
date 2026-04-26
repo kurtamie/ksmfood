@@ -161,11 +161,11 @@ const messages = {
       {
         id: 1,
         title: "Prasmanan Pernikahan",
-        price: "Mulai dari Rp 32.000/porsi",
+        price: "Mulai dari Rp 34.000/porsi",
       },
-      { id: 2, title: "Prasmanan", price: "Mulai dari Rp 32.000/porsi" },
-      { id: 3, title: "Nasi Kotak", price: "Mulai dari Rp 25.000/kotak" },
-      { id: 4, title: "Bento", price: "Mulai dari Rp 56.000/kotak" },
+      { id: 2, title: "Prasmanan", price: "Mulai dari Rp 34.000/porsi" },
+      { id: 3, title: "Nasi Kotak", price: "Mulai dari Rp 27.000/kotak" },
+      { id: 4, title: "Bento", price: "Mulai dari Rp 58.000/kotak" },
       {
         id: 5,
         title: "Rendang Kemasan",
@@ -173,7 +173,7 @@ const messages = {
       },
       { id: 6, title: "Snack Kotak", price: "Mulai dari Rp 13.000" },
       { id: 7, title: "Aqiqah", price: "Harga disesuaikan" },
-      { id: 8, title: "Tumpeng", price: "Mulai dari Rp 700.000" },
+      { id: 8, title: "Tumpeng", price: "Mulai dari Rp 900.000" },
       { id: 9, title: "Katering Korporat", price: "Harga disesuaikan" },
     ],
   },
@@ -406,9 +406,9 @@ const messages = {
     title: "Siap memesan nasi kotak untuk acara Anda?",
     description: "Praktis, lezat, dan terpercaya untuk setiap momen Anda.",
     orderLink:
-      "https://wa.me/628111171713?text=Halo%2C%20saya%20ingin%20pesan%20nasi%20kotak.",
+      "https://wa.me/6281371790122?text=Halo%2C%20saya%20ingin%20pesan%20nasi%20kotak.",
     consultLink:
-      "https://wa.me/628111171713?text=Halo%2C%20saya%20ingin%20konsultasi%20nasi%20kotak.",
+      "https://wa.me/6282288175957?text=Halo%2C%20saya%20ingin%20konsultasi%20nasi%20kotak.",
   },
   aqiqahPage: {
     hero: {
@@ -447,9 +447,9 @@ const messages = {
     title: "Siap memesan paket aqiqah untuk keluarga Anda?",
     description: "Praktis, syar'i, dan lezat untuk momen penuh syukur.",
     orderLink:
-      "https://wa.me/628111171713?text=Halo%2C%20saya%20ingin%20pesan%20paket%20aqiqah.",
+      "https://wa.me/6281371790122?text=Halo%2C%20saya%20ingin%20pesan%20paket%20aqiqah.",
     consultLink:
-      "https://wa.me/628111171713?text=Halo%2C%20saya%20ingin%20konsultasi%20paket%20aqiqah.",
+      "https://wa.me/6282288175957?text=Halo%2C%20saya%20ingin%20konsultasi%20paket%20aqiqah.",
   },
   prasmananPage: {
     hero: {
@@ -498,9 +498,9 @@ const messages = {
     description:
       "Bukan hanya hidangan yang berkualitas, tapi juga kenangan yang bisa dibagikan dan disimpan selamanya.",
     orderLink:
-      "https://wa.me/628111171713?text=Halo%2C%20saya%20ingin%20pesan%20prasmanan.",
+      "https://wa.me/6281371790122?text=Halo%2C%20saya%20ingin%20pesan%20prasmanan.",
     consultLink:
-      "https://wa.me/628111171713?text=Halo%2C%20saya%20ingin%20konsultasi%20prasmanan.",
+      "https://wa.me/6282288175957?text=Halo%2C%20saya%20ingin%20konsultasi%20prasmanan.",
   },
   weddingPage: {
     hero: {
@@ -574,9 +574,9 @@ const messages = {
     description:
       "Nikmati layanan prasmanan lengkap dengan cita rasa istimewa dan tim profesional yang siap melayani setiap detail acara Anda.",
     orderLink:
-      "https://wa.me/628111171713?text=Halo%2C%20saya%20ingin%20pesan%prasmanan%20pernikahan.",
+      "https://wa.me/6281371790122?text=Halo%2C%20saya%20ingin%20pesan%prasmanan%20pernikahan.",
     consultLink:
-      "https://wa.me/628111171713?text=Halo%2C%20saya%20ingin%20konsultasi%20prasmanan%20pernikahan.",
+      "https://wa.me/6282288175957?text=Halo%2C%20saya%20ingin%20konsultasi%20prasmanan%20pernikahan.",
   },
   weddingFaq: {
     items: [
@@ -663,9 +663,9 @@ const messages = {
     description:
       "Hidangan praktis, higienis, dan penuh rasa untuk pengalaman yang tak terlupakan.",
     orderLink:
-      "https://wa.me/628111171713?text=Halo%2C%20saya%20ingin%20pesan%20Bento.",
+      "https://wa.me/6281371790122?text=Halo%2C%20saya%20ingin%20pesan%20Bento.",
     consultLink:
-      "https://wa.me/628111171713?text=Halo%2C%20saya%20ingin%20konsultasi%20Bento.",
+      "https://wa.me/6282288175957?text=Halo%2C%20saya%20ingin%20konsultasi%20Bento.",
   },
   snackBoxPage: {
     hero: {
@@ -708,9 +708,9 @@ const messages = {
     description:
       "lezat dan higienis yang siap melengkapi setiap acara Anda, dari rapat hingga kegiatan spesial.",
     orderLink:
-      "https://wa.me/628111171713?text=Halo%2C%20saya%20ingin%20pesan%20Snack%20Box.",
+      "https://wa.me/6281371790122?text=Halo%2C%20saya%20ingin%20pesan%20Snack%20Box.",
     consultLink:
-      "https://wa.me/628111171713?text=Halo%2C%20saya%20ingin%20konsultasi%20Snack%20Box.",
+      "https://wa.me/6282288175957?text=Halo%2C%20saya%20ingin%20konsultasi%20Snack%20Box.",
   },
   tumpengPage: {
     hero: {
@@ -749,9 +749,9 @@ const messages = {
     description:
       "Disajikan dengan penuh kehangatan dan cita rasa autentik untuk merayakan kebersamaan Anda.",
     orderLink:
-      "https://wa.me/628111171713?text=Halo%2C%20saya%20ingin%20pesan%20Tumpeng.",
+      "https://wa.me/6281371790122?text=Halo%2C%20saya%20ingin%20pesan%20Tumpeng.",
     consultLink:
-      "https://wa.me/628111171713?text=Halo%2C%20saya%20ingin%20konsultasi%20Tumpeng.",
+      "https://wa.me/6282288175957?text=Halo%2C%20saya%20ingin%20konsultasi%20Tumpeng.",
   },
   korporatPage: {
     hero: {
@@ -789,9 +789,9 @@ const messages = {
     description:
       "Dukung setiap kegiatan perusahaan dengan layanan katering berkualitas, menu beragam, dan pelayanan yang terpercaya.",
     orderLink:
-      "https://wa.me/628111171713?text=Halo%2C%20saya%20ingin%20pesan%Katering%20Korporat.",
+      "https://wa.me/6281371790122?text=Halo%2C%20saya%20ingin%20pesan%Katering%20Korporat.",
     consultLink:
-      "https://wa.me/628111171713?text=Halo%2C%20saya%20ingin%20konsultasi%Katering%20Korporat.",
+      "https://wa.me/6282288175957?text=Halo%2C%20saya%20ingin%20konsultasi%Katering%20Korporat.",
   },
   serviceDetail: {
     eyebrow: "Layanan KSM Katering",

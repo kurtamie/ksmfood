@@ -100,7 +100,7 @@ export default async function AboutKsmPage() {
               className="mt-2 h-12 w-full bg-white px-8 text-base text-red-800 sm:w-auto sm:text-lg"
             >
               <a
-                href="https://wa.me/628111171713?text=Halo%2C%20saya%20ingin%20memesan."
+                href="https://wa.me/6281371790122?text=Halo%2C%20saya%20ingin%20memesan."
                 target="_blank"
               >
                 {t("contactSection.primaryCta")}
@@ -111,7 +111,7 @@ export default async function AboutKsmPage() {
               className="mt-2 h-12 w-full border-white bg-transparent px-8 text-base text-white sm:w-auto sm:text-lg"
             >
               <a
-                href="https://wa.me/628111171713?text=Halo%2C%20saya%20ingin%20konsultasi%20tentang%20pemesanan."
+                href="https://wa.me/6282288175957?text=Halo%2C%20saya%20ingin%20konsultasi%20tentang%20pemesanan."
                 target="_blank"
               >
                 {t("contactSection.secondaryCta")}

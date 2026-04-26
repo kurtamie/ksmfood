@@ -161,11 +161,11 @@ const messages = {
       {
         id: 1,
         title: "Wedding Buffet",
-        price: "Starting from Rp 32.000/portion",
+        price: "Starting from Rp 34.000/portion",
       },
-      { id: 2, title: "Buffet", price: "Starting from Rp 32.000/portion" },
-      { id: 3, title: "Rice Box", price: "Starting from Rp 25.000/box" },
-      { id: 4, title: "Bento", price: "Starting from Rp 56.000/box" },
+      { id: 2, title: "Buffet", price: "Starting from Rp 34.000/portion" },
+      { id: 3, title: "Rice Box", price: "Starting from Rp 27.000/box" },
+      { id: 4, title: "Bento", price: "Starting from Rp 58.000/box" },
       {
         id: 5,
         title: "Packaged Rendang",
@@ -173,7 +173,7 @@ const messages = {
       },
       { id: 6, title: "Snack Box", price: "Starting from Rp 13.000" },
       { id: 7, title: "Aqiqah", price: "Flexible pricing" },
-      { id: 8, title: "Tumpeng", price: "Starting from Rp 700.000" },
+      { id: 8, title: "Tumpeng", price: "Starting from Rp 900.000" },
       { id: 9, title: "Corporate Catering", price: "Flexible pricing" },
     ],
   },
@@ -409,9 +409,9 @@ const messages = {
     title: "Ready to order rice boxes for your event?",
     description: "Practical, tasty, and dependable for every moment.",
     orderLink:
-      "https://wa.me/628111171713?text=Hello%2C%20I%20want%20to%20order%20rice%20boxes.",
+      "https://wa.me/6281371790122?text=Hello%2C%20I%20want%20to%20order%20rice%20boxes.",
     consultLink:
-      "https://wa.me/628111171713?text=Hello%2C%20I%20want%20to%20consult%20about%20rice%20boxes.",
+      "https://wa.me/6282288175957?text=Hello%2C%20I%20want%20to%20consult%20about%20rice%20boxes.",
   },
   aqiqahPage: {
     hero: {
@@ -451,9 +451,9 @@ const messages = {
     description:
       "Practical, sharia-compliant, and delicious for a grateful moment.",
     orderLink:
-      "https://wa.me/628111171713?text=Hello%2C%20I%20want%20to%20order%20an%20aqiqah%20package.",
+      "https://wa.me/6281371790122?text=Hello%2C%20I%20want%20to%20order%20an%20aqiqah%20package.",
     consultLink:
-      "https://wa.me/628111171713?text=Hello%2C%20I%20want%20to%20consult%20about%20an%20aqiqah%20package.",
+      "https://wa.me/6282288175957?text=Hello%2C%20I%20want%20to%20consult%20about%20an%20aqiqah%20package.",
   },
   prasmananPage: {
     hero: {
@@ -502,9 +502,9 @@ const messages = {
     description:
       "More than quality dishes, it is also a dining memory worth sharing and remembering.",
     orderLink:
-      "https://wa.me/628111171713?text=Hello%2C%20I%20want%20to%20order%20buffet%20catering.",
+      "https://wa.me/6281371790122?text=Hello%2C%20I%20want%20to%20order%20buffet%20catering.",
     consultLink:
-      "https://wa.me/628111171713?text=Hello%2C%20I%20want%20to%20consult%20about%20buffet%20catering.",
+      "https://wa.me/6282288175957?text=Hello%2C%20I%20want%20to%20consult%20about%20buffet%20catering.",
   },
   weddingPage: {
     hero: {
@@ -578,9 +578,9 @@ const messages = {
     description:
       "Enjoy complete buffet service with special flavors and a professional team ready to handle every detail of your event.",
     orderLink:
-      "https://wa.me/628111171713?text=Hello%2C%20I%20want%20to%20order%20wedding%20buffet%20catering.",
+      "https://wa.me/6281371790122?text=Hello%2C%20I%20want%20to%20order%20wedding%20buffet%20catering.",
     consultLink:
-      "https://wa.me/628111171713?text=Hello%2C%20I%20want%20to%20consult%20about%20wedding%20buffet%20catering.",
+      "https://wa.me/6282288175957?text=Hello%2C%20I%20want%20to%20consult%20about%20wedding%20buffet%20catering.",
   },
   weddingFaq: {
     items: [
@@ -667,9 +667,9 @@ const messages = {
     description:
       "Practical, hygienic, and flavorful meals for a memorable experience.",
     orderLink:
-      "https://wa.me/628111171713?text=Hello%2C%20I%20want%20to%20order%20Bento.",
+      "https://wa.me/6281371790122?text=Hello%2C%20I%20want%20to%20order%20Bento.",
     consultLink:
-      "https://wa.me/628111171713?text=Hello%2C%20I%20want%20to%20consult%20about%20Bento.",
+      "https://wa.me/6282288175957?text=Hello%2C%20I%20want%20to%20consult%20about%20Bento.",
   },
   snackBoxPage: {
     hero: {
@@ -712,9 +712,9 @@ const messages = {
     description:
       "Delicious and hygienic options ready to complete every event, from meetings to special activities.",
     orderLink:
-      "https://wa.me/628111171713?text=Hello%2C%20I%20want%20to%20order%20Snack%20Box.",
+      "https://wa.me/6281371790122?text=Hello%2C%20I%20want%20to%20order%20Snack%20Box.",
     consultLink:
-      "https://wa.me/628111171713?text=Hello%2C%20I%20want%20to%20consult%20about%20Snack%20Box.",
+      "https://wa.me/6282288175957?text=Hello%2C%20I%20want%20to%20consult%20about%20Snack%20Box.",
   },
   tumpengPage: {
     hero: {
@@ -753,9 +753,9 @@ const messages = {
     description:
       "Served with warmth and authentic flavor to celebrate your togetherness.",
     orderLink:
-      "https://wa.me/628111171713?text=Hello%2C%20I%20want%20to%20order%20Tumpeng.",
+      "https://wa.me/6281371790122?text=Hello%2C%20I%20want%20to%20order%20Tumpeng.",
     consultLink:
-      "https://wa.me/628111171713?text=Hello%2C%20I%20want%20to%20consult%20about%20Tumpeng.",
+      "https://wa.me/6282288175957?text=Hello%2C%20I%20want%20to%20consult%20about%20Tumpeng.",
   },
   korporatPage: {
     hero: {
@@ -793,9 +793,9 @@ const messages = {
     description:
       "Support every company activity with quality catering service, varied menus, and dependable service.",
     orderLink:
-      "https://wa.me/628111171713?text=Hello%2C%20I%20want%20to%20order%20Corporate%20Catering.",
+      "https://wa.me/6281371790122?text=Hello%2C%20I%20want%20to%20order%20Corporate%20Catering.",
     consultLink:
-      "https://wa.me/628111171713?text=Hello%2C%20I%20want%20to%20consult%20about%20Corporate%20Catering.",
+      "https://wa.me/6282288175957?text=Hello%2C%20I%20want%20to%20consult%20about%20Corporate%20Catering.",
   },
   serviceDetail: {
     eyebrow: "KSM Katering Services",

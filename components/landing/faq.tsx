@@ -40,7 +40,7 @@ function Faq() {
           className="h-11 border-red-800 px-6 font-bold text-red-800 hover:border-red-800 hover:bg-red-800 hover:text-white"
         >
           <a
-            href="https://wa.me/628111171713?text=Halo%2C%20saya%20ingin%20konsultasi%20tentang%20pemesanan."
+            href="https://wa.me/6282288175957?text=Halo%2C%20saya%20ingin%20konsultasi%20tentang%20pemesanan."
             target="_blank"
           >
             {t("cta")}
