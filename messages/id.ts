@@ -762,9 +762,9 @@ const messages = {
     about: {
       titleHighlight: "Solusi Katering Terbaik untuk Perusahaan Anda",
       paragraph1:
-        "KSM Katering hadir untuk memenuhi kebutuhan katering perusahaan dengan menu yang sehat, lezat, dan higienis.",
+        "korporatPageTerlahir dari catering korporat di tahun 2007, KSM Catering menjadi catering terbesar di Batam dengan kapasitas hingga 10.000 porsi setiap hari melayani berbagai Perusahaan besar di Batam.",
       paragraph2:
-        "Kami menyediakan berbagai pilihan menu yang dapat disesuaikan dengan selera dan kebutuhan perusahaan Anda. Mulai dari makan siang karyawan, meeting, hingga acara perusahaan, kami siap menjadi mitra kuliner terpercaya.",
+        "Dengan standar mutu yang tinggi, menerapkan standar CPB (Cara Produksi yang Baik) dengan skala yang besar, menjadikan KSM Catering menjadi catering yang dipercaya!",
     },
     packages: {
       titleLead: "Paket",

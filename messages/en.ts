@@ -766,9 +766,9 @@ const messages = {
     about: {
       titleHighlight: "The best catering solution for your company",
       paragraph1:
-        "KSM Katering is here to meet corporate catering needs with healthy, delicious, and hygienic menus.",
+        "Born as a corporate catering service in 2007, KSM Catering has become the largest catering service in Batam, with a daily capacity of up to 10,000 servings, serving various large companies in the city.",
       paragraph2:
-        "We provide various menu choices that can be adjusted to your company's tastes and needs. From employee lunches and meetings to corporate events, we are ready to be your trusted culinary partner.",
+        "With high quality standards and the implementation of Good Manufacturing Practices (CPB) on a large scale, KSM Catering has become a trusted catering service!",
     },
     packages: {
       titleLead: "Corporate Catering",
