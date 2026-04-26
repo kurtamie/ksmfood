@@ -75,6 +75,12 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
                 className="object-cover transition-transform duration-500 group-hover:scale-105"
               />
             </div>
+            {/* Item name label */}
+            <div className="px-3 py-2">
+              <p className="text-lg font-medium text-black truncate font-bold text-center capitalize">
+                {item.caption}
+              </p>
+            </div>
           </button>
         ))}
       </div>
@@ -139,7 +145,7 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
                   className="object-contain"
                 />
               </div>
-              <div className="mt-3 flex items-center justify-between gap-4 text-sm text-white/85">
+              <div className="mt-3 flex items-center justify-center flex-col gap-4 text-sm text-white/85">
                 <p className="truncate">{activeItem.caption}</p>
                 <p className="shrink-0">
                   {currentIndex + 1} / {items.length}
