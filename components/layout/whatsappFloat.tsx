@@ -22,7 +22,7 @@ export default function WhatsappFloat() {
                   src={Logo}
                   alt="wa-ksm"
                   className="object-contain"
-                  width={20}
+                  width={30}
                 />
               </div>
               <div className="min-w-0 flex-1 pt-1">

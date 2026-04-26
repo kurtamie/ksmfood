@@ -624,7 +624,7 @@ const messages = {
   bentoPage: {
     hero: {
       eyebrow: "Bento",
-      title: "Praktis, HIgienis ddengan menu bervariasi",
+      title: "Praktis, Higienis dengan menu bervariasi",
       cta: "Unduh Menu",
     },
     about: {

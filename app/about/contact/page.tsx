@@ -32,7 +32,7 @@ const contacts = [
 ] as const;
 
 export default async function ContactPage() {
-  const t = await getTranslations("aboutKsmPage");
+  const t = await getTranslations("contactPage");
 
   return (
     <main className="w-full overflow-x-clip">
