@@ -7,7 +7,6 @@ const packageCards = [
   {
     id: 1,
     title: "Paket A",
-    badge: "Paling Populer",
     dish: [
       "Nasi Kuning 30 porsi",
       "Ayam Bakar 10 porsi",
@@ -17,7 +16,7 @@ const packageCards = [
       "Perkedel Kentang 30 porsi",
       "Urap Sayuran 30 porsi",
     ],
-    price: "Rp 700.000/porsi",
+    price: "Rp 700.000",
   },
   {
     id: 2,
@@ -32,7 +31,7 @@ const packageCards = [
       "Perkedel Kentang 30 porsi",
       "Urap Sayuran 30 porsi",
     ],
-    price: "Rp 800.000/porsi",
+    price: "Rp 800.000",
   },
   {
     id: 3,
@@ -47,11 +46,12 @@ const packageCards = [
       "Perkedel Kentang 30 porsi",
       "Urap Sayuran 30 porsi",
     ],
-    price: "Rp 900.000/porsi",
+    price: "Rp 900.000",
   },
   {
     id: 4,
     title: "Paket D",
+    badge: "Paling Populer",
     dish: [
       "Nasi Kuning 30 porsi",
       "Ayam Bakar 30 porsi",
@@ -63,7 +63,7 @@ const packageCards = [
       "Perkedel Kentang 30 porsi",
       "Urap Sayuran 30 porsi",
     ],
-    price: "Rp 1.000.000/Kotak",
+    price: "Rp 1.000.000",
   },
 ];
 

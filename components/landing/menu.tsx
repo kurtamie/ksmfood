@@ -64,15 +64,15 @@ const packageCards = [
     id: 7,
     image: aqiqah,
     title: "Aqiqah",
-    price: "Harga Disesuaikan",
+    price: "Mulai dari Rp 3.400.000",
     // catalog: "/images/pdf/aqiqah.pdf",
-    route: "/services/aqiqah",
+    url: "/services/aqiqah",
   },
   {
     id: 8,
     image: tumpeng,
     title: "Tumpeng",
-    price: "Mulai dari Rp 900.000",
+    price: "Mulai dari Rp 700.000",
     url: "/services/tumpeng",
   },
   {
