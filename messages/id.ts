@@ -639,9 +639,9 @@ const messages = {
       titleLead: "Paket",
       titleBrand: "Bento",
     },
-    minimumOrder:
-      "Minimal pemesanan 25 kotak (diambil di dapur kami).",
-    minimumOrder2: "Pemesanan 50 kotak atau lebih mendapatkan layanan antar gratis.",
+    minimumOrder: "Minimal pemesanan 25 kotak (diambil di dapur kami).",
+    minimumOrder2:
+      "Pemesanan 50 kotak atau lebih mendapatkan layanan antar gratis.",
     gallerySection: {
       title: "Pilihan Bento Kami",
     },

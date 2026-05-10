@@ -48,9 +48,9 @@ export interface LogoLoopProps {
 
 const ANIMATION_CONFIG = {
   SMOOTH_TAU: 0.25,
-  MIN_COPIES: 2,
-  COPY_HEADROOM: 1,
-  MAX_COPIES: 3,
+  MIN_COPIES: 3,
+  COPY_HEADROOM: 2,
+  MAX_COPIES: 8,
 } as const;
 
 const toCssLength = (value?: number | string): string | undefined =>
@@ -447,7 +447,7 @@ export const LogoLoop = React.memo<LogoLoopProps>(
             height={item.height ?? logoHeight}
             alt={item.alt ?? ""}
             title={item.title}
-            loading="lazy"
+            loading="eager"
             decoding="async"
             draggable={false}
             unoptimized={Boolean(item.srcSet)}

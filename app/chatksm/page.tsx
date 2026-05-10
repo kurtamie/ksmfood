@@ -11,7 +11,10 @@ interface Message {
 const MODEL_NAME = "KSM Catering Assistant";
 
 function formatTime(date: Date): string {
-  return date.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" });
+  return date.toLocaleTimeString("id-ID", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 }
 
 function TypingIndicator() {
@@ -34,7 +37,9 @@ function TypingIndicator() {
 function MessageBubble({ role, content, time }: Message) {
   const isUser = role === "user";
   return (
-    <div className={`flex items-end gap-2 mb-4 ${isUser ? "flex-row-reverse" : ""}`}>
+    <div
+      className={`flex items-end gap-2 mb-4 ${isUser ? "flex-row-reverse" : ""}`}
+    >
       {/* Avatar */}
       {isUser ? (
         <div className="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
@@ -114,7 +119,10 @@ export default function ChatPage() {
     setError(null);
 
     try {
-      const apiMessages = updatedMessages.map(({ role, content }) => ({ role, content }));
+      const apiMessages = updatedMessages.map(({ role, content }) => ({
+        role,
+        content,
+      }));
 
       const res = await fetch("/api/chat", {
         method: "POST",
@@ -134,7 +142,8 @@ export default function ChatPage() {
 
       setMessages((prev) => [...prev, assistantMessage]);
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "Terjadi kesalahan";
+      const errorMessage =
+        err instanceof Error ? err.message : "Terjadi kesalahan";
       setError(errorMessage);
       setMessages(messages);
       setInput(trimmed);
@@ -170,7 +179,9 @@ export default function ChatPage() {
             KSM
           </div>
           <div>
-            <h1 className="font-semibold text-gray-900 text-sm">{MODEL_NAME}</h1>
+            <h1 className="font-semibold text-gray-900 text-sm">
+              {MODEL_NAME}
+            </h1>
             <p className="text-xs text-emerald-500 font-medium flex items-center gap-1">
               <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full inline-block" />
               Online
@@ -231,7 +242,8 @@ export default function ChatPage() {
           </button>
         </div>
         <p className="text-center text-[11px] text-gray-400 mt-2 max-w-3xl mx-auto">
-          KSM Catering · Muka Kuning, Batam · Berpengalaman sejak 2007 · Halal & Higiene
+          KSM Catering · Muka Kuning, Batam · Berpengalaman sejak 2007 · Halal &
+          Higiene
         </p>
       </div>
     </div>

@@ -3,18 +3,27 @@ import React from "react";
 
 const imageLogosTop = [
   { src: "/images/services/korporat/logo/Alcon.webp", alt: "Alcon" },
-  { src: "/images/services/korporat/logo/baker-hughes.webp", alt: "baker-hughes" },
+  {
+    src: "/images/services/korporat/logo/baker-hughes.webp",
+    alt: "baker-hughes",
+  },
   { src: "/images/services/korporat/logo/dynacast.webp", alt: "dynacast" },
   { src: "/images/services/korporat/logo/eaton.webp", alt: "eaton" },
   { src: "/images/services/korporat/logo/Ecogreen.webp", alt: "Ecogreen" },
   { src: "/images/services/korporat/logo/epson.webp", alt: "epson" },
   { src: "/images/services/korporat/logo/excelitas.webp", alt: "excelitas" },
   { src: "/images/services/korporat/logo/Flex.webp", alt: "Flex" },
-  { src: "/images/services/korporat/logo/Garuda-Indonesia.webp", alt: "Garuda-Indonesia" },
+  {
+    src: "/images/services/korporat/logo/Garuda-Indonesia.webp",
+    alt: "Garuda-Indonesia",
+  },
   { src: "/images/services/korporat/logo/Honeywell.webp", alt: "Honeywell" },
   { src: "/images/services/korporat/logo/Infineon.webp", alt: "Infineon" },
   { src: "/images/services/korporat/logo/inmarsat.webp", alt: "inmarsat" },
-  { src: "/images/services/korporat/logo/nissinkogyobatam.webp", alt: "nissinkogyobatam" },
+  {
+    src: "/images/services/korporat/logo/nissinkogyobatam.webp",
+    alt: "nissinkogyobatam",
+  },
   { src: "/images/services/korporat/logo/nittoh.webp", alt: "nittoh" },
   { src: "/images/services/korporat/logo/Panasonic.webp", alt: "Panasonic" },
 ];
@@ -22,8 +31,14 @@ const imageLogosTop = [
 const imageLogosBottom = [
   { src: "/images/services/korporat/logo/patlite.webp", alt: "patlite" },
   { src: "/images/services/korporat/logo/PT-BSTC.webp", alt: "PT BSTC" },
-  { src: "/images/services/korporat/logo/PT-Pegaunihan.webp", alt: "PT Pegaunihan" },
-  { src: "/images/services/korporat/logo/PT-SMOE-Indonesia.webp", alt: "PT SMOE Indonesia" },
+  {
+    src: "/images/services/korporat/logo/PT-Pegaunihan.webp",
+    alt: "PT Pegaunihan",
+  },
+  {
+    src: "/images/services/korporat/logo/PT-SMOE-Indonesia.webp",
+    alt: "PT SMOE Indonesia",
+  },
   { src: "/images/services/korporat/logo/PT-Timas.webp", alt: "PT Timas" },
   { src: "/images/services/korporat/logo/Rigspek.webp", alt: "Rigspek" },
   { src: "/images/services/korporat/logo/rubycon.webp", alt: "rubycon" },
