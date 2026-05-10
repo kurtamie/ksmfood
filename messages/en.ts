@@ -643,8 +643,7 @@ const messages = {
       titleLead: "Bento",
       titleBrand: "Packages",
     },
-    minimumOrder:
-      "Minimum order is 25 boxes for pickup from our kitchen.",
+    minimumOrder: "Minimum order is 25 boxes for pickup from our kitchen.",
     minimumOrder2: "Orders of 50 boxes or more include free delivery.",
     gallerySection: {
       title: "Our Bento Selection",

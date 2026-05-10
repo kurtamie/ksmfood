@@ -95,7 +95,7 @@ const sideDish: MenuCard[] = [
       "Urap Sayuran",
       "Pecel Sayuran",
       "Sup Sayuran",
-      "Orak Arik Buncis",
+      "Tumis Buncis",
       "Tumis Toge Teri",
       "Sayur Lodeh",
       "Gulai Labu Siam",
