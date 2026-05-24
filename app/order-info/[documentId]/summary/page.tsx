@@ -270,7 +270,7 @@ export default function OrderSummaryPage() {
         <div className="mb-8">
           <div className="relative">
             <div className="absolute inset-x-6 top-1/2 h-px bg-gray-200" />
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 gap-4">
               <div className="relative flex flex-col items-center gap-3 text-center">
                 <div className="flex h-10 w-10 items-center justify-center rounded-full border border-gray-300 bg-white text-secondary-500 text-sm font-bold">
                   1
@@ -287,13 +287,6 @@ export default function OrderSummaryPage() {
                 <p className="text-sm font-semibold text-tertiary-900">
                   Ringkasan Pesanan
                 </p>
-              </div>
-
-              <div className="relative flex flex-col items-center gap-3 text-center">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full border border-gray-300 bg-white text-secondary-500 text-sm font-bold">
-                  3
-                </div>
-                <p className="text-sm text-secondary-500">Pembayaran</p>
               </div>
             </div>
           </div>

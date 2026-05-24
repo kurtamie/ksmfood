@@ -738,7 +738,7 @@ export default function OrderInfoPage() {
       <div className="mb-8">
         <div className="relative">
           <div className="absolute inset-x-6 top-1/2 h-px bg-gray-200" />
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-2 gap-4">
             <div className="relative flex flex-col items-center gap-3 text-center">
               <div className="flex h-10 w-10 items-center justify-center rounded-full border border-primary-500 bg-primary-500 text-white text-sm font-bold">
                 1
@@ -753,13 +753,6 @@ export default function OrderInfoPage() {
                 2
               </div>
               <p className="text-sm text-secondary-500">Ringkasan Pesanan</p>
-            </div>
-
-            <div className="relative flex flex-col items-center gap-3 text-center">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full border border-gray-300 bg-white text-secondary-500 text-sm font-bold">
-                3
-              </div>
-              <p className="text-sm text-secondary-500">Pembayaran</p>
             </div>
           </div>
         </div>
@@ -1072,19 +1065,13 @@ export default function OrderInfoPage() {
         {/* Right column - summary */}
         <aside className="sticky top-24">
           <div className="rounded-lg border border-secondary-300 bg-white p-5">
-            <div className="mb-5 flex items-center justify-between gap-4">
+            <div className="mb-5">
               <div>
                 <h3 className="text-lg font-semibold">Detail Pesanan</h3>
                 <p className="text-sm text-secondary-600">
                   {itemCount} kotak dari {orderItems.length} item
                 </p>
               </div>
-              <button
-                onClick={() => router.push("/")}
-                className="rounded-full border border-primary-500 bg-primary-50 px-3 py-1.5 text-xs font-semibold text-primary-700 transition hover:bg-primary-100"
-              >
-                Tambah Pesanan
-              </button>
             </div>
 
             {isOrderLoading ? (
@@ -1178,7 +1165,7 @@ export default function OrderInfoPage() {
               disabled={orderItems.length === 0 || isOrderLoading || isSubmitting}
               className="mt-5 w-full rounded-lg bg-primary-500 py-3 text-sm font-bold text-white transition hover:bg-primary-600 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {isSubmitting ? "Menyimpan..." : "Lanjut Pembayaran"}
+              {isSubmitting ? "Menyimpan..." : "Lanjut Ringkasan"}
             </button>
           </div>
         </aside>
