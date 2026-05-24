@@ -1,5 +1,6 @@
 import type { Order } from "@/types/orders";
 import type { OrderDetail } from "@/types/order-details";
+import type { OrderMenu } from "@/types/order-menus";
 import type { Invoice } from "@/types/invoices";
 import {
   getOrderPaymentStatusLabel,
@@ -38,6 +39,7 @@ export type OrderDetailView = OrderListItem & {
   arriveTime: string | null;
   paymentStatus: string | null;
   orderDetails: Array<OrderDetail & { id: number; documentId?: string }>;
+  orderMenus: Array<OrderMenu & { id: number; documentId?: string }>;
   invoices: Array<Invoice & { id: number; documentId?: string }>;
 };
 
@@ -117,6 +119,36 @@ export async function fetchOrderDetailsForOrder(
   );
 
   return unwrapStrapiList<OrderDetail>(getStrapiListData(body));
+}
+
+export async function fetchOrderMenusForOrder(
+  orderId: number,
+  token?: string | null,
+): Promise<Array<OrderMenu & { id: number; documentId?: string }>> {
+  const authToken = token !== undefined ? token : await getStrapiToken();
+  const baseUrl = getStrapiBaseUrl();
+  const search = new URLSearchParams({
+    "filters[order_id][id][$eq]": String(orderId),
+    "pagination[pageSize]": "100",
+    "fields[0]": "rice",
+    "fields[1]": "main_dish",
+    "fields[2]": "additional_dish",
+    "fields[3]": "vegetable",
+    "fields[4]": "sauce",
+    "fields[5]": "chip",
+    "fields[6]": "fruit",
+    "fields[7]": "mineral_water",
+    "fields[8]": "box",
+    "fields[9]": "pudding",
+    "fields[10]": "snack",
+  });
+
+  const body = await fetchStrapiJson(
+    `${baseUrl}/api/order-menus?${search}`,
+    authToken,
+  );
+
+  return unwrapStrapiList<OrderMenu>(getStrapiListData(body));
 }
 
 export async function fetchOrderByDocumentId(
@@ -199,6 +231,7 @@ export async function mapOrderToDetailView(
 ): Promise<OrderDetailView> {
   const listItem = await mapOrderToListItem(order, token);
   const orderDetails = await fetchOrderDetailsForOrder(order.id, token);
+  const orderMenus = await fetchOrderMenusForOrder(order.id, token);
   const invoices = normalizeInvoices(order.invoices);
 
   return {
@@ -209,6 +242,7 @@ export async function mapOrderToDetailView(
     arriveTime: order.arrive_time ?? null,
     paymentStatus: invoices[0]?.payment_status ?? null,
     orderDetails,
+    orderMenus,
     invoices,
   };
 }

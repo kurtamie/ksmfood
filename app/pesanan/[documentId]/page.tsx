@@ -27,6 +27,83 @@ function formatOrderDate(value: string | null) {
   });
 }
 
+type OrderMenuRow = OrderDetailView["orderMenus"][number];
+type OrderDetailRow = OrderDetailView["orderDetails"][number];
+
+type OrderDisplayItem = {
+  id: string;
+  name: string;
+  addOnLabels: string;
+  quantity: number;
+  unitPrice: number;
+  total: number;
+};
+
+function buildMenuLabels(menu: OrderMenuRow): string {
+  return [
+    menu.rice,
+    menu.main_dish,
+    menu.additional_dish,
+    menu.vegetable,
+    menu.sauce,
+    menu.chip,
+    menu.fruit,
+    menu.mineral_water,
+    menu.box,
+    menu.pudding,
+    menu.snack,
+  ]
+    .filter(Boolean)
+    .join(", ");
+}
+
+function toOrderDisplayItems(
+  menus: OrderMenuRow[],
+  details: OrderDetailRow[],
+): OrderDisplayItem[] {
+  if (details.length === 1) {
+    const detail = details[0];
+    const quantity = parseAmount(detail.qty) || 1;
+    const unitPrice = parseAmount(detail.selling_price);
+    const total =
+      parseAmount(detail.total_amount ?? detail.amount) || quantity * unitPrice;
+
+    return [
+      {
+        id: String(detail.documentId ?? detail.id ?? "order-detail"),
+        name: "Menu Pesanan",
+        addOnLabels: menus.map(buildMenuLabels).filter(Boolean).join(" | "),
+        quantity,
+        unitPrice,
+        total,
+      },
+    ];
+  }
+
+  const rowCount = Math.max(menus.length, details.length);
+
+  return Array.from({ length: rowCount }, (_, index) => {
+    const menu = menus[index];
+    const detail = details[index];
+    const quantity = parseAmount(detail?.qty) || 1;
+    const unitPrice = parseAmount(detail?.selling_price);
+    const total =
+      parseAmount(detail?.total_amount ?? detail?.amount) ||
+      quantity * unitPrice;
+
+    return {
+      id: String(
+        detail?.documentId ?? detail?.id ?? menu?.documentId ?? menu?.id ?? index,
+      ),
+      name: `Menu Pesanan ${index + 1}`,
+      addOnLabels: menu ? buildMenuLabels(menu) : "",
+      quantity,
+      unitPrice,
+      total,
+    };
+  });
+}
+
 export default function OrderDetailPage() {
   const params = useParams();
   const documentId = params?.documentId as string | undefined;
@@ -118,6 +195,11 @@ export default function OrderDetailPage() {
       sum + parseAmount(detail.total_amount ?? detail.amount),
     0,
   );
+  const totalQty = order.orderDetails.reduce(
+    (sum, detail) => sum + parseAmount(detail.qty),
+    0,
+  );
+  const orderItems = toOrderDisplayItems(order.orderMenus, order.orderDetails);
 
   return (
     <div className="mx-auto max-w-5xl px-6 py-10">
@@ -194,32 +276,37 @@ export default function OrderDetailPage() {
               Item Pesanan
             </h2>
             <div className="space-y-4">
-              {order.orderDetails.length > 0 ? (
-                order.orderDetails.map((detail) => {
-                  const qty = parseAmount(detail.qty) || 1;
-                  const lineTotal = parseAmount(
-                    detail.total_amount ?? detail.amount,
-                  );
-                  const unitPrice =
-                    parseAmount(detail.selling_price) ||
-                    (qty > 0 ? lineTotal / qty : lineTotal);
-
+              {orderItems.length > 0 ? (
+                orderItems.map((item) => {
                   return (
                     <div
-                      key={detail.id}
-                      className="flex items-center justify-between gap-4 border-b border-secondary-100 pb-3 last:border-b-0 last:pb-0"
+                      key={item.id}
+                      className="rounded-2xl border border-secondary-200 bg-gray-50 p-4"
                     >
-                      <div>
-                        <p className="font-medium text-tertiary-900">
-                          Item pesanan
-                        </p>
-                        <p className="text-sm text-secondary-500">
-                          {qty} x {formatRupiah(unitPrice)}
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0">
+                          <p className="text-sm font-semibold text-tertiary-900">
+                            {item.name}
+                          </p>
+                          {item.addOnLabels ? (
+                            <p className="mt-2 text-xs leading-relaxed text-secondary-600">
+                              {item.addOnLabels}
+                            </p>
+                          ) : null}
+                        </div>
+                        <p className="shrink-0 text-right text-sm text-secondary-600">
+                          {formatRupiah(item.unitPrice)} / kotak
                         </p>
                       </div>
-                      <p className="font-semibold text-tertiary-900">
-                        {formatRupiah(lineTotal)}
-                      </p>
+                      <div className="mt-4 flex items-center justify-between gap-3 border-t border-secondary-200 pt-3">
+                        <p className="text-sm text-secondary-600">
+                          Qty: {item.quantity} kotak
+                        </p>
+                        <div className="text-right text-sm font-semibold text-tertiary-900">
+                          <div>Total</div>
+                          <div>{formatRupiah(item.total)}</div>
+                        </div>
+                      </div>
                     </div>
                   );
                 })
@@ -238,6 +325,10 @@ export default function OrderDetailPage() {
               Ringkasan Biaya
             </h2>
             <div className="space-y-3 text-sm text-secondary-600">
+              <div className="flex justify-between">
+                <span>Qty</span>
+                <span>{totalQty} kotak</span>
+              </div>
               <div className="flex justify-between">
                 <span>Sub total</span>
                 <span>{formatRupiah(subTotal || order.total)}</span>
