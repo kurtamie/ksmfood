@@ -38,7 +38,13 @@ function TypingIndicator() {
   return (
     <div className="flex items-end gap-2 mb-3">
       <div className="w-7 h-7 rounded-full overflow-hidden flex items-center justify-center flex-shrink-0">
-        <Image src="/images/chara_bot.png" alt="KSM Bot" className="w-full h-full object-cover" width={28} height={28} />
+        <Image
+          src="/images/chara_bot.png"
+          alt="KSM Bot"
+          className="w-full h-full object-cover"
+          width={28}
+          height={28}
+        />
       </div>
       <div className="bg-gray-100 rounded-2xl rounded-bl-sm px-3 py-2.5">
         <div className="flex gap-1 items-center h-4">
@@ -54,20 +60,34 @@ function TypingIndicator() {
 function MessageBubble({ role, content, time }: Message) {
   const isUser = role === "user";
   return (
-    <div className={`flex items-end gap-2 mb-3 ${isUser ? "flex-row-reverse" : ""}`}>
+    <div
+      className={`flex items-end gap-2 mb-3 ${isUser ? "flex-row-reverse" : ""}`}
+    >
       {isUser ? (
         <div className="w-7 h-7 rounded-full bg-black flex items-center justify-center text-white text-[10px] font-bold flex-shrink-0">
           You
         </div>
       ) : (
         <div className="w-7 h-7 rounded-full overflow-hidden flex items-center justify-center flex-shrink-0">
-          <Image src="/images/chara_bot.png" alt="KSM Bot" className="w-full h-full object-cover" width={28} height={28} />
+          <Image
+            src="/images/chara_bot.png"
+            alt="KSM Bot"
+            className="w-full h-full object-cover"
+            width={28}
+            height={28}
+          />
         </div>
       )}
-      <div className={`max-w-[78%] group flex flex-col gap-0.5 ${isUser ? "items-end" : "items-start"}`}>
-        <div className={`px-3 py-2 rounded-2xl text-xs leading-relaxed whitespace-pre-wrap ${
-          isUser ? "bg-red-900 text-white rounded-br-sm" : "bg-gray-100 text-gray-800 rounded-bl-sm"
-        }`}>
+      <div
+        className={`max-w-[78%] group flex flex-col gap-0.5 ${isUser ? "items-end" : "items-start"}`}
+      >
+        <div
+          className={`px-3 py-2 rounded-2xl text-xs leading-relaxed whitespace-pre-wrap ${
+            isUser
+              ? "bg-red-900 text-white rounded-br-sm"
+              : "bg-gray-100 text-gray-800 rounded-bl-sm"
+          }`}
+        >
           {content}
         </div>
         <span className="text-[10px] text-gray-400 px-1 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -83,7 +103,9 @@ export default function WhatsappFloat() {
   const lang = locale === "en" ? "en" : "id";
 
   const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([getInitialMessage(lang)]);
+  const [messages, setMessages] = useState<Message[]>([
+    getInitialMessage(lang),
+  ]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -134,7 +156,10 @@ export default function WhatsappFloat() {
     setError(null);
 
     try {
-      const apiMessages = updatedMessages.map(({ role, content }) => ({ role, content }));
+      const apiMessages = updatedMessages.map(({ role, content }) => ({
+        role,
+        content,
+      }));
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -146,7 +171,11 @@ export default function WhatsappFloat() {
 
       setMessages((prev) => [
         ...prev,
-        { role: "assistant", content: data.reply, time: formatTime(new Date()) },
+        {
+          role: "assistant",
+          content: data.reply,
+          time: formatTime(new Date()),
+        },
       ]);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Terjadi kesalahan");
@@ -174,7 +203,12 @@ export default function WhatsappFloat() {
           >
             <div className="flex items-center gap-3 border-b border-black/5 px-4 py-3 flex-shrink-0">
               <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-[#a90000]">
-                <Image src={Logo} alt="KSM" className="object-cover rounded-full" width={46} />
+                <Image
+                  src={Logo}
+                  alt="KSM"
+                  className="object-cover rounded-full"
+                  width={46}
+                />
               </div>
               <div className="min-w-0 flex-1">
                 <p className="text-sm font-semibold text-[#2f3443]">Vika</p>
@@ -223,7 +257,9 @@ export default function WhatsappFloat() {
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     onKeyDown={handleKeyDown}
-                    placeholder={lang === "en" ? "Type a message..." : "Ketik pesan..."}
+                    placeholder={
+                      lang === "en" ? "Type a message..." : "Ketik pesan..."
+                    }
                     rows={1}
                     disabled={isLoading}
                     className="flex-1 bg-transparent text-xs text-gray-800 placeholder-gray-400 resize-none outline-none min-h-[20px] max-h-[100px] py-1 disabled:opacity-50"
@@ -246,7 +282,15 @@ export default function WhatsappFloat() {
           onClick={() => setIsOpen((v) => !v)}
           className="flex size-16 items-center justify-center rounded-full bg-red-800 text-white shadow-[0_18px_40px_rgba(37,211,102,0.35)] transition hover:scale-[1.03] hover:bg-red-500"
           aria-expanded={isOpen}
-          aria-label={isOpen ? (lang === "en" ? "Close chat" : "Tutup chat") : (lang === "en" ? "Open chat" : "Buka chat")}
+          aria-label={
+            isOpen
+              ? lang === "en"
+                ? "Close chat"
+                : "Tutup chat"
+              : lang === "en"
+                ? "Open chat"
+                : "Buka chat"
+          }
         >
           {isOpen ? <X className="size-7" /> : <VscRobot className="size-9" />}
         </button>

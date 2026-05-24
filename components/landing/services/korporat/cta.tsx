@@ -67,9 +67,7 @@ function Cta() {
             </div>
             <div className="flex flex-col text-center">
               <p>{t("consultEmail")} </p>
-              <a
-                href="mailto:service@ksmpromotionbatam@gmail.com"
-              >
+              <a href="mailto:service@ksmpromotionbatam@gmail.com">
                 <span className="break-all font-medium underline">
                   ksmpromotionbatam@gmail.com
                 </span>

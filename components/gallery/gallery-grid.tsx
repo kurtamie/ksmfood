@@ -17,7 +17,10 @@ type GalleryGridProps = {
   showCaption?: boolean;
 };
 
-export default function GalleryGrid({ items, showCaption = true }: GalleryGridProps) {
+export default function GalleryGrid({
+  items,
+  showCaption = true,
+}: GalleryGridProps) {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const activeItem = activeIndex === null ? null : items[activeIndex];
   const isViewerOpen = activeItem !== null;
@@ -149,9 +152,9 @@ export default function GalleryGrid({ items, showCaption = true }: GalleryGridPr
                 />
               </div>
               <div className="mt-3 flex items-center justify-center flex-col gap-4 text-sm text-white/85">
-              {showCaption && (
-                <p className="truncate">{activeItem.caption}</p>
-              )}
+                {showCaption && (
+                  <p className="truncate">{activeItem.caption}</p>
+                )}
                 <p className="shrink-0">
                   {currentIndex + 1} / {items.length}
                 </p>

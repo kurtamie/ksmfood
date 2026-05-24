@@ -22,7 +22,7 @@ const packageCards = [
     id: 3,
     title: "Nasi Kotak / Prasmanan Event / Coffee Break",
     dish: [
-      "Pastikan event yang diadakan seperti meeting, perayaan, dll di perusahaan anda menjadi lebih spesial dengan sajian dari KSM Katering."
+      "Pastikan event yang diadakan seperti meeting, perayaan, dll di perusahaan anda menjadi lebih spesial dengan sajian dari KSM Katering.",
     ],
   },
 ];
