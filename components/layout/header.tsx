@@ -179,7 +179,7 @@ function Header() {
                   <DropdownMenuGroup>
                     <DropdownMenuItem asChild>
                       <Link
-                        href="/profile/account"
+                        href="/profile"
                         className="flex items-center gap-2 cursor-pointer"
                       >
                         Akun Saya

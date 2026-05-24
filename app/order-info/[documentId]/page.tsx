@@ -182,8 +182,33 @@ type SavedAddress = {
   longitude?: number;
 };
 
-function parseSavedAddresses(raw?: string | null): SavedAddress[] {
+function parseSavedAddresses(
+  raw?: string | null,
+  customerLatitude?: string | number | null,
+  customerLongitude?: string | number | null,
+): SavedAddress[] {
   if (!raw) return [];
+
+  const latitude =
+    typeof customerLatitude === "number"
+      ? customerLatitude
+      : customerLatitude
+      ? Number(customerLatitude)
+      : undefined;
+  const longitude =
+    typeof customerLongitude === "number"
+      ? customerLongitude
+      : customerLongitude
+      ? Number(customerLongitude)
+      : undefined;
+  const validLatitude =
+    latitude !== undefined && Number.isFinite(latitude) ? latitude : undefined;
+  const validLongitude =
+    longitude !== undefined && Number.isFinite(longitude) ? longitude : undefined;
+  const pinpoint =
+    validLatitude !== undefined && validLongitude !== undefined
+      ? `${validLatitude.toFixed(6)}, ${validLongitude.toFixed(6)}`
+      : "";
 
   try {
     const parsed = JSON.parse(raw);
@@ -213,7 +238,37 @@ function parseSavedAddresses(raw?: string | null): SavedAddress[] {
       }));
     }
   } catch {
-    // Ignore parse errors.
+    return [
+      {
+        id: "customer-address",
+        label: raw,
+        addressName: raw,
+        addressLine: raw,
+        subdistrict: "",
+        pinpoint,
+        recipientName: "",
+        recipientPhone: "",
+        latitude: validLatitude,
+        longitude: validLongitude,
+      },
+    ];
+  }
+
+  if (typeof raw === "string") {
+    return [
+      {
+        id: "customer-address",
+        label: raw,
+        addressName: raw,
+        addressLine: raw,
+        subdistrict: "",
+        pinpoint,
+        recipientName: "",
+        recipientPhone: "",
+        latitude: validLatitude,
+        longitude: validLongitude,
+      },
+    ];
   }
 
   return [];
@@ -252,8 +307,17 @@ export default function OrderInfoPage() {
   const [isOrderLoading, setIsOrderLoading] = useState(true);
 
   const savedAddresses = useMemo(
-    () => parseSavedAddresses(user?.customer?.address),
-    [user?.customer?.address],
+    () =>
+      parseSavedAddresses(
+        user?.customer?.address,
+        user?.customer?.latitude,
+        user?.customer?.longitude,
+      ),
+    [
+      user?.customer?.address,
+      user?.customer?.latitude,
+      user?.customer?.longitude,
+    ],
   );
 
   type LeafletMap = {

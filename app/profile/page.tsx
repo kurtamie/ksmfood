@@ -1,73 +1,34 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useAuth } from "@/context/authContext";
 import type { User } from "@/types/users";
 
-type Address = {
-  id: string;
-  name: string;
-  addressLine: string;
-  kelurahan?: string;
-  latitude?: number;
-  longitude?: number;
-  recipientName?: string;
-  recipientPhone?: string;
-};
+const kelurahanOptions = [
+  { label: "Nagoya", value: "Nagoya, Batam" },
+  { label: "Batam Kota", value: "Batam Kota, Batam" },
+  { label: "Lubuk Baja", value: "Lubuk Baja, Batam" },
+  { label: "Lubuk Baja Kota", value: "Lubuk Baja Kota, Batam" },
+  { label: "Batu Ampar", value: "Batu Ampar, Batam" },
+  { label: "Batu Aji", value: "Batu Aji, Batam" },
+  { label: "Bengkong", value: "Bengkong, Batam" },
+  { label: "Sagulung", value: "Sagulung, Batam" },
+  { label: "Nongsa", value: "Nongsa, Batam" },
+  { label: "Sei Beduk", value: "Sei Beduk, Batam" },
+  { label: "Sungai Panas", value: "Sungai Panas, Batam" },
+  { label: "Belakang Padang", value: "Belakang Padang, Batam" },
+  { label: "Sekupang", value: "Sekupang, Batam" },
+  { label: "Galang", value: "Galang, Batam" },
+  { label: "Bulang", value: "Bulang, Batam" },
+  { label: "Tanjung Riau", value: "Tanjung Riau, Batam" },
+  { label: "Sekupang Timur", value: "Sekupang Timur, Batam" },
+  { label: "Lubuk Baja Baru", value: "Lubuk Baja Baru, Batam" },
+];
 
-function generateAddressId() {
-  if (
-    typeof crypto !== "undefined" &&
-    typeof crypto.randomUUID === "function"
-  ) {
-    return crypto.randomUUID();
-  }
-  return String(Math.random()).slice(2);
-}
-
-function parseCustomerAddress(raw?: string | null): Address[] {
-  if (!raw) return [];
-
-  try {
-    const parsed = JSON.parse(raw);
-
-    if (Array.isArray(parsed)) {
-      return parsed.map((item) => ({
-        id: item?.id ?? generateAddressId(),
-        name: item?.name ?? "Alamat",
-        addressLine: item?.addressLine ?? item?.address ?? "",
-        kelurahan: item?.kelurahan,
-        latitude:
-          typeof item?.latitude === "number"
-            ? item.latitude
-            : item?.latitude
-            ? Number(item.latitude)
-            : undefined,
-        longitude:
-          typeof item?.longitude === "number"
-            ? item.longitude
-            : item?.longitude
-            ? Number(item.longitude)
-            : undefined,
-        recipientName: item?.recipientName,
-        recipientPhone: item?.recipientPhone,
-      }));
-    }
-
-    if (typeof parsed === "string") {
-      return [
-        {
-          id: generateAddressId(),
-          name: "Alamat",
-          addressLine: parsed,
-        },
-      ];
-    }
-  } catch {
-    // If parsing fails, ignore and return empty array
-  }
-
-  return [];
+function toCoordinate(value: unknown): number | null {
+  if (typeof value !== "string" && typeof value !== "number") return null;
+  const coordinate = Number(value);
+  return Number.isFinite(coordinate) ? coordinate : null;
 }
 
 export default function AccountPage() {
@@ -98,35 +59,32 @@ export default function AccountPage() {
     }
   });
 
-  const [addresses, setAddresses] = useState<Address[]>(() => {
+  const [addressLine, setAddressLine] = useState<string>(() => {
     try {
-      if (typeof window === "undefined") return [];
-      const raw = localStorage.getItem("ksm_addresses");
-      return raw ? JSON.parse(raw) : [];
+      if (typeof window === "undefined") return "";
+      return localStorage.getItem("ksm_customer_address") || "";
     } catch {
-      return [];
+      return "";
     }
   });
+  const [subdistrict, setSubdistrict] = useState("");
+  const [pinpoint, setPinpoint] = useState("");
+  const [latitude, setLatitude] = useState<number | null>(null);
+  const [longitude, setLongitude] = useState<number | null>(null);
   const [showModal, setShowModal] = useState(false);
-  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [initialName, setInitialName] = useState<string>(customerName);
   const [initialPhone, setInitialPhone] = useState<string>(phone);
-  const [initialAddresses, setInitialAddresses] = useState<Address[]>(addresses);
-  const initialLoadedRef = useRef(false);
-
-  // modal fields
-  const [aName, setAName] = useState("");
-  const [aLine, setALine] = useState("");
-  const [aKel, setAKel] = useState("");
-  const [aRecipient, setARecipient] = useState("");
-  const [aPhone, setAPhone] = useState("");
-  const [latitude, setLatitude] = useState<number | null>(null);
-  const [longitude, setLongitude] = useState<number | null>(null);
+  const [initialAddress, setInitialAddress] = useState<string>(addressLine);
+  const [initialLatitude, setInitialLatitude] = useState<number | null>(null);
+  const [initialLongitude, setInitialLongitude] = useState<number | null>(null);
   const [toastMessage, setToastMessage] = useState("");
   const [toastVisible, setToastVisible] = useState(false);
+  const initialLoadedRef = useRef(false);
   const mapRef = useRef<HTMLDivElement | null>(null);
   const leafletLoadedRef = useRef(false);
+  const toastTimeoutRef = useRef<number | null>(null);
+
   type LeafletMap = {
     setView: (center: [number, number], zoom: number) => void;
     on: (
@@ -134,13 +92,21 @@ export default function AccountPage() {
       callback: (e: { latlng: { lat: number; lng: number } }) => void,
     ) => void;
     removeLayer: (layer: MarkerType) => void;
+    remove: () => void;
   };
   type MarkerType = {
     addTo: (map: LeafletMap) => MarkerType;
   };
   const mapInstanceRef = useRef<LeafletMap | null>(null);
   const markerRef = useRef<MarkerType | null>(null);
-  const toastTimeoutRef = useRef<number | null>(null);
+
+  const hasSavedAddress = addressLine.trim().length > 0;
+  const hasChanges =
+    customerName !== initialName ||
+    phone !== initialPhone ||
+    addressLine !== initialAddress ||
+    latitude !== initialLatitude ||
+    longitude !== initialLongitude;
 
   function showToast(message: string) {
     setToastMessage(message);
@@ -155,144 +121,150 @@ export default function AccountPage() {
   }
 
   useEffect(() => {
-    if (!currentUser) return;
-    setCustomerName(currentUser.username ?? "");
-    setPhone(currentUser.phone_no ?? "");
+    if (!currentUser || initialLoadedRef.current) return;
+
+    const nextName = currentUser.username ?? "";
+    const nextPhone = currentUser.phone_no ?? "";
+    const nextAddress = currentUser.customer?.address ?? "";
+    const nextLatitude = toCoordinate(currentUser.customer?.latitude);
+    const nextLongitude = toCoordinate(currentUser.customer?.longitude);
+
+    setCustomerName(nextName);
+    setPhone(nextPhone);
+    setAddressLine(nextAddress);
+    setLatitude(nextLatitude);
+    setLongitude(nextLongitude);
+    if (nextLatitude !== null && nextLongitude !== null) {
+      setPinpoint(`${nextLatitude.toFixed(6)}, ${nextLongitude.toFixed(6)}`);
+    }
+
+    setInitialName(nextName);
+    setInitialPhone(nextPhone);
+    setInitialAddress(nextAddress);
+    setInitialLatitude(nextLatitude);
+    setInitialLongitude(nextLongitude);
+    localStorage.setItem("ksm_customer_address", nextAddress);
+    initialLoadedRef.current = true;
   }, [currentUser]);
 
-  useEffect(() => {
-    if (addresses.length > 0) return;
-    if (!currentUser?.customer?.address) return;
+  function buildProfilePayload() {
+    const payload: {
+      name?: string;
+      phone?: string;
+      address?: string;
+      latitude?: number | null;
+      longitude?: number | null;
+    } = {};
 
-    const parsed = parseCustomerAddress(currentUser.customer.address);
-    if (parsed.length > 0) {
-      setAddresses(parsed);
-      localStorage.setItem("ksm_addresses", JSON.stringify(parsed));
+    if (customerName !== initialName) payload.name = customerName;
+    if (phone !== initialPhone) payload.phone = phone;
+    if (addressLine !== initialAddress) payload.address = addressLine;
+    if (latitude !== initialLatitude) payload.latitude = latitude;
+    if (longitude !== initialLongitude) payload.longitude = longitude;
+
+    return payload;
+  }
+
+  async function persistProfile(successMessage: string) {
+    const payload = buildProfilePayload();
+    if (Object.keys(payload).length === 0) {
+      showToast("Tidak ada perubahan");
+      return true;
     }
-  }, [currentUser?.customer?.address, addresses.length]);
 
-  useEffect(() => {
-    if (!currentUser || initialLoadedRef.current) return;
-    if (currentUser.customer?.address && addresses.length === 0) return;
-
-    setInitialName(currentUser.username ?? "");
-    setInitialPhone(currentUser.phone_no ?? "");
-    setInitialAddresses(addresses);
-    initialLoadedRef.current = true;
-  }, [currentUser, addresses]);
-
-  const hasChanges =
-    customerName !== initialName ||
-    phone !== initialPhone ||
-    JSON.stringify(addresses) !== JSON.stringify(initialAddresses);
-
-  async function saveProfile() {
     try {
       setIsSaving(true);
       localStorage.setItem(
         "ksm_customer",
         JSON.stringify({ name: customerName, phone }),
       );
+      localStorage.setItem("ksm_customer_address", addressLine);
 
       const response = await fetch("/api/profile", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          name: customerName,
-          phone,
-          addresses,
-        }),
+        body: JSON.stringify(payload),
       });
 
       if (!response.ok) {
         const errorText = await response.text();
         console.error("Profile update error:", errorText);
         showToast("Gagal menyimpan profil");
-        return;
+        return false;
       }
 
-      showToast("Profil berhasil diperbarui");
+      setInitialName(customerName);
+      setInitialPhone(phone);
+      setInitialAddress(addressLine);
+      setInitialLatitude(latitude);
+      setInitialLongitude(longitude);
+      showToast(successMessage);
+      return true;
     } catch (error) {
       console.error(error);
       showToast("Gagal menyimpan profil");
+      return false;
     } finally {
       setIsSaving(false);
     }
   }
 
-  function openAdd() {
-    setAName("");
-    setALine("");
-    setAKel("");
-    setARecipient("");
-    setAPhone("");
+  async function saveProfile() {
+    await persistProfile("Profil berhasil diperbarui");
+  }
+
+  function openAddressModal() {
+    if (latitude !== null && longitude !== null && !pinpoint) {
+      setPinpoint(`${latitude.toFixed(6)}, ${longitude.toFixed(6)}`);
+    }
     setShowModal(true);
   }
 
-  function saveAddress() {
-    const id = generateAddressId();
-    const newAddr: Address = {
-      id,
-      name: aName || "Alamat",
-      addressLine: aLine,
-      kelurahan: aKel,
-      recipientName: aRecipient,
-      recipientPhone: aPhone,
-      latitude: latitude ?? undefined,
-      longitude: longitude ?? undefined,
-    };
-    const next = [newAddr, ...addresses];
-    setAddresses(next);
-    localStorage.setItem("ksm_addresses", JSON.stringify(next));
-    setShowModal(false);
-    showToast("Alamat tersimpan");
-  }
+  async function saveAddress() {
+    if (!addressLine.trim()) {
+      showToast("Alamat lengkap wajib diisi");
+      return;
+    }
+    if (latitude === null || longitude === null) {
+      showToast("Pinpoint lokasi wajib dipilih");
+      return;
+    }
 
-  function removeAddress(id: string) {
-    const next = addresses.filter((a) => a.id !== id);
-    setAddresses(next);
-    localStorage.setItem("ksm_addresses", JSON.stringify(next));
-    showToast("Alamat dihapus");
-    setPendingDeleteId(null);
-  }
-
-  function confirmDeleteAddress(id: string) {
-    setPendingDeleteId(id);
-  }
-
-  function cancelDelete() {
-    setPendingDeleteId(null);
+    const saved = await persistProfile("Alamat berhasil disimpan");
+    if (saved) setShowModal(false);
   }
 
   useEffect(() => {
-    // dynamically load Leaflet CSS & JS when modal opens
-    if (!mapRef.current || leafletLoadedRef.current) return;
-    if (typeof window === "undefined") return;
+    if (!showModal || !mapRef.current || typeof window === "undefined") {
+      return;
+    }
+
+    let cancelled = false;
 
     const loadLeaflet = async () => {
-      // load CSS
       const linkId = "leaflet-css";
       if (!document.getElementById(linkId)) {
-        const l = document.createElement("link");
-        l.id = linkId;
-        l.rel = "stylesheet";
-        l.href = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
-        document.head.appendChild(l);
+        const link = document.createElement("link");
+        link.id = linkId;
+        link.rel = "stylesheet";
+        link.href = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
+        document.head.appendChild(link);
       }
 
-      // load script
       if (!(window as unknown as { L?: unknown }).L) {
         await new Promise<void>((resolve, reject) => {
-          const s = document.createElement("script");
-          s.src = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
-          s.async = true;
-          s.onload = () => resolve();
-          s.onerror = () => reject(new Error("Failed to load Leaflet"));
-          document.body.appendChild(s);
+          const script = document.createElement("script");
+          script.src = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
+          script.async = true;
+          script.onload = () => resolve();
+          script.onerror = () => reject(new Error("Failed to load Leaflet"));
+          document.body.appendChild(script);
         });
       }
+
+      if (cancelled || mapInstanceRef.current) return;
 
       try {
         type LeafletGlobal = {
@@ -305,61 +277,128 @@ export default function AccountPage() {
         };
         const L = (window as unknown as { L: LeafletGlobal }).L;
         const map = L.map(mapRef.current);
-        map.setView([1.1265, 104.0236], 13); // Batam center
+        const center: [number, number] =
+          latitude !== null && longitude !== null
+            ? [latitude, longitude]
+            : [1.1265, 104.0236];
+
+        map.setView(center, latitude !== null && longitude !== null ? 15 : 13);
         L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
           attribution: "&copy; OpenStreetMap contributors",
         }).addTo(map);
 
-        mapInstanceRef.current = map;
-        markerRef.current = null;
-        map.on("click", function (e) {
-          const { lat, lng } = e.latlng;
+        if (latitude !== null && longitude !== null) {
+          markerRef.current = L.marker([latitude, longitude]).addTo(map);
+        }
+
+        map.on("click", (event) => {
+          const { lat, lng } = event.latlng;
           setLatitude(lat);
           setLongitude(lng);
+          setPinpoint(`${lat.toFixed(6)}, ${lng.toFixed(6)}`);
           if (markerRef.current) map.removeLayer(markerRef.current);
           markerRef.current = L.marker([lat, lng]).addTo(map);
         });
 
+        mapInstanceRef.current = map;
         leafletLoadedRef.current = true;
-      } catch (err) {
-        console.error("Leaflet init error", err);
+      } catch (error) {
+        console.error("Leaflet init error", error);
       }
     };
 
-    // only load when modal shown
-    if (showModal) loadLeaflet();
+    void loadLeaflet();
+
+    return () => {
+      cancelled = true;
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.remove();
+        mapInstanceRef.current = null;
+        markerRef.current = null;
+        leafletLoadedRef.current = false;
+      }
+    };
   }, [showModal]);
 
   useEffect(() => {
-    if (!showModal || !aKel) return;
-    if (!leafletLoadedRef.current || !mapInstanceRef.current) return;
+    if (!showModal || !leafletLoadedRef.current || !mapInstanceRef.current) {
+      return;
+    }
 
-    const query = `${aKel}, Batam`;
-    const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`;
-    fetch(url)
-      .then((r) => r.json())
-      .then((data) => {
-        if (!data || data.length === 0) return;
-        const loc = data[0];
-        const lat = parseFloat(loc.lat);
-        const lon = parseFloat(loc.lon);
-        const map = mapInstanceRef.current;
-        if (!map) return;
-        map.setView([lat, lon], 15);
-        type LeafletGlobal = {
-          marker: (coords: [number, number]) => MarkerType;
-        };
-        const L = (window as unknown as { L: LeafletGlobal }).L;
-        if (markerRef.current) map.removeLayer(markerRef.current);
-        markerRef.current = L.marker([lat, lon]).addTo(map);
+    const query = pinpoint || subdistrict;
+    if (!query) return;
+
+    const coordinateMatch = query.match(
+      /^[\s]*([+-]?\d+(?:\.\d+)?)[,\s]+([+-]?\d+(?:\.\d+)?)[\s]*$/,
+    );
+    if (coordinateMatch) {
+      const lat = Number(coordinateMatch[1]);
+      const lng = Number(coordinateMatch[2]);
+      if (!Number.isNaN(lat) && !Number.isNaN(lng)) {
         setLatitude(lat);
-        setLongitude(lon);
-      })
-      .catch((e) => console.error("Geocode error", e));
-  }, [aKel, showModal]);
+        setLongitude(lng);
+        return;
+      }
+    }
+
+    const controller = new AbortController();
+    const timer = window.setTimeout(() => {
+      fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
+          query,
+        )}&limit=1`,
+        { signal: controller.signal },
+      )
+        .then((response) => response.json())
+        .then((results) => {
+          if (!results || results.length === 0) return;
+          const first = results[0];
+          const lat = Number(first.lat);
+          const lng = Number(first.lon);
+          if (Number.isNaN(lat) || Number.isNaN(lng)) return;
+          setLatitude(lat);
+          setLongitude(lng);
+          const map = mapInstanceRef.current;
+          if (!map) return;
+          type LeafletGlobal = {
+            marker: (coords: [number, number]) => MarkerType;
+          };
+          const L = (window as unknown as { L: LeafletGlobal }).L;
+          if (markerRef.current) map.removeLayer(markerRef.current);
+          markerRef.current = L.marker([lat, lng]).addTo(map);
+          map.setView([lat, lng], 15);
+        })
+        .catch((error) => {
+          if (error.name !== "AbortError") {
+            console.error("Geocode error", error);
+          }
+        });
+    }, 400);
+
+    return () => {
+      controller.abort();
+      window.clearTimeout(timer);
+    };
+  }, [pinpoint, subdistrict, showModal]);
+
+  useEffect(() => {
+    if (!showModal || !leafletLoadedRef.current || !mapInstanceRef.current) {
+      return;
+    }
+    if (latitude === null || longitude === null) return;
+
+    const map = mapInstanceRef.current;
+    map.setView([latitude, longitude], 15);
+    type LeafletGlobal = {
+      marker: (coords: [number, number]) => MarkerType;
+    };
+    const L = (window as unknown as { L: LeafletGlobal }).L;
+    if (markerRef.current) map.removeLayer(markerRef.current);
+    markerRef.current = L.marker([latitude, longitude]).addTo(map);
+  }, [latitude, longitude, showModal]);
 
   return (
-    <div className="mx-auto max-w-5xl px-6 py-10 relative">
+    <div className="relative mx-auto max-w-5xl px-6 py-10">
       {toastVisible && (
         <div className="fixed inset-x-0 top-6 z-80 flex justify-center px-4">
           <div className="rounded-full bg-black/90 px-4 py-2 text-sm text-white shadow-lg">
@@ -367,29 +406,28 @@ export default function AccountPage() {
           </div>
         </div>
       )}
-      <h1 className="text-2xl font-semibold text-tertiary-900 mb-6">
-        Pengaturan dan Daftar Alamat
+
+      <h1 className="mb-6 text-2xl font-semibold text-tertiary-900">
+        Pengaturan dan Alamat
       </h1>
 
       <div className="grid grid-cols-1 gap-6">
         <div>
-          <label className="block text-sm mb-1">Nama Customer</label>
+          <label className="mb-1 block text-sm">Nama Customer</label>
           <input
             value={customerName}
-            onChange={(e) => setCustomerName(e.target.value)}
+            onChange={(event) => setCustomerName(event.target.value)}
             className="w-full rounded-md border px-3 py-2"
           />
         </div>
 
-        <div className="grid grid-cols-1 gap-4">
-          <div>
-            <label className="block text-sm mb-1">Nomor Handphone</label>
-            <input
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              className="w-full rounded-md border px-3 py-2"
-            />
-          </div>
+        <div>
+          <label className="mb-1 block text-sm">Nomor Handphone</label>
+          <input
+            value={phone}
+            onChange={(event) => setPhone(event.target.value)}
+            className="w-full rounded-md border px-3 py-2"
+          />
         </div>
 
         <div>
@@ -402,165 +440,114 @@ export default function AccountPage() {
           </button>
         </div>
 
-        <div className="mt-6 flex items-center justify-between">
+        <div className="mt-6 flex items-center justify-between gap-4">
           <h2 className="text-xl font-semibold">Alamat Pengiriman</h2>
           <button
-            onClick={openAdd}
+            type="button"
+            onClick={openAddressModal}
             className="rounded-md bg-red-600 px-4 py-2 text-white"
           >
-            Tambah Alamat Baru
+            {hasSavedAddress ? "Ubah Alamat" : "Tambah Alamat Baru"}
           </button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {addresses.length === 0 && (
-            <p className="text-sm text-secondary-600">
-              Belum ada alamat tersimpan.
-            </p>
-          )}
-          {addresses.map((addr) => (
-            <div key={addr.id} className="rounded-md border p-4 bg-white">
-              <div className="flex items-start justify-between">
-                <div>
-                  <p className="font-semibold">{addr.name}</p>
-                  <p className="text-sm text-secondary-600">
-                    {addr.addressLine}
-                  </p>
-                  <p className="text-sm text-secondary-600">{addr.kelurahan}</p>
-                </div>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => confirmDeleteAddress(addr.id)}
-                    title="Hapus"
-                    className="text-sm text-red-600"
-                  >
-                    Hapus
-                  </button>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
+        {hasSavedAddress ? (
+          <div className="rounded-md border bg-white p-4">
+            <p className="text-sm text-secondary-600">{addressLine}</p>
+            {latitude !== null && longitude !== null && (
+              <p className="mt-2 text-sm text-secondary-700">
+                Koordinat: {latitude.toFixed(6)}, {longitude.toFixed(6)}
+              </p>
+            )}
+          </div>
+        ) : (
+          <p className="text-sm text-secondary-600">
+            Belum ada alamat tersimpan.
+          </p>
+        )}
       </div>
 
       {showModal && (
         <div className="fixed inset-0 z-70 flex items-start justify-center overflow-auto bg-black/40 p-4">
-          <div className="w-full max-w-2xl rounded-md bg-white p-6 max-h-[90vh] overflow-auto">
-            <h3 className="text-lg font-semibold mb-4">TAMBAH ALAMAT</h3>
-            <div className="grid grid-cols-1 gap-3">
+          <div className="max-h-[90vh] w-full max-w-2xl overflow-auto rounded-md bg-white p-6">
+            <h3 className="mb-4 text-lg font-semibold">
+              {hasSavedAddress ? "UBAH ALAMAT" : "TAMBAH ALAMAT"}
+            </h3>
+
+            <div className="grid grid-cols-1 gap-4">
               <div>
-                <label className="block text-sm mb-1">Nama Alamat *</label>
-                <input
-                  value={aName}
-                  onChange={(e) => setAName(e.target.value)}
-                  className="w-full rounded-md border px-3 py-2"
+                <label className="mb-1 block text-sm">Alamat Lengkap *</label>
+                <textarea
+                  value={addressLine}
+                  onChange={(event) => setAddressLine(event.target.value)}
+                  rows={3}
+                  className="w-full rounded-md border px-3 py-2 text-sm"
                 />
               </div>
+
               <div>
-                <label className="block text-sm mb-1">Alamat Lengkap *</label>
-                <input
-                  value={aLine}
-                  onChange={(e) => setALine(e.target.value)}
-                  className="w-full rounded-md border px-3 py-2"
-                />
-              </div>
-              <div>
-                <label className="block text-sm mb-1">Kelurahan *</label>
+                <label className="mb-1 block text-sm">Kelurahan *</label>
                 <select
-                  value={aKel}
-                  onChange={(e) => setAKel(e.target.value)}
+                  value={subdistrict}
+                  onChange={(event) => setSubdistrict(event.target.value)}
                   className="w-full rounded-md border px-3 py-2"
                 >
                   <option value="">Pilih Kelurahan</option>
-                  <option value="Nagoya">Nagoya</option>
-                  <option value="Batam Kota">Batam Kota</option>
-                  <option value="Lubuk Baja">Lubuk Baja</option>
-                  <option value="Lubuk Baja Kota">Lubuk Baja Kota</option>
-                  <option value="Batu Ampar">Batu Ampar</option>
-                  <option value="Batu Aji">Batu Aji</option>
-                  <option value="Bengkong">Bengkong</option>
-                  <option value="Sagulung">Sagulung</option>
-                  <option value="Nongsa">Nongsa</option>
-                  <option value="Sei Beduk">Sei Beduk</option>
-                  <option value="Sungai Panas">Sungai Panas</option>
-                  <option value="Belakang Padang">Belakang Padang</option>
-                  <option value="Sekupang">Sekupang</option>
-                  <option value="Galang">Galang</option>
-                  <option value="Bulang">Bulang</option>
-                  <option value="Tanjung Riau">Tanjung Riau</option>
-                  <option value="Sekupang Timur">Sekupang Timur</option>
-                  <option value="Lubuk Baja Baru">Lubuk Baja Baru</option>
+                  {kelurahanOptions.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
                 </select>
               </div>
 
               <div>
-                <label className="block text-sm mb-1">Pinpoin Lokasi</label>
-                <div
-                  ref={mapRef}
-                  id="add-address-map"
-                  className="h-48 w-full rounded-md border bg-gray-100 text-sm"
-                />
-                <p className="mt-2 text-xs text-secondary-500">
-                  Klik peta untuk memilih titik (lat/lng akan tersimpan).
-                </p>
-              </div>
-
-              <div>
-                <label className="block text-sm mb-1">Nama Penerima</label>
-                <input
-                  value={aRecipient}
-                  onChange={(e) => setARecipient(e.target.value)}
-                  className="w-full rounded-md border px-3 py-2"
-                />
-              </div>
-              <div>
-                <label className="block text-sm mb-1">Telepon Penerima *</label>
-                <input
-                  value={aPhone}
-                  onChange={(e) => setAPhone(e.target.value)}
-                  className="w-full rounded-md border px-3 py-2"
-                />
+                <label className="mb-1 block text-sm">Pinpoint Lokasi *</label>
+                <div className="rounded-md border bg-white p-3">
+                  <div className="mb-3 rounded-md border bg-gray-50 px-3 py-2">
+                    <input
+                      type="text"
+                      value={pinpoint}
+                      onChange={(event) => setPinpoint(event.target.value)}
+                      placeholder="Cari lokasi / ketik nama tempat"
+                      className="w-full bg-transparent text-sm outline-none"
+                    />
+                  </div>
+                  <div className="overflow-hidden rounded-md border bg-gray-100">
+                    <div
+                      ref={mapRef}
+                      className="h-72 w-full"
+                      aria-label="Peta alamat customer"
+                    />
+                  </div>
+                  <p className="mt-2 text-xs text-secondary-500">
+                    Klik peta untuk menandai lokasi dan simpan latitude/longitude.
+                  </p>
+                  {latitude !== null && longitude !== null && (
+                    <p className="mt-2 text-sm text-secondary-700">
+                      Koordinat: {latitude.toFixed(6)}, {longitude.toFixed(6)}
+                    </p>
+                  )}
+                </div>
               </div>
 
               <div className="mt-4 flex justify-end gap-3">
                 <button
+                  type="button"
                   onClick={() => setShowModal(false)}
                   className="rounded-md border px-4 py-2"
                 >
                   Batal
                 </button>
                 <button
+                  type="button"
                   onClick={saveAddress}
-                  className="rounded-md bg-red-600 px-4 py-2 text-white"
+                  disabled={isSaving}
+                  className="rounded-md bg-red-600 px-4 py-2 text-white disabled:opacity-50"
                 >
-                  Simpan
+                  {isSaving ? "Menyimpan..." : "Simpan"}
                 </button>
               </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {pendingDeleteId && (
-        <div className="fixed inset-0 z-80 flex items-center justify-center bg-black/40 px-4 py-8">
-          <div className="w-full max-w-md rounded-md bg-white p-6 shadow-xl">
-            <h3 className="text-lg font-semibold mb-4">Konfirmasi Hapus</h3>
-            <p className="mb-6 text-sm text-secondary-700">
-              Apakah Anda yakin ingin menghapus alamat ini?
-            </p>
-            <div className="flex justify-end gap-3">
-              <button
-                onClick={cancelDelete}
-                className="rounded-md border px-4 py-2"
-              >
-                Batal
-              </button>
-              <button
-                onClick={() => removeAddress(pendingDeleteId)}
-                className="rounded-md bg-red-600 px-4 py-2 text-white"
-              >
-                Hapus
-              </button>
             </div>
           </div>
         </div>

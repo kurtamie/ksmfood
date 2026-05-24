@@ -1,7 +1,40 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getToken } from "@/app/data/services/get-token";
 import { getUserMe } from "@/app/data/services/get-user-me";
-import { updateStrapiUser, updateStrapiCustomer } from "@/app/data/services/profile-service";
+import {
+  updateStrapiCustomer,
+  updateStrapiUser,
+} from "@/app/data/services/profile-service";
+
+function hasField(body: Record<string, unknown>, key: string) {
+  return Object.prototype.hasOwnProperty.call(body, key);
+}
+
+function normalizeText(value: unknown): string | null {
+  if (typeof value !== "string") return null;
+  const trimmed = value.trim();
+  return trimmed ? trimmed : null;
+}
+
+function normalizeCoordinate(value: unknown): string | null {
+  if (value == null || value === "") return null;
+  const coordinate = Number(value);
+  return Number.isFinite(coordinate) ? String(coordinate) : null;
+}
+
+function addIfChanged<T extends Record<string, unknown>>(
+  fields: T,
+  key: keyof T,
+  nextValue: T[keyof T],
+  currentValue: unknown,
+) {
+  const current =
+    currentValue == null || currentValue === "" ? null : String(currentValue);
+  const next = nextValue == null || nextValue === "" ? null : String(nextValue);
+  if (next !== current) {
+    fields[key] = nextValue;
+  }
+}
 
 export async function POST(req: NextRequest) {
   try {
@@ -18,25 +51,82 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    const body = await req.json();
-    const { name, phone, addresses } = body;
+    const body = (await req.json()) as Record<string, unknown>;
+    const userFields: {
+      username?: string | null;
+      phone_no?: string | null;
+    } = {};
+    const customerFields: {
+      name?: string | null;
+      phone_no?: string | null;
+      address?: string | null;
+      latitude?: string | null;
+      longitude?: string | null;
+    } = {};
 
-    await updateStrapiUser(String(currentUser.id), name, phone, bearerHeaders);
+    if (hasField(body, "name")) {
+      const name = normalizeText(body.name);
+      addIfChanged(userFields, "username", name, currentUser.username);
+      addIfChanged(customerFields, "name", name, currentUser.customer?.name);
+    }
 
-    if (currentUser.customer?.id) {
-      const addressJson = addresses ? JSON.stringify(addresses) : null;
+    if (hasField(body, "phone")) {
+      const phone = normalizeText(body.phone);
+      addIfChanged(userFields, "phone_no", phone, currentUser.phone_no);
+      addIfChanged(customerFields, "phone_no", phone, currentUser.customer?.phone_no);
+    }
+
+    if (hasField(body, "address")) {
+      const address = normalizeText(body.address);
+      addIfChanged(customerFields, "address", address, currentUser.customer?.address);
+    }
+
+    if (hasField(body, "latitude")) {
+      const latitude = normalizeCoordinate(body.latitude);
+      addIfChanged(
+        customerFields,
+        "latitude",
+        latitude,
+        currentUser.customer?.latitude,
+      );
+    }
+
+    if (hasField(body, "longitude")) {
+      const longitude = normalizeCoordinate(body.longitude);
+      addIfChanged(
+        customerFields,
+        "longitude",
+        longitude,
+        currentUser.customer?.longitude,
+      );
+    }
+
+    if (Object.keys(userFields).length > 0) {
+      await updateStrapiUser(String(currentUser.id), userFields, bearerHeaders);
+    }
+
+    if (Object.keys(customerFields).length > 0) {
+      if (!currentUser.customer?.id) {
+        return NextResponse.json(
+          { error: "Customer not found" },
+          { status: 404 },
+        );
+      }
+
       await updateStrapiCustomer(
-        String(currentUser.customer.id),
-        name,
-        phone,
-        addressJson,
-        bearerHeaders
+        {
+          id: String(currentUser.customer.id),
+          documentId: currentUser.customer.documentId,
+        },
+        customerFields,
+        bearerHeaders,
       );
     }
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Internal server error";
+    const message =
+      error instanceof Error ? error.message : "Internal server error";
     console.error("Profile update error:", message);
     return NextResponse.json({ error: message }, { status: 500 });
   }
