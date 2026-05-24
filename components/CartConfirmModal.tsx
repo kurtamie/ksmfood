@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useCallback } from "react";
+import { useEffect, useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
 import { CartItem, getItemTotalPrice } from "@/components/CartContext";
 import { useAuth } from "@/context/authContext";
@@ -10,7 +10,7 @@ import { useAuth } from "@/context/authContext";
 interface CartConfirmModalProps {
   item: CartItem | null;
   onClose: () => void;
-  onCheckout?: () => void;
+  onCheckout?: () => void | Promise<void>;
   onBack?: () => void;
   onRequireLogin?: () => void;
 }
@@ -36,6 +36,8 @@ export default function CartConfirmModal({
 }: CartConfirmModalProps) {
   const router = useRouter();
   const { isLoggedIn } = useAuth();
+  const [checkoutError, setCheckoutError] = useState<string | null>(null);
+  const [isCheckingOut, setIsCheckingOut] = useState(false);
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
@@ -61,13 +63,28 @@ export default function CartConfirmModal({
     item.basePrice + item.addOns.reduce((s, a) => s + a.price, 0);
   const addOnLabels = item.addOns.map((a) => a.label).join(", ");
 
-  const handleCheckout = () => {
+  const handleCheckout = async () => {
     if (!isLoggedIn) {
       onRequireLogin?.();
       return;
     }
-    onCheckout?.();
-    router.push("/order-info");
+    setCheckoutError(null);
+    setIsCheckingOut(true);
+    try {
+      if (onCheckout) {
+        await onCheckout();
+        return;
+      }
+      router.push("/order-info");
+    } catch (error) {
+      setCheckoutError(
+        error instanceof Error
+          ? error.message
+          : "Gagal membuat pesanan. Coba lagi.",
+      );
+    } finally {
+      setIsCheckingOut(false);
+    }
   };
 
   return (
@@ -172,6 +189,10 @@ export default function CartConfirmModal({
         {/* Divider */}
         <div className="mx-6 border-t border-secondary-300" />
 
+        {checkoutError ? (
+          <p className="mx-6 mt-3 text-xs text-red-600">{checkoutError}</p>
+        ) : null}
+
         {/* ── Footer ── */}
         <div className="flex flex-row gap-2 px-6 py-4">
           {/* Tambah menu lainnya → addItem + tutup semua */}
@@ -206,11 +227,12 @@ export default function CartConfirmModal({
           {/* Checkout → addItem + redirect */}
           <button
             onClick={handleCheckout}
+            disabled={isCheckingOut}
             className="
               flex flex-1 items-center justify-center gap-1.5
               rounded-xl bg-primary-500
               px-3 py-3 text-xs font-semibold text-white
-              transition-colors hover:bg-primary-600
+              transition-colors hover:bg-primary-600 disabled:cursor-not-allowed disabled:opacity-60
             "
           >
             <svg
@@ -228,7 +250,7 @@ export default function CartConfirmModal({
               <line x1="5" y1="12" x2="19" y2="12" />
               <polyline points="12 5 19 12 12 19" />
             </svg>
-            Checkout
+            {isCheckingOut ? "Memproses..." : "Checkout"}
           </button>
         </div>
       </div>

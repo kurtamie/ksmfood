@@ -41,6 +41,7 @@ export default function OrderDetailPage() {
       setIsLoading(false);
       return;
     }
+    const orderDocumentId = documentId;
 
     let cancelled = false;
 
@@ -50,7 +51,7 @@ export default function OrderDetailPage() {
 
       try {
         const res = await fetch(
-          `/api/orders/mine/${encodeURIComponent(documentId)}`,
+          `/api/orders/mine/${encodeURIComponent(orderDocumentId)}`,
           { cache: "no-store" },
         );
         const json = await res.json();

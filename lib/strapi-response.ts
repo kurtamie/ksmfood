@@ -6,7 +6,7 @@ export type StrapiEntityInput<T> =
   | null
   | undefined;
 
-export function unwrapStrapiEntity<T extends Record<string, unknown>>(
+export function unwrapStrapiEntity<T extends object>(
   entity: StrapiEntityInput<T>,
 ): (T & { id: number; documentId?: string }) | null {
   if (!entity) return null;
@@ -20,7 +20,7 @@ export function unwrapStrapiEntity<T extends Record<string, unknown>>(
   return entity as T & { id: number; documentId?: string };
 }
 
-export function unwrapStrapiList<T extends Record<string, unknown>>(
+export function unwrapStrapiList<T extends object>(
   rows: unknown,
 ): Array<T & { id: number; documentId?: string }> {
   if (!Array.isArray(rows)) return [];

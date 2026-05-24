@@ -13,6 +13,7 @@ import { GrCart } from "react-icons/gr";
 import { useAuth } from "@/context/authContext";
 import AuthModal from "@/components/auth/AuthModal";
 import { useState } from "react";
+import { createCheckoutOrder } from "@/lib/client-checkout";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -88,8 +89,10 @@ function CartItemRow({ item }: { item: CartItem }) {
 
 export default function CartSidebar() {
   const { state, closeCart, totalPrice, isEmpty, clearCart } = useCart();
-  const { isLoggedIn } = useAuth();
+  const { isLoggedIn, user } = useAuth();
   const [isAuthOpen, setIsAuthOpen] = useState(false);
+  const [checkoutError, setCheckoutError] = useState<string | null>(null);
+  const [isCheckingOut, setIsCheckingOut] = useState(false);
   const router = useRouter();
   const isOpen = state.isOpen;
 
@@ -111,13 +114,30 @@ export default function CartSidebar() {
     };
   }, [isOpen, handleKeyDown]);
 
-  const handleCheckout = () => {
+  const handleCheckout = async () => {
     if (!isLoggedIn) {
       setIsAuthOpen(true); // ← tampilkan AuthModal
       return;
     }
-    closeCart();
-    router.push("/order-info");
+    setCheckoutError(null);
+    setIsCheckingOut(true);
+    try {
+      const checkout = await createCheckoutOrder(state.items, {
+        id: user?.customer?.id,
+        documentId: user?.customer?.documentId,
+      });
+      clearCart();
+      closeCart();
+      router.push(`/order-info/${checkout.orderDocumentId}`);
+    } catch (error) {
+      setCheckoutError(
+        error instanceof Error
+          ? error.message
+          : "Gagal membuat pesanan. Coba lagi.",
+      );
+    } finally {
+      setIsCheckingOut(false);
+    }
   };
 
   return (
@@ -209,11 +229,15 @@ export default function CartSidebar() {
             {/* Tombol checkout */}
             <button
               onClick={handleCheckout}
-              className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary-500 py-3 text-sm font-bold text-white transition-colors hover:bg-primary-600"
+              disabled={isCheckingOut}
+              className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary-500 py-3 text-sm font-bold text-white transition-colors hover:bg-primary-600 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              Lanjut ke Checkout
+              {isCheckingOut ? "Memproses..." : "Lanjut ke Checkout"}
               <FaArrowRight size={15} />
             </button>
+            {checkoutError ? (
+              <p className="text-xs text-red-600">{checkoutError}</p>
+            ) : null}
           </div>
         )}
       </div>
@@ -223,7 +247,6 @@ export default function CartSidebar() {
         onSuccess={() => {
           setIsAuthOpen(false);
           closeCart();
-          router.push("/order-info");
         }}
       />
     </>

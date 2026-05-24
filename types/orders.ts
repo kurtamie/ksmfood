@@ -33,6 +33,7 @@ export interface CreateOrderInput {
   customer_id?: number;
   /** documentId customer (Strapi v5) — disarankan dikirim bersama customer_id */
   customer_document_id?: string;
+  customer_type?: string;
   delivery_date?: string;
   arrive_time?: string;
   leave?: string;

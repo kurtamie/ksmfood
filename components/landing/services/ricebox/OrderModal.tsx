@@ -16,6 +16,8 @@ import CartConfirmModal from "@/components/CartConfirmModal";
 import type { CartItem } from "@/components/CartContext";
 import AuthModal from "@/components/auth/AuthModal";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/context/authContext";
+import { createCheckoutOrder } from "@/lib/client-checkout";
 
 export interface PackageCard {
   id: number;
@@ -96,7 +98,8 @@ const sambalOptions = [
 
 export function OrderModal({ card, serviceName, onClose }: OrderModalProps) {
   const t = useTranslations("riceboxMenu");
-  const { addItem } = useCart();
+  const { addItem, state, clearCart } = useCart();
+  const { user } = useAuth();
   const [pendingItem, setPendingItem] = useState<CartItem | null>(null);
   const isPlus = ["A+-ayam", "A+-daging", "B+", "C+"].includes(
     card.packageType,
@@ -232,9 +235,18 @@ export function OrderModal({ card, serviceName, onClose }: OrderModalProps) {
   };
 
   // Klik "Checkout" → addItem masuk keranjang, tutup order modal, redirect
-  const handleCheckoutAll = () => {
-    if (pendingItem) addItem(pendingItem);
+  const handleCheckoutAll = async () => {
+    if (!pendingItem) return;
+
+    const checkout = await createCheckoutOrder([...state.items, pendingItem], {
+      id: user?.customer?.id,
+      documentId: user?.customer?.documentId,
+    });
+
+    clearCart();
     setPendingItem(null);
+    onClose();
+    router.push(`/order-info/${checkout.orderDocumentId}`);
   };
 
   // Tombol X → balik ke order modal tanpa addItem
@@ -545,7 +557,6 @@ export function OrderModal({ card, serviceName, onClose }: OrderModalProps) {
           setIsAuthOpen(false);
           setPendingItem(null);
           onClose();
-          router.push("/order-info");
         }}
       />
     </>

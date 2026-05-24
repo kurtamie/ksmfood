@@ -37,12 +37,16 @@ async function toNextResponse(res: Response) {
   return NextResponse.json({ success: true, data: body }, { status: res.status });
 }
 
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) {
   try {
+    const { id } = await params;
     const token = await getToken();
     const baseUrl = getStrapiBaseUrl();
     const endpoint = getOrderDetailEndpoint();
-    const url = `${baseUrl}/api/${endpoint}/${params.id}${request.nextUrl.search}`;
+    const url = `${baseUrl}/api/${endpoint}/${id}${request.nextUrl.search}`;
 
     const res = await fetch(url, {
       method: "GET",
@@ -65,14 +69,18 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
   }
 }
 
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) {
   try {
+    const { id } = await params;
     const token = await getToken();
     const payload = await request.json();
     const baseUrl = getStrapiBaseUrl();
     const endpoint = getOrderDetailEndpoint();
 
-    const res = await fetch(`${baseUrl}/api/${endpoint}/${params.id}`, {
+    const res = await fetch(`${baseUrl}/api/${endpoint}/${id}`, {
       method: "PUT",
       headers: buildHeaders(token),
       body: JSON.stringify({ data: payload }),
@@ -93,13 +101,17 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
   }
 }
 
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) {
   try {
+    const { id } = await params;
     const token = await getToken();
     const baseUrl = getStrapiBaseUrl();
     const endpoint = getOrderDetailEndpoint();
 
-    const res = await fetch(`${baseUrl}/api/${endpoint}/${params.id}`, {
+    const res = await fetch(`${baseUrl}/api/${endpoint}/${id}`, {
       method: "DELETE",
       headers: buildHeaders(token),
     });

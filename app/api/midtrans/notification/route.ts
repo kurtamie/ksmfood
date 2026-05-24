@@ -1,6 +1,6 @@
 import { createHash } from "crypto";
 import { NextRequest, NextResponse } from "next/server";
-import { createInvoiceForOrder } from "@/lib/invoices";
+import { updateInvoicePaymentStatusByOrder } from "@/lib/invoices";
 import {
   getMidtransServerKey,
   parseOrderIdFromMidtransOrderId,
@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
       (fraudStatus === "accept" || !fraudStatus);
 
     if (isPaid) {
-      await createInvoiceForOrder(orderId, "paid", {
+      await updateInvoicePaymentStatusByOrder(orderId, "paid", {
         invoiceNo: payload.transaction_id
           ? `INV/${payload.transaction_id}`
           : undefined,

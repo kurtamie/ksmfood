@@ -50,6 +50,110 @@ async function toNextResponse(res: Response) {
   return NextResponse.json({ success: true, data: body }, { status: res.status });
 }
 
+function getInvoiceDocumentId(row: unknown): string | null {
+  if (!row || typeof row !== "object") return null;
+  const record = row as { documentId?: unknown; id?: unknown };
+  if (typeof record.documentId === "string") return record.documentId;
+  return null;
+}
+
+async function findInvoiceDocumentIdByNumericId(
+  token: string | null,
+  invoiceId: number,
+): Promise<string | null> {
+  const baseUrl = getStrapiBaseUrl();
+  const res = await fetch(
+    `${baseUrl}/api/invoices?filters[id][$eq]=${invoiceId}&pagination[pageSize]=1`,
+    {
+      method: "GET",
+      headers: buildHeaders(token),
+      cache: "no-store",
+    },
+  );
+  if (!res.ok) return null;
+
+  const body = await res.json().catch(() => null);
+  const row = Array.isArray(body?.data) ? body.data[0] : null;
+  return getInvoiceDocumentId(row);
+}
+
+async function findInvoiceDocumentIdByOrder(
+  token: string | null,
+  orderId?: number,
+  orderDocumentId?: string,
+): Promise<string | null> {
+  const baseUrl = getStrapiBaseUrl();
+  const attempts = [
+    orderId ? `filters[orders][id][$eq]=${orderId}` : null,
+    orderId ? `filters[order][id][$eq]=${orderId}` : null,
+    orderId ? `filters[order_id][id][$eq]=${orderId}` : null,
+    orderDocumentId
+      ? `filters[orders][documentId][$eq]=${encodeURIComponent(orderDocumentId)}`
+      : null,
+  ].filter((query): query is string => query != null);
+
+  for (const query of attempts) {
+    const res = await fetch(
+      `${baseUrl}/api/invoices?${query}&pagination[pageSize]=1`,
+      {
+        method: "GET",
+        headers: buildHeaders(token),
+        cache: "no-store",
+      },
+    );
+    if (!res.ok) continue;
+
+    const body = await res.json().catch(() => null);
+    const row = Array.isArray(body?.data) ? body.data[0] : null;
+    const documentId = getInvoiceDocumentId(row);
+    if (documentId) return documentId;
+  }
+
+  return null;
+}
+
+async function getCurrentInvoice(
+  token: string | null,
+  documentId: string,
+): Promise<Record<string, unknown> | null> {
+  const res = await fetch(`${getStrapiBaseUrl()}/api/invoices/${documentId}`, {
+    method: "GET",
+    headers: buildHeaders(token),
+    cache: "no-store",
+  });
+  if (!res.ok) return null;
+  const body = await res.json().catch(() => null);
+  return body?.data && typeof body.data === "object"
+    ? (body.data as Record<string, unknown>)
+    : null;
+}
+
+async function getNextInvoiceNo(token: string | null): Promise<string> {
+  const res = await fetch(
+    `${getStrapiBaseUrl()}/api/invoices?fields[0]=invoice_no&pagination[pageSize]=1000`,
+    {
+      method: "GET",
+      headers: buildHeaders(token),
+      cache: "no-store",
+    },
+  );
+  if (!res.ok) return "0001";
+
+  const body = await res.json().catch(() => null);
+  const rows = Array.isArray(body?.data) ? body.data : [];
+  const max = rows.reduce((highest: number, row: unknown) => {
+    if (!row || typeof row !== "object") return highest;
+    const invoiceNo = (row as { invoice_no?: unknown }).invoice_no;
+    if (typeof invoiceNo !== "string" || !/^\d+$/.test(invoiceNo)) {
+      return highest;
+    }
+    const value = Number(invoiceNo);
+    return Number.isFinite(value) && value > highest ? value : highest;
+  }, 0);
+
+  return String(max + 1).padStart(4, "0");
+}
+
 export async function GET(request: NextRequest) {
   try {
     const token = await getToken();
@@ -140,11 +244,20 @@ export async function PATCH(request: NextRequest) {
     const payload = await request.json() as {
       invoiceDocumentId?: string;
       invoiceId?: number;
+      orderId?: number;
+      orderDocumentId?: string;
       payment_status: InvoiceStatus;
       invoiceNo?: string;
     };
 
-    const { invoiceDocumentId, invoiceId, payment_status, invoiceNo } = payload;
+    const {
+      invoiceDocumentId,
+      invoiceId,
+      orderId,
+      orderDocumentId,
+      payment_status,
+      invoiceNo,
+    } = payload;
 
     if (!payment_status) {
       return NextResponse.json(
@@ -153,11 +266,26 @@ export async function PATCH(request: NextRequest) {
       );
     }
 
-    if (!invoiceDocumentId && !invoiceId) {
+    let identifier: string | null = invoiceDocumentId ?? null;
+
+    if (!identifier && invoiceId) {
+      identifier = await findInvoiceDocumentIdByNumericId(token, invoiceId);
+    }
+
+    if (!identifier && (orderId || orderDocumentId)) {
+      identifier = await findInvoiceDocumentIdByOrder(
+        token,
+        orderId,
+        orderDocumentId,
+      );
+    }
+
+    if (!identifier) {
       return NextResponse.json(
         {
           success: false,
-          error: "invoiceDocumentId atau invoiceId wajib diisi.",
+          error:
+            "Invoice documentId tidak ditemukan untuk update invoice.",
         },
         { status: 400 },
       );
@@ -169,11 +297,21 @@ export async function PATCH(request: NextRequest) {
     }
 
     const baseUrl = getStrapiBaseUrl();
+    const currentInvoice = await getCurrentInvoice(token, identifier);
+    const currentInvoiceNo =
+      typeof currentInvoice?.invoice_no === "string"
+        ? currentInvoice.invoice_no
+        : "";
 
-    // Strapi v5 lebih baik pakai documentId, v4 pakai numeric id
-    const identifier = invoiceDocumentId ?? invoiceId;
+    if (!updateData.invoice_no) {
+      updateData.invoice_no =
+        currentInvoiceNo && /^\d+$/.test(currentInvoiceNo)
+          ? currentInvoiceNo
+          : await getNextInvoiceNo(token);
+    }
+
     const res = await fetch(`${baseUrl}/api/invoices/${identifier}`, {
-      method: "PATCH",
+      method: "PUT",
       headers: buildHeaders(token),
       body: JSON.stringify({ data: updateData }),
     });

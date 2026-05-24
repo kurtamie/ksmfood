@@ -267,6 +267,7 @@ export async function POST(request: NextRequest) {
 
     for (const relationFields of relationAttempts) {
       const orderData = compactObject({
+        customer_type: "personal",
         ...orderFields,
         ...relationFields,
       });

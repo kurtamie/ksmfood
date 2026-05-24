@@ -83,16 +83,14 @@ export async function getOrderPaymentAmount(
   token?: string | null,
 ): Promise<{ amount: number; order: Order | null; details: OrderDetail[] }> {
   const order = await fetchOrderById(orderId, token);
-  let details =
+  let details: OrderDetail[] =
     order?.order_details?.map((detail) =>
       "attributes" in (detail as object)
         ? unwrapStrapiEntity(
             detail as OrderDetail | { id: number; attributes?: OrderDetail },
           )
         : detail,
-    ) ?? [];
-
-  details = details.filter((d): d is OrderDetail => d != null);
+    ).filter((detail): detail is OrderDetail => detail != null) ?? [];
 
   if (!details.length) {
     details = await fetchOrderDetailsByOrderId(orderId, token);

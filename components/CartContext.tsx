@@ -62,7 +62,7 @@ export function getCartTotalPrice(items: CartItem[]): number {
 }
 
 export function getCartTotalQuantity(items: CartItem[]): number {
-  return items.reduce((sum, item) => sum + item.quantity, 0);
+  return items.length;
 }
 
 const INITIAL_STATE: CartState = { items: [], isOpen: false };

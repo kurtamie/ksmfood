@@ -74,7 +74,7 @@ export default function OrderSummaryPage() {
 
   useEffect(() => {
     if (!summary) {
-      router.replace("/order-info");
+      router.replace("/");
     }
   }, [router, summary]);
 
@@ -97,25 +97,36 @@ export default function OrderSummaryPage() {
       const invoiceDocId = summary?.invoiceDocumentId;
       const invoiceNumId = summary?.invoiceId;
 
-      if (!invoiceDocId && !invoiceNumId) {
+      if (!invoiceDocId && !invoiceNumId && !numericOrderId) {
         console.warn(
-          "[markInvoicePaid] Tidak ada invoiceDocumentId/invoiceId di summary. Skip update.",
+          "[markInvoicePaid] Tidak ada invoice/order id di summary. Skip update.",
         );
         return;
       }
 
-      const res = await fetch("/api/invoices", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          invoiceDocumentId: invoiceDocId ?? undefined,
-          invoiceId: invoiceNumId ?? undefined,
-          payment_status: "paid",
-          invoiceNo: result.transaction_id
-            ? `INV/${result.transaction_id}`
-            : undefined,
-        }),
-      });
+      const updatePayload = {
+        payment_status: "paid",
+      };
+
+      const res = invoiceDocId
+        ? await fetch(`/api/invoices/${invoiceDocId}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(updatePayload),
+          })
+        : await fetch("/api/invoices", {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              invoiceId: invoiceNumId ?? undefined,
+              orderId: numericOrderId ?? undefined,
+              orderDocumentId:
+                typeof documentId === "string"
+                  ? documentId
+                  : summary?.documentId ?? undefined,
+              payment_status: "paid",
+            }),
+          });
 
       if (!res.ok) {
         const json = await res.json().catch(() => null);
@@ -126,7 +137,13 @@ export default function OrderSummaryPage() {
         );
       }
     },
-    [summary?.invoiceDocumentId, summary?.invoiceId],
+    [
+      documentId,
+      numericOrderId,
+      summary?.documentId,
+      summary?.invoiceDocumentId,
+      summary?.invoiceId,
+    ],
   );
 
   const handlePayNow = useCallback(async () => {

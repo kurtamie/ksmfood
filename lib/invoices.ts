@@ -69,9 +69,10 @@ export async function createInvoiceForOrder(
 }
 
 export async function updateInvoicePaymentStatus(
-  invoiceId: number,
+  invoiceId: number | string,
   paymentStatus: InvoiceStatus,
   token?: string | null,
+  options?: { invoiceNo?: string },
 ) {
   const authToken = token !== undefined ? token : await getStrapiToken();
   const baseUrl = getStrapiBaseUrl();
@@ -80,7 +81,10 @@ export async function updateInvoicePaymentStatus(
     method: "PUT",
     headers: buildStrapiHeaders(authToken),
     body: JSON.stringify({
-      data: { payment_status: paymentStatus },
+      data: {
+        payment_status: paymentStatus,
+        ...(options?.invoiceNo ? { invoice_no: options.invoiceNo } : {}),
+      },
     }),
   });
 
@@ -94,4 +98,55 @@ export async function updateInvoicePaymentStatus(
   }
 
   return res.json();
+}
+
+export async function updateInvoicePaymentStatusByOrder(
+  orderId: number,
+  paymentStatus: InvoiceStatus,
+  options?: { invoiceNo?: string; token?: string | null },
+) {
+  const token =
+    options?.token !== undefined ? options.token : await getStrapiToken();
+  const baseUrl = getStrapiBaseUrl();
+  const query =
+    `?filters[orders][id][$eq]=${orderId}` +
+    "&pagination[pageSize]=1";
+
+  const findRes = await fetch(`${baseUrl}/api/invoices${query}`, {
+    method: "GET",
+    headers: buildStrapiHeaders(token),
+    cache: "no-store",
+  });
+
+  if (!findRes.ok) {
+    const body = await findRes.json().catch(() => null);
+    throw new Error(
+      typeof body === "object" && body?.error?.message
+        ? body.error.message
+        : "Gagal mencari invoice order.",
+    );
+  }
+
+  const body = await findRes.json();
+  const invoice = Array.isArray(body?.data) ? body.data[0] : null;
+
+  if (invoice?.documentId) {
+    return updateInvoicePaymentStatus(
+      invoice.documentId,
+      paymentStatus,
+      token,
+      { invoiceNo: options?.invoiceNo },
+    );
+  }
+
+  if (invoice?.id) {
+    return updateInvoicePaymentStatus(invoice.id, paymentStatus, token, {
+      invoiceNo: options?.invoiceNo,
+    });
+  }
+
+  return createInvoiceForOrder(orderId, paymentStatus, {
+    invoiceNo: options?.invoiceNo,
+    token,
+  });
 }
