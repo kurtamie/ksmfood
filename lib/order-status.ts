@@ -8,6 +8,7 @@ const STATUS_LABEL: Record<InvoiceStatus, PaymentStatusLabel> = {
   paid: "Dibayar",
   unpaid: "Belum DiBayar",
   overdue: "Jatuh Tempo",
+  expired: "Jatuh Tempo",
 };
 
 export function normalizeInvoices(

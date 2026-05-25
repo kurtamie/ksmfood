@@ -6,7 +6,7 @@ import type { OrderDetail } from "./order-details";
 import type { OrderMenu } from "./order-menus";
 import type { Invoice } from "./invoices";
 
-export type OrderStep = "packing" | string;
+export type OrderStep = "packing" | "send" | "success";
 
 export type CreateOrderDetailInput = Pick<
   OrderDetail,

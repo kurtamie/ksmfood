@@ -7,6 +7,7 @@ import { isPaidStatus } from "@/lib/order-status";
 import type { PaymentStatusLabel } from "@/lib/order-status";
 import type { OrderDetailView } from "@/lib/order-queries";
 import { parseAmount } from "@/lib/order-totals";
+import type { OrderStep } from "@/types/orders";
 
 function formatRupiah(amount: number) {
   return new Intl.NumberFormat("id-ID", {
@@ -38,6 +39,17 @@ type OrderDisplayItem = {
   unitPrice: number;
   total: number;
 };
+
+const ORDER_STEP_LABEL: Record<OrderStep, string> = {
+  packing: "Pesanan sedang di packing",
+  send: "Dalam pengiriman",
+  success: "Pesanan Diterima",
+};
+
+function getOrderStepLabel(step: OrderDetailView["step"]): string | null {
+  if (!step) return null;
+  return ORDER_STEP_LABEL[step] ?? null;
+}
 
 function buildMenuLabels(menu: OrderMenuRow): string {
   return [
@@ -200,6 +212,7 @@ export default function OrderDetailPage() {
     0,
   );
   const orderItems = toOrderDisplayItems(order.orderMenus, order.orderDetails);
+  const orderStepLabel = paid ? getOrderStepLabel(order.step) : null;
 
   return (
     <div className="mx-auto max-w-5xl px-6 py-10">
@@ -355,6 +368,17 @@ export default function OrderDetailPage() {
               </p>
             ) : null}
           </div>
+
+          {orderStepLabel ? (
+            <div className="rounded-3xl border border-secondary-200 bg-white p-6 shadow-sm">
+              <h2 className="text-lg font-semibold text-tertiary-900 mb-4">
+                Status Pesanan
+              </h2>
+              <p className="text-sm font-medium text-tertiary-900">
+                {orderStepLabel}
+              </p>
+            </div>
+          ) : null}
         </aside>
       </div>
     </div>

@@ -1,4 +1,5 @@
 import type { Order } from "@/types/orders";
+import type { OrderStep } from "@/types/orders";
 import type { OrderDetail } from "@/types/order-details";
 import type { OrderMenu } from "@/types/order-menus";
 import type { Invoice } from "@/types/invoices";
@@ -37,6 +38,7 @@ export type OrderDetailView = OrderListItem & {
   recipientPhone: string | null;
   deliveryNote: string | null;
   arriveTime: string | null;
+  step: OrderStep | null;
   paymentStatus: string | null;
   orderDetails: Array<OrderDetail & { id: number; documentId?: string }>;
   orderMenus: Array<OrderMenu & { id: number; documentId?: string }>;
@@ -240,6 +242,7 @@ export async function mapOrderToDetailView(
     recipientPhone: order.recipient_phone_no ?? null,
     deliveryNote: order.delivery_note ?? null,
     arriveTime: order.arrive_time ?? null,
+    step: order.step ?? null,
     paymentStatus: invoices[0]?.payment_status ?? null,
     orderDetails,
     orderMenus,
