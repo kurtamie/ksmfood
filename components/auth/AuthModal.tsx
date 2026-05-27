@@ -8,6 +8,14 @@ import {
   registerAction,
 } from "@/app/data/actions/auth-actions";
 import { useAuth } from "@/context/authContext";
+import {
+  type AuthFieldErrors,
+  hasAuthFieldErrors,
+  normalizeAuthPhoneInput,
+  validatePassword,
+  validatePhoneNo,
+  validateUsername,
+} from "@/lib/auth-validation";
 
 type Step = "login" | "register" | "otp" | "profile";
 
@@ -32,17 +40,37 @@ export default function AuthModal({
   const [newPassword, setNewPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
+  const [fieldErrors, setFieldErrors] = useState<AuthFieldErrors>({});
 
   if (!isOpen) return null;
 
   const otpCode = otp.join("");
 
-  // Strip semua non-digit, lalu buang leading 0
-  // Contoh: "0895xxx" → "895xxx", nanti di service jadi "62895xxx"
   const handlePhoneChange = (value: string) => {
-    const digits = value.replace(/\D/g, "");
-    const stripped = digits.replace(/^0+/, "");
-    setPhone(stripped);
+    setPhone(normalizeAuthPhoneInput(value));
+  };
+
+  const applyActionErrors = (
+    fallback: string,
+    result: { error?: string; fieldErrors?: AuthFieldErrors },
+  ) => {
+    setFieldErrors(result.fieldErrors ?? {});
+    setErrorMsg(result.error ?? fallback);
+  };
+
+  const renderFieldErrors = (messages?: string[]) => {
+    if (!messages?.length) return null;
+    if (messages.length === 1) {
+      return <p className="text-xs text-red-500">{messages[0]}</p>;
+    }
+
+    return (
+      <ul className="list-disc pl-4 text-xs text-red-500">
+        {messages.map((message) => (
+          <li key={message}>{message}</li>
+        ))}
+      </ul>
+    );
   };
 
   const handleOtpChange = (index: number, value: string) => {
@@ -63,15 +91,21 @@ export default function AuthModal({
 
   const handleLogin = async () => {
     setErrorMsg("");
-    if (!phone || !password) {
-      setErrorMsg("Nomor WhatsApp dan password wajib diisi.");
+    const nextFieldErrors: AuthFieldErrors = {
+      phone_no: validatePhoneNo(phone),
+      password: validatePassword(password),
+    };
+    setFieldErrors(nextFieldErrors);
+
+    if (hasAuthFieldErrors(nextFieldErrors)) {
       return;
     }
+
     setIsLoading(true);
     const result = await loginAction({ phone_no: phone, password });
     setIsLoading(false);
     if (!result.success) {
-      setErrorMsg(result.error ?? "Login gagal.");
+      applyActionErrors("Login gagal.", result);
       return;
     }
     login(result.data!.token, result.data!.user);
@@ -81,15 +115,20 @@ export default function AuthModal({
 
   const handleSendOtp = async () => {
     setErrorMsg("");
-    if (!phone) {
-      setErrorMsg("Masukkan nomor WhatsApp terlebih dahulu.");
+    const nextFieldErrors: AuthFieldErrors = {
+      phone_no: validatePhoneNo(phone),
+    };
+    setFieldErrors(nextFieldErrors);
+
+    if (hasAuthFieldErrors(nextFieldErrors)) {
       return;
     }
+
     setIsLoading(true);
     const result = await sendOtpAction({ phone_no: phone });
     setIsLoading(false);
     if (!result.success) {
-      setErrorMsg(result.error ?? "Gagal mengirim OTP.");
+      applyActionErrors("Gagal mengirim OTP.", result);
       return;
     }
     setOtp(["", "", "", "", "", ""]);
@@ -98,6 +137,7 @@ export default function AuthModal({
 
   const handleVerifyOtp = async () => {
     setErrorMsg("");
+    setFieldErrors({});
     if (otpCode.length < 6) {
       setErrorMsg("Masukkan 6 digit kode OTP.");
       return;
@@ -117,14 +157,17 @@ export default function AuthModal({
 
   const handleRegister = async () => {
     setErrorMsg("");
-    if (!username) {
-      setErrorMsg("Nama lengkap wajib diisi.");
+    const nextFieldErrors: AuthFieldErrors = {
+      username: validateUsername(username),
+      phone_no: validatePhoneNo(phone),
+      password: validatePassword(newPassword),
+    };
+    setFieldErrors(nextFieldErrors);
+
+    if (hasAuthFieldErrors(nextFieldErrors)) {
       return;
     }
-    if (newPassword.length < 8) {
-      setErrorMsg("Password minimal 8 karakter.");
-      return;
-    }
+
     setIsLoading(true);
     const result = await registerAction({
       phone_no: phone,
@@ -133,7 +176,7 @@ export default function AuthModal({
     });
     setIsLoading(false);
     if (!result.success) {
-      setErrorMsg(result.error ?? "Registrasi gagal.");
+      applyActionErrors("Registrasi gagal.", result);
       return;
     }
     login(result.data!.token, result.data!.user);
@@ -233,6 +276,7 @@ export default function AuthModal({
                     className="flex-1 text-sm outline-none bg-transparent text-tertiary-900 placeholder:text-secondary-500"
                   />
                 </div>
+                {renderFieldErrors(fieldErrors.phone_no)}
               </div>
 
               <div className="flex flex-col gap-1.5">
@@ -247,6 +291,7 @@ export default function AuthModal({
                   placeholder="Masukkan password"
                   className="rounded-xl border border-secondary-400 px-3 py-2.5 text-sm outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-all text-tertiary-900 placeholder:text-secondary-500"
                 />
+                {renderFieldErrors(fieldErrors.password)}
               </div>
 
               <button
@@ -262,6 +307,7 @@ export default function AuthModal({
                 <button
                   onClick={() => {
                     setErrorMsg("");
+                    setFieldErrors({});
                     setStep("register");
                   }}
                   className="font-semibold text-primary-500 hover:underline"
@@ -291,6 +337,7 @@ export default function AuthModal({
                     className="flex-1 text-sm outline-none bg-transparent text-tertiary-900 placeholder:text-secondary-500"
                   />
                 </div>
+                {renderFieldErrors(fieldErrors.phone_no)}
                 <p className="text-xs text-secondary-600">
                   Kode OTP akan dikirim ke nomor WhatsApp ini
                 </p>
@@ -309,6 +356,7 @@ export default function AuthModal({
                 <button
                   onClick={() => {
                     setErrorMsg("");
+                    setFieldErrors({});
                     setStep("login");
                   }}
                   className="font-semibold text-primary-500 hover:underline"
@@ -378,6 +426,7 @@ export default function AuthModal({
                   placeholder="Masukkan nama lengkap"
                   className="rounded-xl border border-secondary-400 px-3 py-2.5 text-sm outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-all text-tertiary-900 placeholder:text-secondary-500"
                 />
+                {renderFieldErrors(fieldErrors.username)}
               </div>
 
               <div className="flex flex-col gap-1.5">
@@ -392,6 +441,7 @@ export default function AuthModal({
                   placeholder="Minimal 8 karakter"
                   className="rounded-xl border border-secondary-400 px-3 py-2.5 text-sm outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-all text-tertiary-900 placeholder:text-secondary-500"
                 />
+                {renderFieldErrors(fieldErrors.password)}
               </div>
 
               <button

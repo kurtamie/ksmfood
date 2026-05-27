@@ -2,6 +2,7 @@
 
 import { cookies } from "next/headers";
 import {
+  isPhoneNoRegisteredService,
   loginService,
   registerService,
   sendOtpService,
@@ -12,6 +13,13 @@ import {
   type VerifyOtpPayload,
   type AuthUser,
 } from "../services/auth-service";
+import {
+  type AuthFieldErrors,
+  hasAuthFieldErrors,
+  validatePassword,
+  validatePhoneNo,
+  validateUsername,
+} from "@/lib/auth-validation";
 
 async function setAuthCookies(token: string, user: AuthUser) {
   const cookieStore = await cookies();
@@ -43,6 +51,7 @@ export interface ActionResult<T = void> {
   success: boolean;
   data?: T;
   error?: string;
+  fieldErrors?: AuthFieldErrors;
 }
 
 function extractMessage(err: unknown, fallback: string): string {
@@ -56,6 +65,19 @@ export async function loginAction(
   payload: LoginPayload,
 ): Promise<ActionResult<{ token: string; user: AuthUser }>> {
   try {
+    const fieldErrors: AuthFieldErrors = {
+      phone_no: validatePhoneNo(payload.phone_no),
+      password: validatePassword(payload.password),
+    };
+
+    if (hasAuthFieldErrors(fieldErrors)) {
+      return {
+        success: false,
+        error: "Periksa kembali data yang diisi.",
+        fieldErrors,
+      };
+    }
+
     const { token, user } = await loginService(payload);
     await setAuthCookies(token, user);
     return { success: true, data: { token, user } };
@@ -74,6 +96,26 @@ export async function sendOtpAction(
   payload: SendOtpPayload,
 ): Promise<ActionResult> {
   try {
+    const fieldErrors: AuthFieldErrors = {
+      phone_no: validatePhoneNo(payload.phone_no),
+    };
+
+    if (hasAuthFieldErrors(fieldErrors)) {
+      return {
+        success: false,
+        error: "Periksa kembali data yang diisi.",
+        fieldErrors,
+      };
+    }
+
+    if (await isPhoneNoRegisteredService(payload.phone_no)) {
+      return {
+        success: false,
+        error: "Nomor Hp sudah terdaftar",
+        fieldErrors: { phone_no: ["Nomor Hp sudah terdaftar"] },
+      };
+    }
+
     await sendOtpService(payload);
     return { success: true };
   } catch (err) {
@@ -102,6 +144,28 @@ export async function registerAction(
   payload: RegisterPayload,
 ): Promise<ActionResult<{ token: string; user: AuthUser }>> {
   try {
+    const fieldErrors: AuthFieldErrors = {
+      username: validateUsername(payload.username),
+      phone_no: validatePhoneNo(payload.phone_no),
+      password: validatePassword(payload.password),
+    };
+
+    if (hasAuthFieldErrors(fieldErrors)) {
+      return {
+        success: false,
+        error: "Periksa kembali data yang diisi.",
+        fieldErrors,
+      };
+    }
+
+    if (await isPhoneNoRegisteredService(payload.phone_no)) {
+      return {
+        success: false,
+        error: "Nomor Hp sudah terdaftar",
+        fieldErrors: { phone_no: ["Nomor Hp sudah terdaftar"] },
+      };
+    }
+
     const result = await registerService(payload);
     console.log("[registerAction] result →", JSON.stringify(result));
 

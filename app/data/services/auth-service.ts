@@ -1,4 +1,5 @@
 import type { User } from "@/types/users";
+import { normalizeAuthPhoneInput } from "@/lib/auth-validation";
 
 function getBaseUrl(): string {
   const url = process.env.NEXT_PUBLIC_STRAPI_URL;
@@ -7,7 +8,7 @@ function getBaseUrl(): string {
 }
 
 function normalizePhone(phone: string): string {
-  return `62${phone.replace(/^0+/, "")}`;
+  return `62${normalizeAuthPhoneInput(phone)}`;
 }
 
 export type AuthUser = User;
@@ -105,6 +106,32 @@ export async function verifyOtpService(
     }),
   });
   return handleResponse<{ message: string; verified: boolean }>(res);
+}
+
+export async function isPhoneNoRegisteredService(
+  phoneNo: string,
+): Promise<boolean> {
+  const phone = normalizePhone(phoneNo);
+  const params = new URLSearchParams({
+    "filters[phone_no][$eq]": phone,
+    "pagination[pageSize]": "1",
+    "fields[0]": "id",
+  });
+
+  const res = await fetch(`${getBaseUrl()}/api/users?${params.toString()}`, {
+    method: "GET",
+    headers: { "Content-Type": "application/json" },
+    cache: "no-store",
+  });
+
+  const data = await handleResponse<unknown>(res);
+  if (Array.isArray(data)) return data.length > 0;
+  if (typeof data === "object" && data !== null && "data" in data) {
+    const entries = (data as { data?: unknown }).data;
+    return Array.isArray(entries) && entries.length > 0;
+  }
+
+  return false;
 }
 
 export async function createCustomerService(
