@@ -95,7 +95,6 @@ const sambalOptions = [
   "Sambal Bajak",
 ];
 
-
 export function OrderModal({ card, serviceName, onClose }: OrderModalProps) {
   const t = useTranslations("riceboxMenu");
   const { addItem, state, clearCart } = useCart();

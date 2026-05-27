@@ -9,12 +9,7 @@ import {
 const PAID_STATUSES = new Set(["capture", "settlement"]);
 
 function verifySignature(payload: Record<string, string>): boolean {
-  const {
-    order_id,
-    status_code,
-    gross_amount,
-    signature_key,
-  } = payload;
+  const { order_id, status_code, gross_amount, signature_key } = payload;
 
   if (!order_id || !status_code || !gross_amount || !signature_key) {
     return false;

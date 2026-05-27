@@ -33,6 +33,13 @@ export interface RegisterPayload {
   password: string;
 }
 
+export interface ResetPasswordPayload {
+  phone_no: string;
+  otp_code: string;
+  password: string;
+  password_confirmation: string;
+}
+
 export interface AuthResponse {
   token: string;
   user: AuthUser;
@@ -106,6 +113,25 @@ export async function verifyOtpService(
     }),
   });
   return handleResponse<{ message: string; verified: boolean }>(res);
+}
+
+export async function resetPasswordWithPhoneService(
+  payload: ResetPasswordPayload,
+): Promise<{ message: string }> {
+  const phone = normalizePhone(payload.phone_no);
+
+  const res = await fetch(`${getBaseUrl()}/api/auth/reset-password-phone`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      phone_no: phone,
+      otp_code: payload.otp_code,
+      password: payload.password,
+      password_confirmation: payload.password_confirmation,
+    }),
+  });
+
+  return handleResponse<{ message: string }>(res);
 }
 
 export async function isPhoneNoRegisteredService(

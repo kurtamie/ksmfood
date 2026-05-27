@@ -57,7 +57,9 @@ function pickOrderUpdateFields(payload: Record<string, unknown>) {
 function getRelationDocumentIds(value: unknown): string[] {
   const rows = Array.isArray(value)
     ? value
-    : value && typeof value === "object" && Array.isArray((value as { data?: unknown }).data)
+    : value &&
+        typeof value === "object" &&
+        Array.isArray((value as { data?: unknown }).data)
       ? (value as { data: unknown[] }).data
       : [];
 
@@ -101,9 +103,7 @@ async function getExistingRelationConnects(token: string | null, id: string) {
 
   return compactObject({
     order_details:
-      detailDocumentIds.length > 0
-        ? { connect: detailDocumentIds }
-        : undefined,
+      detailDocumentIds.length > 0 ? { connect: detailDocumentIds } : undefined,
     order_menus:
       menuDocumentIds.length > 0 ? { connect: menuDocumentIds } : undefined,
   });
@@ -120,7 +120,10 @@ async function toNextResponse(res: Response) {
       { status: res.status },
     );
   }
-  return NextResponse.json({ success: true, data: body }, { status: res.status });
+  return NextResponse.json(
+    { success: true, data: body },
+    { status: res.status },
+  );
 }
 
 export async function GET(

@@ -105,7 +105,11 @@ function toOrderDisplayItems(
 
     return {
       id: String(
-        detail?.documentId ?? detail?.id ?? menu?.documentId ?? menu?.id ?? index,
+        detail?.documentId ??
+          detail?.id ??
+          menu?.documentId ??
+          menu?.id ??
+          index,
       ),
       name: `Menu Pesanan ${index + 1}`,
       addOnLabels: menu ? buildMenuLabels(menu) : "",
@@ -159,9 +163,7 @@ export default function OrderDetailPage() {
       } catch (err) {
         if (!cancelled) {
           setError(
-            err instanceof Error
-              ? err.message
-              : "Gagal memuat detail pesanan.",
+            err instanceof Error ? err.message : "Gagal memuat detail pesanan.",
           );
         }
       } finally {
@@ -203,8 +205,7 @@ export default function OrderDetailPage() {
   const status = order.paymentStatusLabel as PaymentStatusLabel;
   const paid = isPaidStatus(status);
   const subTotal = order.orderDetails.reduce(
-    (sum, detail) =>
-      sum + parseAmount(detail.total_amount ?? detail.amount),
+    (sum, detail) => sum + parseAmount(detail.total_amount ?? detail.amount),
     0,
   );
   const totalQty = order.orderDetails.reduce(

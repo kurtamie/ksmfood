@@ -5,10 +5,12 @@ import {
   isPhoneNoRegisteredService,
   loginService,
   registerService,
+  resetPasswordWithPhoneService,
   sendOtpService,
   verifyOtpService,
   type LoginPayload,
   type RegisterPayload,
+  type ResetPasswordPayload,
   type SendOtpPayload,
   type VerifyOtpPayload,
   type AuthUser,
@@ -17,6 +19,7 @@ import {
   type AuthFieldErrors,
   hasAuthFieldErrors,
   validatePassword,
+  validatePasswordConfirmation,
   validatePhoneNo,
   validateUsername,
 } from "@/lib/auth-validation";
@@ -126,6 +129,40 @@ export async function sendOtpAction(
   }
 }
 
+export async function sendPasswordResetOtpAction(
+  payload: SendOtpPayload,
+): Promise<ActionResult> {
+  try {
+    const fieldErrors: AuthFieldErrors = {
+      phone_no: validatePhoneNo(payload.phone_no),
+    };
+
+    if (hasAuthFieldErrors(fieldErrors)) {
+      return {
+        success: false,
+        error: "Periksa kembali data yang diisi.",
+        fieldErrors,
+      };
+    }
+
+    if (!(await isPhoneNoRegisteredService(payload.phone_no))) {
+      return {
+        success: false,
+        error: "Nomor Hp tidak terdaftar",
+        fieldErrors: { phone_no: ["Nomor Hp tidak terdaftar"] },
+      };
+    }
+
+    await sendOtpService(payload);
+    return { success: true };
+  } catch (err) {
+    return {
+      success: false,
+      error: extractMessage(err, "Gagal mengirim OTP. Coba lagi."),
+    };
+  }
+}
+
 export async function verifyOtpAction(
   payload: VerifyOtpPayload,
 ): Promise<ActionResult> {
@@ -136,6 +173,87 @@ export async function verifyOtpAction(
     return {
       success: false,
       error: extractMessage(err, "Kode OTP tidak valid atau sudah kadaluarsa."),
+    };
+  }
+}
+
+export async function verifyPasswordResetOtpAction(
+  payload: VerifyOtpPayload,
+): Promise<ActionResult> {
+  try {
+    const fieldErrors: AuthFieldErrors = {
+      phone_no: validatePhoneNo(payload.phone_no),
+    };
+
+    if (hasAuthFieldErrors(fieldErrors)) {
+      return {
+        success: false,
+        error: "Periksa kembali data yang diisi.",
+        fieldErrors,
+      };
+    }
+
+    if (!(await isPhoneNoRegisteredService(payload.phone_no))) {
+      return {
+        success: false,
+        error: "Nomor Hp tidak terdaftar",
+        fieldErrors: { phone_no: ["Nomor Hp tidak terdaftar"] },
+      };
+    }
+
+    await verifyOtpService(payload);
+    return { success: true };
+  } catch (err) {
+    return {
+      success: false,
+      error: extractMessage(err, "Kode OTP tidak valid atau sudah kadaluarsa."),
+    };
+  }
+}
+
+export async function resetPasswordWithPhoneAction(
+  payload: ResetPasswordPayload,
+): Promise<ActionResult> {
+  try {
+    const fieldErrors: AuthFieldErrors = {
+      phone_no: validatePhoneNo(payload.phone_no),
+      password: validatePassword(payload.password),
+      password_confirmation: validatePasswordConfirmation(
+        payload.password,
+        payload.password_confirmation,
+      ),
+    };
+
+    if (payload.otp_code.length < 6) {
+      return {
+        success: false,
+        error: "Masukkan 6 digit kode OTP.",
+        fieldErrors,
+      };
+    }
+
+    if (hasAuthFieldErrors(fieldErrors)) {
+      return {
+        success: false,
+        error: "Periksa kembali data yang diisi.",
+        fieldErrors,
+      };
+    }
+
+    if (!(await isPhoneNoRegisteredService(payload.phone_no))) {
+      return {
+        success: false,
+        error: "Nomor Hp tidak terdaftar",
+        fieldErrors: { phone_no: ["Nomor Hp tidak terdaftar"] },
+      };
+    }
+
+    await resetPasswordWithPhoneService(payload);
+    return { success: true };
+  } catch (err) {
+    return {
+      success: false,
+      error: extractMessage(err, "Gagal mengganti kata sandi. Coba lagi."),
     };
   }
 }

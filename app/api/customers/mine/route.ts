@@ -2,10 +2,7 @@ import { NextResponse } from "next/server";
 import { getUserMe } from "@/app/data/services/get-user-me";
 import { getToken } from "@/app/data/services/get-token";
 import { resolveCustomerForUser } from "@/lib/customers";
-import {
-  buildStrapiHeaders,
-  getStrapiBaseUrl,
-} from "@/lib/strapi";
+import { buildStrapiHeaders, getStrapiBaseUrl } from "@/lib/strapi";
 import { getStrapiSingleData, unwrapStrapiEntity } from "@/lib/strapi-response";
 import type { Customer } from "@/types/customers";
 

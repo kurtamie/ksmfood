@@ -88,9 +88,7 @@ export default function OrderHistoryPage() {
         <p className="text-sm text-secondary-600">Memuat pesanan...</p>
       ) : null}
 
-      {error ? (
-        <p className="text-sm text-red-600">{error}</p>
-      ) : null}
+      {error ? <p className="text-sm text-red-600">{error}</p> : null}
 
       {!isLoading && !error && orders.length === 0 ? (
         <p className="text-sm text-secondary-600">

@@ -26,7 +26,9 @@ export function unwrapStrapiList<T extends object>(
   if (!Array.isArray(rows)) return [];
   return rows
     .map((row) => unwrapStrapiEntity<T>(row as StrapiEntityInput<T>))
-    .filter((row): row is T & { id: number; documentId?: string } => row != null);
+    .filter(
+      (row): row is T & { id: number; documentId?: string } => row != null,
+    );
 }
 
 export function getStrapiListData(body: unknown): unknown[] {

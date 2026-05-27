@@ -136,10 +136,7 @@ function Header() {
           <div className="hidden items-center gap-3 md:flex">
             <LanguageSwitcher />
 
-            <CartButton
-              totalQuantity={totalQuantity}
-              onClick={toggleCart}
-            />
+            <CartButton totalQuantity={totalQuantity} onClick={toggleCart} />
 
             {isLoggedIn ? (
               <DropdownMenu>
@@ -236,10 +233,7 @@ function Header() {
 
           {/* Mobile right side */}
           <div className="ml-auto flex items-center gap-2 md:hidden">
-            <CartButton
-              totalQuantity={totalQuantity}
-              onClick={toggleCart}
-            />
+            <CartButton totalQuantity={totalQuantity} onClick={toggleCart} />
 
             <button
               type="button"

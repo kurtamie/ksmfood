@@ -31,9 +31,7 @@ export async function fetchOrderById(
 ): Promise<Order | null> {
   const authToken = token !== undefined ? token : await getStrapiToken();
   const baseUrl = getStrapiBaseUrl();
-  const populate = encodeURIComponent(
-    JSON.stringify({ order_details: true }),
-  );
+  const populate = encodeURIComponent(JSON.stringify({ order_details: true }));
 
   const res = await fetch(
     `${baseUrl}/api/orders/${orderId}?populate=${populate}`,
@@ -84,13 +82,15 @@ export async function getOrderPaymentAmount(
 ): Promise<{ amount: number; order: Order | null; details: OrderDetail[] }> {
   const order = await fetchOrderById(orderId, token);
   let details: OrderDetail[] =
-    order?.order_details?.map((detail) =>
-      "attributes" in (detail as object)
-        ? unwrapStrapiEntity(
-            detail as OrderDetail | { id: number; attributes?: OrderDetail },
-          )
-        : detail,
-    ).filter((detail): detail is OrderDetail => detail != null) ?? [];
+    order?.order_details
+      ?.map((detail) =>
+        "attributes" in (detail as object)
+          ? unwrapStrapiEntity(
+              detail as OrderDetail | { id: number; attributes?: OrderDetail },
+            )
+          : detail,
+      )
+      .filter((detail): detail is OrderDetail => detail != null) ?? [];
 
   if (!details.length) {
     details = await fetchOrderDetailsByOrderId(orderId, token);

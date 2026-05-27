@@ -34,7 +34,10 @@ async function toNextResponse(res: Response) {
       { status: res.status },
     );
   }
-  return NextResponse.json({ success: true, data: body }, { status: res.status });
+  return NextResponse.json(
+    { success: true, data: body },
+    { status: res.status },
+  );
 }
 
 export async function GET(

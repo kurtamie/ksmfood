@@ -1,10 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getUserMe } from "@/app/data/services/get-user-me";
 import { getToken } from "@/app/data/services/get-token";
-import {
-  resolveCustomerForUser,
-  type ResolvedCustomer,
-} from "@/lib/customers";
+import { resolveCustomerForUser, type ResolvedCustomer } from "@/lib/customers";
 import { buildStrapiRelationConnect } from "@/lib/strapi-relations";
 import type {
   CreateOrderDetailInput,
@@ -75,7 +72,10 @@ async function toNextResponse(res: Response) {
       { status: res.status },
     );
   }
-  return NextResponse.json({ success: true, data: body }, { status: res.status });
+  return NextResponse.json(
+    { success: true, data: body },
+    { status: res.status },
+  );
 }
 
 async function createRelatedEntries(
@@ -331,7 +331,11 @@ export async function POST(request: NextRequest) {
       }
 
       // 2. Buat invoice dengan status unpaid
-      const invoice = await createInvoiceForOrder(token, orderId, orderDocumentId);
+      const invoice = await createInvoiceForOrder(
+        token,
+        orderId,
+        orderDocumentId,
+      );
       if (invoice) {
         invoiceId = invoice.id;
         invoiceDocumentId = invoice.documentId ?? null;
@@ -359,4 +363,4 @@ export async function POST(request: NextRequest) {
       { status: 500 },
     );
   }
-}   
+}

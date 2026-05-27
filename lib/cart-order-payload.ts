@@ -16,9 +16,7 @@ export function getLeaveTime(arriveTime: string) {
   return date.toTimeString().slice(0, 8);
 }
 
-export function parseCartItemToOrderMenu(
-  item: CartItem,
-): CreateOrderMenuInput {
+export function parseCartItemToOrderMenu(item: CartItem): CreateOrderMenuInput {
   const riceAddon = item.addOns.find((a) => /^nasi_/i.test(a.value));
   const mainDishAddons = item.addOns.filter(
     (a) => /^lauk_[0-9]+_/i.test(a.value) && !/^lauk_tambahan_/i.test(a.value),
@@ -28,9 +26,7 @@ export function parseCartItemToOrderMenu(
   );
   const vegetableAddon = item.addOns.find((a) => /^sayur_/i.test(a.value));
   const sauceAddon = item.addOns.find((a) => /^sambal_/i.test(a.value));
-  const mineralWaterAddon = item.addOns.find((a) =>
-    /^minuman_/i.test(a.value),
-  );
+  const mineralWaterAddon = item.addOns.find((a) => /^minuman_/i.test(a.value));
   const fruitAddon = item.addOns.find((a) => /(Pisang|Jeruk)/i.test(a.label));
   const chipAddon = item.addOns.find((a) => /kerupuk/i.test(a.label));
   const puddingAddon = item.addOns.find((a) => /puding/i.test(a.label));
@@ -72,7 +68,10 @@ export function buildAggregateOrderDetail(
 ): CreateOrderDetailInput {
   const qty = items.reduce((sum, item) => sum + item.quantity, 0);
   const total = items.reduce((sum, item) => {
-    const addOnTotal = item.addOns.reduce((addOnSum, addOn) => addOnSum + addOn.price, 0);
+    const addOnTotal = item.addOns.reduce(
+      (addOnSum, addOn) => addOnSum + addOn.price,
+      0,
+    );
     return sum + (item.basePrice + addOnTotal) * item.quantity;
   }, 0);
   const averageSellingPrice = qty > 0 ? Math.round(total / qty) : 0;

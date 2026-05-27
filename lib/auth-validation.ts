@@ -1,6 +1,7 @@
 export interface AuthFieldErrors {
   phone_no?: string[];
   password?: string[];
+  password_confirmation?: string[];
   username?: string[];
 }
 
@@ -81,10 +82,27 @@ export function validatePassword(password: string): string[] {
   }
 
   if (!/[!@#$%^&*(),.?":{}|<>_\-+=\[\]\\;/`~]/.test(password)) {
-    errors.push("Password harus mengandung karakter spesial, contoh: ! @ # $ %");
+    errors.push(
+      "Password harus mengandung karakter spesial, contoh: ! @ # $ %",
+    );
   }
 
   return errors;
+}
+
+export function validatePasswordConfirmation(
+  password: string,
+  passwordConfirmation: string,
+): string[] {
+  if (!passwordConfirmation) {
+    return [REQUIRED_MESSAGE];
+  }
+
+  if (password !== passwordConfirmation) {
+    return ["Konfirmasi kata sandi tidak sama"];
+  }
+
+  return [];
 }
 
 export function hasAuthFieldErrors(errors: AuthFieldErrors): boolean {

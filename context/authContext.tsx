@@ -28,8 +28,7 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 
 function clearClientUserCookie() {
   if (typeof document === "undefined") return;
-  document.cookie =
-    "ksm_auth_user=; path=/; max-age=0; SameSite=Lax";
+  document.cookie = "ksm_auth_user=; path=/; max-age=0; SameSite=Lax";
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -75,10 +74,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     void refreshSession();
   }, [refreshSession]);
 
-  const login = useCallback((token: string, user: AuthUser) => {
-    setState({ user, token, isLoading: false });
-    void refreshSession();
-  }, [refreshSession]);
+  const login = useCallback(
+    (token: string, user: AuthUser) => {
+      setState({ user, token, isLoading: false });
+      void refreshSession();
+    },
+    [refreshSession],
+  );
 
   const logout = useCallback(async () => {
     try {

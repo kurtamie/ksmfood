@@ -18,7 +18,8 @@ export async function createInvoiceForOrder(
   paymentStatus: InvoiceStatus,
   options?: { invoiceNo?: string; token?: string | null },
 ) {
-  const token = options?.token !== undefined ? options.token : await getStrapiToken();
+  const token =
+    options?.token !== undefined ? options.token : await getStrapiToken();
   const baseUrl = getStrapiBaseUrl();
   const invoiceNo = options?.invoiceNo ?? generateInvoiceNo(orderId);
   const invoiceDate = new Date().toISOString().slice(0, 10);
@@ -109,8 +110,7 @@ export async function updateInvoicePaymentStatusByOrder(
     options?.token !== undefined ? options.token : await getStrapiToken();
   const baseUrl = getStrapiBaseUrl();
   const query =
-    `?filters[orders][id][$eq]=${orderId}` +
-    "&pagination[pageSize]=1";
+    `?filters[orders][id][$eq]=${orderId}` + "&pagination[pageSize]=1";
 
   const findRes = await fetch(`${baseUrl}/api/invoices${query}`, {
     method: "GET",

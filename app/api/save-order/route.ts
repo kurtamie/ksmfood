@@ -54,8 +54,7 @@ export async function POST(request: NextRequest) {
       delivery_address: payload.addressLine,
       recipient_name: payload.recipientName,
       recipient_phone_no: payload.recipientPhone,
-      latitude:
-        payload.latitude != null ? String(payload.latitude) : undefined,
+      latitude: payload.latitude != null ? String(payload.latitude) : undefined,
       longitude:
         payload.longitude != null ? String(payload.longitude) : undefined,
       delivery_note: payload.notes,

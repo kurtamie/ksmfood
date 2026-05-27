@@ -9,7 +9,12 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { CalendarIcon } from "lucide-react";
-import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from "@/components/ui/input-group";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupInput,
+} from "@/components/ui/input-group";
 import { Calendar } from "@/components/ui/calendar";
 import { Input } from "@/components/ui/input";
 import { getLeaveTime } from "@/lib/cart-order-payload";
@@ -96,8 +101,12 @@ function getRelationRows<T extends object>(value: unknown): T[] {
       .filter((row): row is T => row != null);
   }
 
-  if (value && typeof value === "object" && Array.isArray((value as { data?: unknown }).data)) {
-    return ((value as { data: unknown[] }).data)
+  if (
+    value &&
+    typeof value === "object" &&
+    Array.isArray((value as { data?: unknown }).data)
+  ) {
+    return (value as { data: unknown[] }).data
       .map((row) => unwrapEntity<T>(row))
       .filter((row): row is T => row != null);
   }
@@ -131,7 +140,8 @@ function toOrderDisplayItems(
     const detail = details[0];
     const quantity = parseAmount(detail.qty) || 1;
     const unitPrice = parseAmount(detail.selling_price);
-    const total = parseAmount(detail.total_amount ?? detail.amount) || quantity * unitPrice;
+    const total =
+      parseAmount(detail.total_amount ?? detail.amount) || quantity * unitPrice;
 
     return [
       {
@@ -154,10 +164,13 @@ function toOrderDisplayItems(
     const detail = details[index] ?? {};
     const quantity = parseAmount(detail.qty) || 1;
     const unitPrice = parseAmount(detail.selling_price);
-    const total = parseAmount(detail.total_amount ?? detail.amount) || quantity * unitPrice;
+    const total =
+      parseAmount(detail.total_amount ?? detail.amount) || quantity * unitPrice;
 
     return {
-      id: String(detail.documentId ?? detail.id ?? menu.documentId ?? menu.id ?? index),
+      id: String(
+        detail.documentId ?? detail.id ?? menu.documentId ?? menu.id ?? index,
+      ),
       name: `Menu Pesanan ${index + 1}`,
       addOnLabels: buildMenuLabels(menu),
       quantity,
@@ -193,18 +206,20 @@ function parseSavedAddresses(
     typeof customerLatitude === "number"
       ? customerLatitude
       : customerLatitude
-      ? Number(customerLatitude)
-      : undefined;
+        ? Number(customerLatitude)
+        : undefined;
   const longitude =
     typeof customerLongitude === "number"
       ? customerLongitude
       : customerLongitude
-      ? Number(customerLongitude)
-      : undefined;
+        ? Number(customerLongitude)
+        : undefined;
   const validLatitude =
     latitude !== undefined && Number.isFinite(latitude) ? latitude : undefined;
   const validLongitude =
-    longitude !== undefined && Number.isFinite(longitude) ? longitude : undefined;
+    longitude !== undefined && Number.isFinite(longitude)
+      ? longitude
+      : undefined;
   const pinpoint =
     validLatitude !== undefined && validLongitude !== undefined
       ? `${validLatitude.toFixed(6)}, ${validLongitude.toFixed(6)}`
@@ -227,14 +242,14 @@ function parseSavedAddresses(
           typeof item?.latitude === "number"
             ? item.latitude
             : item?.latitude
-            ? Number(item.latitude)
-            : undefined,
+              ? Number(item.latitude)
+              : undefined,
         longitude:
           typeof item?.longitude === "number"
             ? item.longitude
             : item?.longitude
-            ? Number(item.longitude)
-            : undefined,
+              ? Number(item.longitude)
+              : undefined,
       }));
     }
   } catch {
@@ -300,7 +315,9 @@ export default function OrderInfoPage() {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [addressPickerOpen, setAddressPickerOpen] = useState(false);
   const [creatingAddress, setCreatingAddress] = useState(false);
-  const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
+  const [selectedAddressId, setSelectedAddressId] = useState<string | null>(
+    null,
+  );
   const [orderId, setOrderId] = useState<number | string | null>(null);
   const [orderMenus, setOrderMenus] = useState<OrderMenuRow[]>([]);
   const [orderDetails, setOrderDetails] = useState<OrderDetailRow[]>([]);
@@ -322,7 +339,10 @@ export default function OrderInfoPage() {
 
   type LeafletMap = {
     setView: (coords: [number, number], zoom: number) => void;
-    on: (event: string, callback: (e: { latlng: { lat: number; lng: number } }) => void) => void;
+    on: (
+      event: string,
+      callback: (e: { latlng: { lat: number; lng: number } }) => void,
+    ) => void;
     removeLayer: (layer: MarkerType) => void;
     remove: () => void;
   };
@@ -440,11 +460,17 @@ export default function OrderInfoPage() {
         if (typeof order.delivery_address === "string") {
           setAddressLine(order.delivery_address);
         }
-        if (typeof order.latitude === "string" || typeof order.latitude === "number") {
+        if (
+          typeof order.latitude === "string" ||
+          typeof order.latitude === "number"
+        ) {
           const nextLatitude = Number(order.latitude);
           if (Number.isFinite(nextLatitude)) setLatitude(nextLatitude);
         }
-        if (typeof order.longitude === "string" || typeof order.longitude === "number") {
+        if (
+          typeof order.longitude === "string" ||
+          typeof order.longitude === "number"
+        ) {
           const nextLongitude = Number(order.longitude);
           if (Number.isFinite(nextLongitude)) setLongitude(nextLongitude);
         }
@@ -478,7 +504,11 @@ export default function OrderInfoPage() {
   }, [documentId]);
 
   useEffect(() => {
-    if (!mapRef.current || leafletLoadedRef.current || typeof window === "undefined") {
+    if (
+      !mapRef.current ||
+      leafletLoadedRef.current ||
+      typeof window === "undefined"
+    ) {
       return;
     }
 
@@ -520,7 +550,9 @@ export default function OrderInfoPage() {
         };
 
         const L = (window as unknown as { L: LeafletGlobal }).L;
-        if ((mapRef.current as unknown as { _leaflet_id?: number })?._leaflet_id) {
+        if (
+          (mapRef.current as unknown as { _leaflet_id?: number })?._leaflet_id
+        ) {
           return;
         }
         const map = L.map(mapRef.current);
@@ -570,7 +602,9 @@ export default function OrderInfoPage() {
       return;
     }
 
-    const coordinateMatch = query.match(/^[\s]*([+-]?\d+(?:\.\d+)?)[,\s]+([+-]?\d+(?:\.\d+)?)[\s]*$/);
+    const coordinateMatch = query.match(
+      /^[\s]*([+-]?\d+(?:\.\d+)?)[,\s]+([+-]?\d+(?:\.\d+)?)[\s]*$/,
+    );
     if (coordinateMatch) {
       const lat = Number(coordinateMatch[1]);
       const lng = Number(coordinateMatch[2]);
@@ -709,7 +743,11 @@ export default function OrderInfoPage() {
         }
       })();
       const savedOrderId =
-        orderRecord?.id ?? existingSummary?.orderId ?? result.data?.id ?? orderId ?? null;
+        orderRecord?.id ??
+        existingSummary?.orderId ??
+        result.data?.id ??
+        orderId ??
+        null;
       const orderDocumentId =
         orderRecord?.documentId ??
         existingSummary?.documentId ??
@@ -828,174 +866,175 @@ export default function OrderInfoPage() {
           <div className="rounded-lg border border-secondary-300 bg-white p-5">
             <h2 className="mb-4 text-lg font-semibold">Informasi Pengiriman</h2>
 
-              <div className="flex flex-col gap-2">
-                <div>
-                  <label className="mb-1 block text-sm font-medium text-gray-700">
-                    Tanggal
-                  </label>
-                  <InputGroup>
-                    <InputGroupInput
-                      id="date-required"
-                      value={value}
-                      placeholder="June 01, 2025"
-                      onChange={(e) => {
-                        const date = new Date(e.target.value)
-                        setValue(e.target.value)
-                        if (isValidDate(date)) {
-                          setDate(date)
-                          setMonth(date)
-                        }
-                      }}
-                      onKeyDown={(e) => {
-                        if (e.key === "ArrowDown") {
-                          e.preventDefault()
-                          setOpen(true)
-                        }
-                      }}
-                    />
-                    <InputGroupAddon align="inline-end">
-                      <Popover open={open} onOpenChange={setOpen}>
-                        <PopoverTrigger asChild>
-                          <InputGroupButton
-                            id="date-picker"
-                            variant="ghost"
-                            size="icon-xs"
-                            aria-label="Select date"
-                          >
-                            <CalendarIcon />
-                            <span className="sr-only">Select date</span>
-                          </InputGroupButton>
-                        </PopoverTrigger>
-                        <PopoverContent
-                          className="w-auto overflow-hidden p-0"
-                          align="end"
-                          alignOffset={-8}
-                          sideOffset={10}
+            <div className="flex flex-col gap-2">
+              <div>
+                <label className="mb-1 block text-sm font-medium text-gray-700">
+                  Tanggal
+                </label>
+                <InputGroup>
+                  <InputGroupInput
+                    id="date-required"
+                    value={value}
+                    placeholder="June 01, 2025"
+                    onChange={(e) => {
+                      const date = new Date(e.target.value);
+                      setValue(e.target.value);
+                      if (isValidDate(date)) {
+                        setDate(date);
+                        setMonth(date);
+                      }
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === "ArrowDown") {
+                        e.preventDefault();
+                        setOpen(true);
+                      }
+                    }}
+                  />
+                  <InputGroupAddon align="inline-end">
+                    <Popover open={open} onOpenChange={setOpen}>
+                      <PopoverTrigger asChild>
+                        <InputGroupButton
+                          id="date-picker"
+                          variant="ghost"
+                          size="icon-xs"
+                          aria-label="Select date"
                         >
-                          <Calendar
-                            mode="single"
-                            selected={date}
-                            month={month}
-                            onMonthChange={setMonth}
-                            onSelect={(date) => {
-                              setDate(date);
-                              setValue(formatDate(date));
-                              setOpen(false);
-                            }}
-                          />
-                        </PopoverContent>
-                      </Popover>
-                    </InputGroupAddon>
-                  </InputGroup>
-                </div>
+                          <CalendarIcon />
+                          <span className="sr-only">Select date</span>
+                        </InputGroupButton>
+                      </PopoverTrigger>
+                      <PopoverContent
+                        className="w-auto overflow-hidden p-0"
+                        align="end"
+                        alignOffset={-8}
+                        sideOffset={10}
+                      >
+                        <Calendar
+                          mode="single"
+                          selected={date}
+                          month={month}
+                          onMonthChange={setMonth}
+                          onSelect={(date) => {
+                            setDate(date);
+                            setValue(formatDate(date));
+                            setOpen(false);
+                          }}
+                        />
+                      </PopoverContent>
+                    </Popover>
+                  </InputGroupAddon>
+                </InputGroup>
+              </div>
 
-                <div>
-                  <label className="mb-1 block text-sm font-medium text-gray-700">
-                    Jam Sampai
-                  </label>
-                  <Input
-                    type="time"
-                    id="time-picker-optional"
-                    step="1"
-                    value={deliveryTime}
-                    onChange={(e) => setDeliveryTime(e.target.value)}
-                    className="appearance-none bg-background [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
-                  />
-                </div>
+              <div>
+                <label className="mb-1 block text-sm font-medium text-gray-700">
+                  Jam Sampai
+                </label>
+                <Input
+                  type="time"
+                  id="time-picker-optional"
+                  step="1"
+                  value={deliveryTime}
+                  onChange={(e) => setDeliveryTime(e.target.value)}
+                  className="appearance-none bg-background [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
+                />
+              </div>
 
-                <div>
-                  <label className="mb-1 block text-sm font-medium text-gray-700">
-                    Alamat Lengkap <span className="text-red-600">*</span>
-                  </label>
-                  <textarea
-                    value={addressLine}
-                    onChange={(e) => setAddressLine(e.target.value)}
-                    placeholder="Peumahan GMP Blok N"
-                    rows={3}
-                    className="w-full rounded-lg border px-3 py-2 text-sm"
-                  />
-                </div>
+              <div>
+                <label className="mb-1 block text-sm font-medium text-gray-700">
+                  Alamat Lengkap <span className="text-red-600">*</span>
+                </label>
+                <textarea
+                  value={addressLine}
+                  onChange={(e) => setAddressLine(e.target.value)}
+                  placeholder="Peumahan GMP Blok N"
+                  rows={3}
+                  className="w-full rounded-lg border px-3 py-2 text-sm"
+                />
+              </div>
 
-                <div>
-                  <label className="mb-1 block text-sm font-medium text-gray-700">
-                    Kelurahan <span className="text-red-600">*</span>
-                  </label>
-                  <select
-                    value={subdistrict}
-                    onChange={(e) => setSubdistrict(e.target.value)}
-                    className="w-full rounded-lg border px-3 py-2"
-                  >
-                    <option value="">Pilih Kelurahan</option>
-                    {kelurahanOptions.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+              <div>
+                <label className="mb-1 block text-sm font-medium text-gray-700">
+                  Kelurahan <span className="text-red-600">*</span>
+                </label>
+                <select
+                  value={subdistrict}
+                  onChange={(e) => setSubdistrict(e.target.value)}
+                  className="w-full rounded-lg border px-3 py-2"
+                >
+                  <option value="">Pilih Kelurahan</option>
+                  {kelurahanOptions.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
-                <div>
-                  <label className="mb-1 block text-sm font-medium text-gray-700">
-                    Pinpoint Lokasi <span className="text-red-600">*</span>
-                  </label>
-                  <div className="rounded-2xl border border-secondary-300 bg-white p-3">
-                    <div className="mb-3 rounded-lg border border-secondary-200 bg-gray-50 px-3 py-2">
-                      <input
-                        type="text"
-                        value={pinpoint}
-                        onChange={(e) => setPinpoint(e.target.value)}
-                        placeholder="Cari lokasi / ketik nama tempat"
-                        className="w-full bg-transparent text-sm outline-none"
-                      />
-                    </div>
-                    <div className="overflow-hidden rounded-xl border border-secondary-300 bg-gray-100">
-                      <div
-                        ref={mapRef}
-                        className="h-72 w-full"
-                        aria-label="Peta lokasi pengiriman"
-                      />
-                    </div>
-                    <p className="mt-2 text-sm text-secondary-600">
-                      Klik peta untuk menandai lokasi dan simpan latitude/longitude.
-                    </p>
-                    {latitude !== null && longitude !== null && (
-                      <p className="mt-2 text-sm text-secondary-700">
-                        Koordinat: {latitude.toFixed(6)}, {longitude.toFixed(6)}
-                      </p>
-                    )}
+              <div>
+                <label className="mb-1 block text-sm font-medium text-gray-700">
+                  Pinpoint Lokasi <span className="text-red-600">*</span>
+                </label>
+                <div className="rounded-2xl border border-secondary-300 bg-white p-3">
+                  <div className="mb-3 rounded-lg border border-secondary-200 bg-gray-50 px-3 py-2">
+                    <input
+                      type="text"
+                      value={pinpoint}
+                      onChange={(e) => setPinpoint(e.target.value)}
+                      placeholder="Cari lokasi / ketik nama tempat"
+                      className="w-full bg-transparent text-sm outline-none"
+                    />
                   </div>
+                  <div className="overflow-hidden rounded-xl border border-secondary-300 bg-gray-100">
+                    <div
+                      ref={mapRef}
+                      className="h-72 w-full"
+                      aria-label="Peta lokasi pengiriman"
+                    />
+                  </div>
+                  <p className="mt-2 text-sm text-secondary-600">
+                    Klik peta untuk menandai lokasi dan simpan
+                    latitude/longitude.
+                  </p>
+                  {latitude !== null && longitude !== null && (
+                    <p className="mt-2 text-sm text-secondary-700">
+                      Koordinat: {latitude.toFixed(6)}, {longitude.toFixed(6)}
+                    </p>
+                  )}
                 </div>
+              </div>
 
-                <div>
-                  <label className="mb-1 block text-sm font-medium text-gray-700">
-                    Nama Penerima <span className="text-red-600">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={recipientName}
-                    onChange={(e) => setRecipientName(e.target.value)}
-                    placeholder="Nama penerima"
-                    className="w-full rounded-lg border px-3 py-2"
-                  />
-                </div>
+              <div>
+                <label className="mb-1 block text-sm font-medium text-gray-700">
+                  Nama Penerima <span className="text-red-600">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={recipientName}
+                  onChange={(e) => setRecipientName(e.target.value)}
+                  placeholder="Nama penerima"
+                  className="w-full rounded-lg border px-3 py-2"
+                />
+              </div>
 
-                <div>
-                  <label className="mb-1 block text-sm font-medium text-gray-700">
-                    Telepon Penerima <span className="text-red-600">*</span>
-                  </label>
-                  <input
-                    type="tel"
-                    value={recipientPhone}
-                    onChange={(e) => setRecipientPhone(e.target.value)}
-                    placeholder="081234567890"
-                    className="w-full rounded-lg border px-3 py-2"
-                  />
-                </div>
+              <div>
+                <label className="mb-1 block text-sm font-medium text-gray-700">
+                  Telepon Penerima <span className="text-red-600">*</span>
+                </label>
+                <input
+                  type="tel"
+                  value={recipientPhone}
+                  onChange={(e) => setRecipientPhone(e.target.value)}
+                  placeholder="081234567890"
+                  className="w-full rounded-lg border px-3 py-2"
+                />
+              </div>
 
               <div className="mt-6 flex items-center justify-between gap-4">
                 <p className="text-sm text-secondary-600">
-                  Jika sudah pernah menyimpan alamat di akun, alamat akan terpilih
-                  otomatis.
+                  Jika sudah pernah menyimpan alamat di akun, alamat akan
+                  terpilih otomatis.
                 </p>
                 <button
                   type="button"
@@ -1010,7 +1049,9 @@ export default function OrderInfoPage() {
                 <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 px-4 py-6">
                   <div className="w-full max-w-lg rounded-3xl bg-white p-6 shadow-xl">
                     <div className="flex items-center justify-between">
-                      <h3 className="text-lg font-semibold">Lokasi Pengiriman</h3>
+                      <h3 className="text-lg font-semibold">
+                        Lokasi Pengiriman
+                      </h3>
                       <button
                         type="button"
                         onClick={() => {
@@ -1122,7 +1163,7 @@ export default function OrderInfoPage() {
                   Pesanan akan diantar oleh KSM dengan gratis ongkir.
                 </p>
               </div>
-              </div>
+            </div>
           </div>
         </div>
 
@@ -1226,7 +1267,9 @@ export default function OrderInfoPage() {
 
             <button
               onClick={handleSaveAndContinue}
-              disabled={orderItems.length === 0 || isOrderLoading || isSubmitting}
+              disabled={
+                orderItems.length === 0 || isOrderLoading || isSubmitting
+              }
               className="mt-5 w-full rounded-lg bg-primary-500 py-3 text-sm font-bold text-white transition hover:bg-primary-600 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {isSubmitting ? "Menyimpan..." : "Lanjut Ringkasan"}

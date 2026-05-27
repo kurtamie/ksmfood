@@ -123,7 +123,7 @@ export default function OrderSummaryPage() {
               orderDocumentId:
                 typeof documentId === "string"
                   ? documentId
-                  : summary?.documentId ?? undefined,
+                  : (summary?.documentId ?? undefined),
               payment_status: "paid",
             }),
           });
@@ -198,7 +198,9 @@ export default function OrderSummaryPage() {
           try {
             // Update invoice yang sudah ada menjadi "paid"
             await markInvoicePaid(result);
-            setPaymentMessage("Pembayaran berhasil. Status invoice telah diperbarui.");
+            setPaymentMessage(
+              "Pembayaran berhasil. Status invoice telah diperbarui.",
+            );
             router.push("/pesanan");
           } catch (err) {
             // Pembayaran tetap sukses meski update invoice gagal
@@ -296,8 +298,7 @@ export default function OrderSummaryPage() {
           Ringkasan Pesanan
         </h1>
         <p className="text-center text-sm text-secondary-600 mb-6">
-          Order ID:{" "}
-          {documentId ?? summary.documentId ?? summary.orderId ?? "-"}
+          Order ID: {documentId ?? summary.documentId ?? summary.orderId ?? "-"}
         </p>
 
         {paymentMessage ? (

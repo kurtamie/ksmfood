@@ -10,7 +10,9 @@ function getStrapiBaseUrl(): string {
 }
 
 function getOrderDetailEndpoint(): string {
-  return process.env.NEXT_PUBLIC_STRAPI_ORDER_DETAIL_ENDPOINT ?? "order-details";
+  return (
+    process.env.NEXT_PUBLIC_STRAPI_ORDER_DETAIL_ENDPOINT ?? "order-details"
+  );
 }
 
 function buildHeaders(token: string | null): HeadersInit {
@@ -34,7 +36,10 @@ async function toNextResponse(res: Response) {
       { status: res.status },
     );
   }
-  return NextResponse.json({ success: true, data: body }, { status: res.status });
+  return NextResponse.json(
+    { success: true, data: body },
+    { status: res.status },
+  );
 }
 
 export async function GET(request: NextRequest) {

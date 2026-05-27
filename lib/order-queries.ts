@@ -81,10 +81,7 @@ export async function fetchOrdersByCustomerId(
 
   let body: unknown;
   try {
-    body = await fetchStrapiJson(
-      `${baseUrl}/api/orders?${search}`,
-      authToken,
-    );
+    body = await fetchStrapiJson(`${baseUrl}/api/orders?${search}`, authToken);
   } catch {
     const fallback = new URLSearchParams({
       "filters[customer_id][id][$eq]": String(customerId),

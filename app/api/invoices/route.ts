@@ -47,7 +47,10 @@ async function toNextResponse(res: Response) {
       { status: res.status },
     );
   }
-  return NextResponse.json({ success: true, data: body }, { status: res.status });
+  return NextResponse.json(
+    { success: true, data: body },
+    { status: res.status },
+  );
 }
 
 function getInvoiceDocumentId(row: unknown): string | null {
@@ -181,14 +184,19 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const token = await getToken();
-    const payload = await request.json() as {
+    const payload = (await request.json()) as {
       orderId?: number;
       orderDocumentId?: string;
       paymentStatus?: InvoiceStatus;
       invoiceNo?: string;
     };
 
-    const { orderId, orderDocumentId, paymentStatus = "unpaid", invoiceNo } = payload;
+    const {
+      orderId,
+      orderDocumentId,
+      paymentStatus = "unpaid",
+      invoiceNo,
+    } = payload;
 
     const data: Record<string, unknown> = {
       payment_status: paymentStatus,
@@ -241,7 +249,7 @@ export async function POST(request: NextRequest) {
 export async function PATCH(request: NextRequest) {
   try {
     const token = await getToken();
-    const payload = await request.json() as {
+    const payload = (await request.json()) as {
       invoiceDocumentId?: string;
       invoiceId?: number;
       orderId?: number;
@@ -284,8 +292,7 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json(
         {
           success: false,
-          error:
-            "Invoice documentId tidak ditemukan untuk update invoice.",
+          error: "Invoice documentId tidak ditemukan untuk update invoice.",
         },
         { status: 400 },
       );

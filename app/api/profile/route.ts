@@ -73,12 +73,22 @@ export async function POST(req: NextRequest) {
     if (hasField(body, "phone")) {
       const phone = normalizeText(body.phone);
       addIfChanged(userFields, "phone_no", phone, currentUser.phone_no);
-      addIfChanged(customerFields, "phone_no", phone, currentUser.customer?.phone_no);
+      addIfChanged(
+        customerFields,
+        "phone_no",
+        phone,
+        currentUser.customer?.phone_no,
+      );
     }
 
     if (hasField(body, "address")) {
       const address = normalizeText(body.address);
-      addIfChanged(customerFields, "address", address, currentUser.customer?.address);
+      addIfChanged(
+        customerFields,
+        "address",
+        address,
+        currentUser.customer?.address,
+      );
     }
 
     if (hasField(body, "latitude")) {

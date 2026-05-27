@@ -521,7 +521,8 @@ export default function AccountPage() {
                     />
                   </div>
                   <p className="mt-2 text-xs text-secondary-500">
-                    Klik peta untuk menandai lokasi dan simpan latitude/longitude.
+                    Klik peta untuk menandai lokasi dan simpan
+                    latitude/longitude.
                   </p>
                   {latitude !== null && longitude !== null && (
                     <p className="mt-2 text-sm text-secondary-700">
