@@ -18,9 +18,17 @@ export function getLeaveTime(arriveTime: string) {
 
 export function parseCartItemToOrderMenu(item: CartItem): CreateOrderMenuInput {
   const riceAddon = item.addOns.find((a) => /^nasi_/i.test(a.value));
-  const mainDishAddons = item.addOns.filter(
-    (a) => /^lauk_[0-9]+_/i.test(a.value) && !/^lauk_tambahan_/i.test(a.value),
-  );
+  const mainDishAddons = item.addOns
+    .map((addOn) => {
+      const match = addOn.value.match(/^lauk_([0-9]+)_/i);
+      if (!match) return null;
+      return {
+        index: Number(match[1]),
+        label: addOn.label.replace(/^Lauk\s+[0-9]+:\s*/i, ""),
+      };
+    })
+    .filter((addOn): addOn is { index: number; label: string } => addOn != null)
+    .sort((a, b) => a.index - b.index);
   const additionalAddon = item.addOns.find((a) =>
     /^lauk_tambahan_/i.test(a.value),
   );
@@ -33,10 +41,9 @@ export function parseCartItemToOrderMenu(item: CartItem): CreateOrderMenuInput {
 
   return {
     rice: riceAddon?.label ?? undefined,
-    main_dish:
-      mainDishAddons.length > 0
-        ? mainDishAddons.map((a) => a.label).join(", ")
-        : undefined,
+    main_dish: mainDishAddons[0]?.label ?? undefined,
+    main_dish2: mainDishAddons[1]?.label ?? undefined,
+    main_dish3: mainDishAddons[2]?.label ?? undefined,
     additional_dish: additionalAddon?.label ?? undefined,
     vegetable: vegetableAddon?.label ?? undefined,
     sauce: sauceAddon?.label ?? undefined,

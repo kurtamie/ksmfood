@@ -66,6 +66,8 @@ function buildMenuLabels(menu: OrderMenuRow): string {
   return [
     menu.rice,
     menu.main_dish,
+    menu.main_dish2,
+    menu.main_dish3,
     menu.additional_dish,
     menu.vegetable,
     menu.sauce,

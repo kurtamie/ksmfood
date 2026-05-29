@@ -17,6 +17,8 @@ export type CreateOrderMenuInput = Pick<
   OrderMenu,
   | "rice"
   | "main_dish"
+  | "main_dish2"
+  | "main_dish3"
   | "additional_dish"
   | "vegetable"
   | "sauce"

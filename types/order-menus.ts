@@ -5,6 +5,8 @@ export interface OrderMenu extends BaseEntity {
   order_id?: Order[];
   rice?: string | null;
   main_dish?: string | null;
+  main_dish2?: string | null;
+  main_dish3?: string | null;
   additional_dish?: string | null;
   vegetable?: string | null;
   sauce?: string | null;

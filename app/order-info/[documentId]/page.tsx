@@ -50,6 +50,8 @@ type OrderMenuRow = {
   documentId?: string;
   rice?: string | null;
   main_dish?: string | null;
+  main_dish2?: string | null;
+  main_dish3?: string | null;
   additional_dish?: string | null;
   vegetable?: string | null;
   sauce?: string | null;
@@ -132,6 +134,8 @@ function buildMenuLabels(menu: OrderMenuRow): string {
   return [
     menu.rice,
     menu.main_dish,
+    menu.main_dish2,
+    menu.main_dish3,
     menu.additional_dish,
     menu.vegetable,
     menu.sauce,
