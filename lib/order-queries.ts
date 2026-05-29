@@ -160,6 +160,16 @@ export async function fetchOrderByDocumentId(
   const byDocumentSearch = new URLSearchParams({
     "filters[documentId][$eq]": documentId,
     "pagination[pageSize]": "1",
+    "fields[0]": "step",          // ← tambah ini
+    "fields[1]": "order_no",      // ← tambah ini
+    "fields[2]": "createdAt",
+    "fields[3]": "delivery_date",
+    "fields[4]": "delivery_address",
+    "fields[5]": "recipient_name",
+    "fields[6]": "recipient_phone_no",
+    "fields[7]": "delivery_note",
+    "fields[8]": "arrive_time",
+    "fields[9]": "created_date",
     "populate[invoices][fields][0]": "invoice_no",
     "populate[invoices][fields][1]": "payment_status",
     "populate[invoices][fields][2]": "invoice_date",

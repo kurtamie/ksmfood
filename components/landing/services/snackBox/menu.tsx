@@ -1,44 +1,53 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
-import { createWhatsappLink } from "@/const/whatsapp";
 import { useTranslations } from "next-intl";
 import { LuAward, LuCheck, LuPackageOpen } from "react-icons/lu";
+import { useState } from "react";
+import { SnackOrderModal, type SnackPackageCard } from "./OrderModal";
 
-const packageCards = [
+const packageCards: SnackPackageCard[] = [
   {
-    id: 1,
+    id: "1",
     title: "Paket A",
-    badge: "Paling Populer",
-    dish: ["2 Kue", "Air Mineral Gelas"],
+    packageType: "A",
+    items: ["2 Kue", "Air Mineral Gelas"],
+    badge: true,
     price: "Rp 13.000/Kotak",
   },
   {
-    id: 2,
+    id: "2",
     title: "Paket B",
-    dish: ["2 Kue", "Teh Kotak"],
+    packageType: "B",
+    items: ["2 Kue", "Teh Kotak"],
     price: "Rp 16.000/Kotak",
   },
   {
-    id: 3,
+    id: "3",
     title: "Paket C",
-    dish: ["3 Kue", "Air Mineral Gelas"],
+    packageType: "C",
+    items: ["3 Kue", "Air Mineral Gelas"],
     price: "Rp 17.000/Kotak",
   },
   {
-    id: 4,
+    id: "4",
     title: "Paket D",
-    dish: ["3 Kue", "Teh Kotak"],
+    packageType: "D",
+    items: ["3 Kue", "Teh Kotak"],
     price: "Rp 19.000/Kotak",
   },
   {
-    id: 5,
+    id: "5",
     title: "Paket E",
-    dish: ["4 Kue", "Air Mineral Gelas"],
+    packageType: "E",
+    items: ["4 Kue", "Air Mineral Gelas"],
     price: "Rp 20.000/Kotak",
   },
   {
-    id: 6,
+    id: "6",
     title: "Paket F",
-    dish: ["4 Kue", "Teh Kotak"],
+    packageType: "F",
+    items: ["4 Kue", "Teh Kotak"],
     price: "Rp 23.000/Kotak",
   },
 ];
@@ -46,9 +55,11 @@ const packageCards = [
 function Menu() {
   const t = useTranslations("snackBoxMenu");
   const serviceName = "Snack Kotak";
+  const [selectedCard, setSelectedCard] = useState<typeof packageCards[0] | null>(null);
 
   return (
-    <div className="mt-12 grid w-full max-w-6xl grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
+    <>
+      <div className="mt-12 grid w-full max-w-6xl grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
       {packageCards.map((card, index) => {
         const isLastOddItem =
           packageCards.length % 2 !== 0 && index === packageCards.length - 1;
@@ -81,12 +92,12 @@ function Menu() {
             </div>
             <div className="mt-5 flex flex-1 flex-col">
               <div className="grow space-y-2">
-                {card.dish.map((dish) => (
-                  <div key={dish} className="flex items-center gap-2">
-                    <LuCheck className="shrink-0 text-base text-red-800" />
-                    <p className="text-sm text-gray-700">{dish}</p>
-                  </div>
-                ))}
+              {card.items.map((item) => (
+                <div key={item} className="flex items-center gap-2">
+                  <LuCheck className="shrink-0 text-base text-red-800" />
+                  <p className="text-sm text-gray-700">{item}</p>
+                </div>
+              ))}
               </div>
 
               <p className="mt-5 text-center text-lg font-bold text-red-800">
@@ -94,24 +105,25 @@ function Menu() {
               </p>
 
               <Button
-                asChild
+                onClick={() => setSelectedCard(card)}
                 className="mt-3 h-11 w-full bg-red-800 text-white hover:bg-red-900"
               >
-                <a
-                  href={createWhatsappLink(
-                    `Halo, saya ingin memesan ${serviceName} dengan ${card.title}.`,
-                  )}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {t("orderNow")}
-                </a>
+                {t("orderNow")}
               </Button>
             </div>
           </article>
         );
       })}
-    </div>
+      </div>
+
+      {selectedCard && (
+        <SnackOrderModal
+          card={selectedCard}
+          serviceName={serviceName}
+          onClose={() => setSelectedCard(null)}
+        />
+      )}
+    </>
   );
 }
 

@@ -9,6 +9,7 @@ import type { PaymentStatusLabel } from "@/lib/order-status";
 import type { OrderDetailView } from "@/lib/order-queries";
 import { parseAmount } from "@/lib/order-totals";
 import type { OrderStep } from "@/types/orders";
+import { OrderStepper } from "@/components/OrderStepper";
 
 const SNAP_SCRIPT_URL =
   process.env.NEXT_PUBLIC_MIDTRANS_IS_PRODUCTION === "true"
@@ -189,11 +190,6 @@ export default function OrderDetailPage() {
     };
   }, [documentId]);
 
-  /**
-   * Lanjutkan pembayaran — buka kembali Midtrans Snap.
-   * Menggunakan order.id (numeric) sebagai orderId untuk snap-token,
-   * dan invoice.documentId / invoice.id untuk update status setelah bayar.
-   */
   const handleResumePayment = useCallback(async () => {
     setPayError(null);
     setPaymentMessage(null);
@@ -388,7 +384,7 @@ export default function OrderDetailPage() {
           {/* Baris status + tombol lanjutkan pembayaran */}
           <div className="flex flex-col gap-3 border-b border-gray-100 px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-3">
-              <span className="text-sm text-secondary-500">Status</span>
+              <span className="text-sm text-secondary-500">Status Pembayaran</span>
               <span
                 className={`rounded-full px-3 py-1 text-xs font-semibold ${
                   paid
@@ -400,7 +396,7 @@ export default function OrderDetailPage() {
               </span>
             </div>
 
-            {!paid ? (
+          {!paid ? (
               <button
                 type="button"
                 onClick={() => void handleResumePayment()}
@@ -411,6 +407,16 @@ export default function OrderDetailPage() {
               </button>
             ) : null}
           </div>
+
+          {/* Status pesanan — hanya muncul kalau sudah lunas dan ada step */}
+          {paid && order.step ? (
+            <div className="border-b border-gray-100 px-6 py-5">
+              <p className="mb-4 text-sm font-semibold text-tertiary-900">
+                Status Pesanan
+              </p>
+              <OrderStepper currentStep={order.step} />
+            </div>
+          ) : null}
 
           {/* Tanggal pemesanan & no. invoice */}
           <div className="grid grid-cols-1 divide-y divide-gray-100 border-b border-gray-100 sm:grid-cols-2 sm:divide-x sm:divide-y-0">
@@ -438,6 +444,30 @@ export default function OrderDetailPage() {
               Informasi Pengiriman
             </p>
             <div className="space-y-2 text-sm">
+               {/* Nama penerima */}
+              {order.recipientName ? (
+                <div className="flex gap-4">
+                  <span className="w-36 shrink-0 text-secondary-500">
+                    Nama Penerima
+                  </span>
+                  <span className="text-tertiary-900">
+                    : {order.recipientName}
+                  </span>
+                </div>
+              ) : null}
+
+              {/* No. telepon penerima — sudah ada, pastikan tetap ada */}
+              {order.recipientPhone ? (
+                <div className="flex gap-4">
+                  <span className="w-36 shrink-0 text-secondary-500">
+                    No. Telepon
+                  </span>
+                  <span className="text-tertiary-900">
+                    : {order.recipientPhone}
+                  </span>
+                </div>
+              ) : null}
+
               <div className="flex gap-4">
                 <span className="w-36 shrink-0 text-secondary-500">
                   Metode Pengiriman
@@ -555,13 +585,13 @@ export default function OrderDetailPage() {
 
               {/* Status pengiriman + lacak */}
               <div className="flex flex-col gap-3 sm:items-end">
-                {orderStepLabel ? (
+                {/* {orderStepLabel ? (
                   <div className="rounded-xl border border-primary-200 bg-primary-50 px-4 py-3 text-sm">
                     <p className="font-semibold text-primary-700">
                       {orderStepLabel}
                     </p>
                   </div>
-                ) : null}
+                ) : null} */}
 
               </div>
             </div>

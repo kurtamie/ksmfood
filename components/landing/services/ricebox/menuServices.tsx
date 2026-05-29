@@ -239,7 +239,7 @@ function MenuServices() {
       <h2 className="mt-4 text-lg font-bold uppercase sm:text-xl">
         {t("sideTitle")}
       </h2>
-      <div className="grid w-full max-w-8xl grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">
+      <div className="grid w-full max-w-7xl grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">
         {sideDish.map((card) => {
           return (
             <article

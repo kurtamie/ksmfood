@@ -1,13 +1,16 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
-import { createWhatsappLink } from "@/const/whatsapp";
 import { useTranslations } from "next-intl";
 import { LuAward, LuCheck, LuPackageOpen } from "react-icons/lu";
+import { useState } from "react";
+import { OrderModal, type PackageCard } from "./OrderModal";
 
-const packageCards = [
+const packageCards: PackageCard[] = [
   {
-    id: 1,
+    id: "1",
     title: "Paket A",
-    badge: "Paling Populer",
+    badge: true,
     dish: [
       "Nasi Putih",
       "1 Lauk Utama",
@@ -19,10 +22,22 @@ const packageCards = [
       "Puding",
       "Air Mineral 330ml",
     ],
+    items: [
+      "Nasi Putih",
+      "1 Lauk Utama",
+      "Lauk Tambahan",
+      "Sayur",
+      "Sambal",
+      "Kerupuk",
+      "Buah",
+      "Puding",
+      "Air Mineral 330ml",
+    ],
+    packageType: "A",
     price: "Rp 58.000/Kotak",
   },
   {
-    id: 2,
+    id: "2",
     title: "Paket B",
     dish: [
       "Nasi Putih",
@@ -35,6 +50,18 @@ const packageCards = [
       "Puding",
       "Air Mineral 330ml",
     ],
+    items: [
+      "Nasi Putih",
+      "2 Lauk Utama",
+      "Lauk Tambahan",
+      "Sayur",
+      "Sambal",
+      "Kerupuk",
+      "Buah",
+      "Puding",
+      "Air Mineral 330ml",
+    ],
+    packageType: "B",
     price: "Rp 66.000/Kotak",
   },
 ];
@@ -42,9 +69,11 @@ const packageCards = [
 function Menu() {
   const t = useTranslations("bentoMenu");
   const serviceName = "Bento";
+  const [selectedCard, setSelectedCard] = useState<typeof packageCards[0] | null>(null);
 
   return (
-    <div className="mt-12 grid w-full max-w-3xl grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-2">
+    <>
+      <div className="mt-12 grid w-full max-w-3xl grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-2">
       {packageCards.map((card, index) => {
         const isLastOddItem =
           packageCards.length % 2 !== 0 && index === packageCards.length - 1;
@@ -90,24 +119,25 @@ function Menu() {
               </p>
 
               <Button
-                asChild
+                onClick={() => setSelectedCard(card)}
                 className="mt-3 h-11 w-full bg-red-800 text-white hover:bg-red-900"
               >
-                <a
-                  href={createWhatsappLink(
-                    `Halo, saya ingin memesan ${serviceName} dengan ${card.title}.`,
-                  )}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {t("orderNow")}
-                </a>
+                {t("orderNow")}
               </Button>
             </div>
           </article>
         );
       })}
-    </div>
+      </div>
+
+      {selectedCard && (
+        <OrderModal
+          card={selectedCard}
+          serviceName={serviceName}
+          onClose={() => setSelectedCard(null)}
+        />
+      )}
+    </>
   );
 }
 

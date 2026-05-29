@@ -1,13 +1,18 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
-import { createWhatsappLink } from "@/const/whatsapp";
 import { useTranslations } from "next-intl";
 import { LuAward, LuCheck, LuPackageOpen } from "react-icons/lu";
+import { useState } from "react";
+import { TumpengOrderModal, type TumpengPackageCard } from "./OrderModal";
 
-const packageCards = [
+const packageCards: TumpengPackageCard[] = [
   {
-    id: 1,
+    id: "1",
     title: "Paket A",
-    dish: [
+    packageType: "A",
+    price: "Rp 700.000",
+    items: [
       "Nasi Kuning 30 porsi",
       "Ayam Bakar 10 porsi",
       "Empal Daging 10 potong",
@@ -16,12 +21,13 @@ const packageCards = [
       "Perkedel Kentang 30 porsi",
       "Urap Sayuran 30 porsi",
     ],
-    price: "Rp 700.000",
   },
   {
-    id: 2,
+    id: "2",
     title: "Paket B",
-    dish: [
+    packageType: "B",
+    price: "Rp 800.000",
+    items: [
       "Nasi Kuning 30 porsi",
       "Ayam Bakar 15 porsi",
       "Empal Daging 10 potong",
@@ -31,12 +37,13 @@ const packageCards = [
       "Perkedel Kentang 30 porsi",
       "Urap Sayuran 30 porsi",
     ],
-    price: "Rp 800.000",
   },
   {
-    id: 3,
+    id: "3",
     title: "Paket C",
-    dish: [
+    packageType: "C",
+    price: "Rp 900.000",
+    items: [
       "Nasi Kuning 30 porsi",
       "Ayam Bakar 30 porsi",
       "Empal Daging 30 potong",
@@ -46,13 +53,14 @@ const packageCards = [
       "Perkedel Kentang 30 porsi",
       "Urap Sayuran 30 porsi",
     ],
-    price: "Rp 900.000",
   },
   {
-    id: 4,
+    id: "4",
     title: "Paket D",
-    badge: "Paling Populer",
-    dish: [
+    packageType: "D",
+    price: "Rp 1.000.000",
+    badge: true,
+    items: [
       "Nasi Kuning 30 porsi",
       "Ayam Bakar 30 porsi",
       "Empal Daging 30 potong",
@@ -63,16 +71,17 @@ const packageCards = [
       "Perkedel Kentang 30 porsi",
       "Urap Sayuran 30 porsi",
     ],
-    price: "Rp 1.000.000",
   },
 ];
 
 function Menu() {
   const t = useTranslations("tumpengMenu");
   const serviceName = "Tumpeng";
+  const [selectedCard, setSelectedCard] = useState<typeof packageCards[0] | null>(null);
 
   return (
-    <div className="mt-12 grid w-full max-w-7xl grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-2">
+    <>
+      <div className="mt-12 grid w-full max-w-7xl grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-2">
       {packageCards.map((card, index) => {
         const isLastOddItem =
           packageCards.length % 2 !== 0 && index === packageCards.length - 1;
@@ -105,10 +114,10 @@ function Menu() {
             </div>
             <div className="mt-5 flex flex-1 flex-col">
               <div className="grow space-y-2">
-                {card.dish.map((dish) => (
-                  <div key={dish} className="flex items-center gap-2">
+                {card.items.map((items) => (
+                  <div key={items} className="flex items-center gap-2">
                     <LuCheck className="shrink-0 text-base text-red-800" />
-                    <p className="text-sm text-gray-700">{dish}</p>
+                    <p className="text-sm text-gray-700">{items}</p>
                   </div>
                 ))}
               </div>
@@ -118,24 +127,25 @@ function Menu() {
               </p>
 
               <Button
-                asChild
+                onClick={() => setSelectedCard(card)}
                 className="mt-3 h-11 w-full bg-red-800 text-white hover:bg-red-900"
               >
-                <a
-                  href={createWhatsappLink(
-                    `Halo, saya ingin memesan ${serviceName} dengan ${card.title}.`,
-                  )}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {t("orderNow")}
-                </a>
+                {t("orderNow")}
               </Button>
             </div>
           </article>
         );
       })}
-    </div>
+      </div>
+
+      {selectedCard && (
+        <TumpengOrderModal
+          card={selectedCard}
+          serviceName={serviceName}
+          onClose={() => setSelectedCard(null)}
+        />
+      )}
+    </>
   );
 }
 

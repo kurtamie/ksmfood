@@ -245,7 +245,7 @@ export default function MenuServices() {
       <h3 className="mt-14 text-center text-3xl font-bold uppercase tracking-tight text-[#332929]">
         {t("sideTitle")}
       </h3>
-      <div className="mt-10 grid w-full max-w-8xl grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-5">
+      <div className="mt-10 grid w-full max-w-7xl grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-5">
         {companionCards.map((card) => (
           <MenuCard key={card.id} card={card} />
         ))}

@@ -81,6 +81,20 @@ type OrderDisplayItem = {
   detail: OrderDetailRow;
 };
 
+type SessionAddOn = {
+  label: string;
+  value: string;
+  price: number;
+};
+
+type SessionItem = {
+  id: string;
+  name: string;
+  basePrice: number;
+  addOns: SessionAddOn[];
+  quantity: number;
+};
+
 function unwrapEntity<T extends object>(row: unknown): T | null {
   if (!row || typeof row !== "object") return null;
   const record = row as Record<string, unknown>;
@@ -195,6 +209,11 @@ type SavedAddress = {
   longitude?: number;
 };
 
+function normalizeText(value: unknown): string {
+  if (typeof value !== "string") return "";
+  return value.trim();
+}
+
 function parseSavedAddresses(
   raw?: string | null,
   customerLatitude?: string | number | null,
@@ -230,28 +249,42 @@ function parseSavedAddresses(
     const parsed = JSON.parse(raw);
 
     if (Array.isArray(parsed)) {
-      return parsed.map((item) => ({
-        id: item?.id ?? String(Math.random()).slice(2),
-        label: item?.name ?? item?.addressLine ?? item?.address ?? "Alamat",
-        addressName: item?.name ?? item?.addressLine ?? item?.address ?? "",
-        addressLine: item?.addressLine ?? item?.address ?? "",
-        subdistrict: customerSubdistrict ?? "",
-        pinpoint: item?.pinpoint ?? "",
-        recipientName: item?.recipientName ?? "",
-        recipientPhone: item?.recipientPhone ?? "",
-        latitude:
-          typeof item?.latitude === "number"
-            ? item.latitude
-            : item?.latitude
-              ? Number(item.latitude)
-              : undefined,
-        longitude:
-          typeof item?.longitude === "number"
-            ? item.longitude
-            : item?.longitude
-              ? Number(item.longitude)
-              : undefined,
-      }));
+      return parsed.map((item) => {
+        const itemSubdistrict =
+          normalizeText(item?.subdistrict ?? item?.kelurahan ?? customerSubdistrict);
+
+        return {
+          id: item?.id ?? String(Math.random()).slice(2),
+          label:
+            normalizeText(item?.name) ||
+            normalizeText(item?.addressLine) ||
+            normalizeText(item?.address) ||
+            "Alamat",
+          addressName:
+            normalizeText(item?.name) ||
+            normalizeText(item?.addressLine) ||
+            normalizeText(item?.address) ||
+            "",
+          addressLine:
+            normalizeText(item?.addressLine) || normalizeText(item?.address) || "",
+          subdistrict: itemSubdistrict,
+          pinpoint: normalizeText(item?.pinpoint) || pinpoint,
+          recipientName: normalizeText(item?.recipientName),
+          recipientPhone: normalizeText(item?.recipientPhone),
+          latitude:
+            typeof item?.latitude === "number"
+              ? item.latitude
+              : item?.latitude
+                ? Number(item.latitude)
+                : undefined,
+          longitude:
+            typeof item?.longitude === "number"
+              ? item.longitude
+              : item?.longitude
+                ? Number(item.longitude)
+                : undefined,
+        };
+      });
     }
   } catch {
     return [
@@ -260,7 +293,7 @@ function parseSavedAddresses(
         label: raw,
         addressName: raw,
         addressLine: raw,
-        subdistrict: "",
+        subdistrict: normalizeText(customerSubdistrict),
         pinpoint,
         recipientName: "",
         recipientPhone: "",
@@ -277,7 +310,7 @@ function parseSavedAddresses(
         label: raw,
         addressName: raw,
         addressLine: raw,
-        subdistrict: "",
+        subdistrict: normalizeText(customerSubdistrict),
         pinpoint,
         recipientName: "",
         recipientPhone: "",
@@ -322,6 +355,7 @@ export default function OrderInfoPage() {
   const [orderMenus, setOrderMenus] = useState<OrderMenuRow[]>([]);
   const [orderDetails, setOrderDetails] = useState<OrderDetailRow[]>([]);
   const [isOrderLoading, setIsOrderLoading] = useState(true);
+  const [sessionItems, setSessionItems] = useState<SessionItem[]>([]);
 
   const savedAddresses = useMemo(
     () =>
@@ -386,10 +420,39 @@ export default function OrderInfoPage() {
     { label: "Lubuk Baja Baru", value: "Lubuk Baja Baru, Batam" },
   ];
 
-  const orderItems = useMemo(
-    () => toOrderDisplayItems(orderMenus, orderDetails),
-    [orderDetails, orderMenus],
-  );
+const orderItems = useMemo(() => {
+  if (orderDetails.length === 0 && sessionItems.length === 0) return [];
+
+  if (orderDetails.length > 0) {
+    const apiItems = toOrderDisplayItems(orderMenus, orderDetails);
+    return apiItems.map((item, index) => {
+      const session = sessionItems[index];
+      const addOns = session?.addOns ?? [];
+      const unitPrice = session?.basePrice ?? item.unitPrice;
+      return {
+        ...item,
+        name: session?.name ?? item.name,
+        addOns,
+        addOnLabels: addOns.map((a: SessionAddOn) => a.label).join(", "),
+        unitPrice,
+        total: unitPrice * item.quantity,
+      };
+    });
+  }
+
+  return sessionItems.map((item) => ({
+    id: item.id,
+    name: item.name,
+    addOns: item.addOns,
+    addOnLabels: item.addOns.map((a) => a.label).join(", "),
+    quantity: item.quantity,
+    unitPrice: item.basePrice,
+    total: item.basePrice * item.quantity,
+    menu: {} as OrderMenuRow,
+    detail: {} as OrderDetailRow,
+  }));
+}, [orderDetails, orderMenus, sessionItems]);
+
   const itemCount = useMemo(
     () => orderItems.reduce((sum, item) => sum + item.quantity, 0),
     [orderItems],
@@ -504,6 +567,19 @@ export default function OrderInfoPage() {
       cancelled = true;
     };
   }, [documentId]);
+
+  useEffect(() => {
+  try {
+    const raw = window.sessionStorage.getItem("ksm_order_summary");
+    if (!raw) return;
+    const parsed = JSON.parse(raw);
+    if (Array.isArray(parsed?.items)) {
+      setSessionItems(parsed.items);
+    }
+  } catch {
+    // ignore
+  }
+}, []);
 
   useEffect(() => {
     if (
@@ -856,19 +932,41 @@ async function handleSaveAndContinue() {
 
   function updateOrderQuantity(index: number, quantity: number) {
     if (quantity <= 0) return;
-
+  // Update via sessionItems kalau ada
+  if (sessionItems.length > index) {
+    const session = sessionItems[index];
+    const unitPrice = session.basePrice;
+    setSessionItems((current) =>
+      current.map((item, i) =>
+        i === index ? { ...item, quantity } : item,
+      ),
+    );
+    // Sync ke orderDetails juga kalau ada
     setOrderDetails((current) =>
-      current.map((detail, detailIndex) => {
-        if (detailIndex !== index) return detail;
-
-        const unitPrice = parseAmount(detail.selling_price);
-        const total = quantity * unitPrice;
-
+      current.map((detail, i) => {
+        if (i !== index) return detail;
         return {
           ...detail,
           qty: String(quantity),
-          amount: String(total),
-          total_amount: String(total),
+          amount: String(quantity * unitPrice),
+          total_amount: String(quantity * unitPrice),
+        };
+      }),
+    );
+    return;
+  }
+
+  // Fallback pakai selling_price dari API
+  setOrderDetails((current) =>
+    current.map((detail, detailIndex) => {
+      if (detailIndex !== index) return detail;
+      const unitPrice = parseAmount(detail.selling_price);
+      const total = quantity * unitPrice;
+      return {
+        ...detail,
+        qty: String(quantity),
+        amount: String(total),
+        total_amount: String(total),
         };
       }),
     );
@@ -1007,6 +1105,10 @@ async function handleSaveAndContinue() {
                   className="w-full rounded-lg border px-3 py-2"
                 >
                   <option value="">Pilih Kelurahan</option>
+                  {subdistrict &&
+                    !kelurahanOptions.some((option) => option.value === subdistrict) && (
+                      <option value={subdistrict}>{subdistrict}</option>
+                    )}
                   {kelurahanOptions.map((option) => (
                     <option key={option.value} value={option.value}>
                       {option.label}

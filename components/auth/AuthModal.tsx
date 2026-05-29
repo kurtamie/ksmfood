@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 import {
   loginAction,
   resetPasswordWithPhoneAction,
@@ -51,6 +52,9 @@ export default function AuthModal({
   const [username, setusername] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   const [fieldErrors, setFieldErrors] = useState<AuthFieldErrors>({});
@@ -413,14 +417,23 @@ export default function AuthModal({
                 <label className="text-sm font-semibold text-tertiary-800">
                   Password
                 </label>
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && handleLogin()}
-                  placeholder="Masukkan password"
-                  className="rounded-xl border border-secondary-400 px-3 py-2.5 text-sm outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-all text-tertiary-900 placeholder:text-secondary-500"
-                />
+                <div className="relative">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && handleLogin()}
+                    placeholder="Masukkan password"
+                    className="w-full rounded-xl border border-secondary-400 px-3 py-2.5 text-sm outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-all text-tertiary-900 placeholder:text-secondary-500"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((current) => !current)}
+                    className="absolute inset-y-0 right-3 flex items-center text-secondary-500 hover:text-tertiary-900"
+                  >
+                    {showPassword ? <FaEye /> : <FaEyeSlash />}
+                  </button>
+                </div>
                 {renderFieldErrors(fieldErrors.password)}
               </div>
 
@@ -647,13 +660,22 @@ export default function AuthModal({
                 <label className="text-sm font-semibold text-tertiary-800">
                   Kata Sandi Baru
                 </label>
-                <input
-                  type="password"
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  placeholder="Minimal 8 karakter"
-                  className="rounded-xl border border-secondary-400 px-3 py-2.5 text-sm outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-all text-tertiary-900 placeholder:text-secondary-500"
-                />
+                <div className="relative">
+                  <input
+                    type={showNewPassword ? "text" : "password"}
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    placeholder="Minimal 8 karakter"
+                    className="w-full rounded-xl border border-secondary-400 px-3 py-2.5 text-sm outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-all text-tertiary-900 placeholder:text-secondary-500"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowNewPassword((current) => !current)}
+                    className="absolute inset-y-0 right-3 flex items-center text-secondary-500 hover:text-tertiary-900"
+                  >
+                    {showNewPassword ? <FaEye /> : <FaEyeSlash />}
+                  </button>
+                </div>
                 {renderFieldErrors(fieldErrors.password)}
               </div>
 
@@ -661,14 +683,23 @@ export default function AuthModal({
                 <label className="text-sm font-semibold text-tertiary-800">
                   Konfirmasi Kata Sandi Baru
                 </label>
-                <input
-                  type="password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && handleResetPassword()}
-                  placeholder="Ulangi kata sandi baru"
-                  className="rounded-xl border border-secondary-400 px-3 py-2.5 text-sm outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-all text-tertiary-900 placeholder:text-secondary-500"
-                />
+                <div className="relative">
+                  <input
+                    type={showConfirmPassword ? "text" : "password"}
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && handleResetPassword()}
+                    placeholder="Ulangi kata sandi baru"
+                    className="w-full rounded-xl border border-secondary-400 px-3 py-2.5 text-sm outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-all text-tertiary-900 placeholder:text-secondary-500"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword((current) => !current)}
+                    className="absolute inset-y-0 right-3 flex items-center text-secondary-500 hover:text-tertiary-900"
+                  >
+                    {showConfirmPassword ? <FaEye /> : <FaEyeSlash />}
+                  </button>
+                </div>
                 {renderFieldErrors(fieldErrors.password_confirmation)}
               </div>
 
@@ -702,14 +733,23 @@ export default function AuthModal({
                 <label className="text-sm font-semibold text-tertiary-800">
                   Buat Password
                 </label>
-                <input
-                  type="password"
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && handleRegister()}
-                  placeholder="Minimal 8 karakter"
-                  className="rounded-xl border border-secondary-400 px-3 py-2.5 text-sm outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-all text-tertiary-900 placeholder:text-secondary-500"
-                />
+                <div className="relative">
+                  <input
+                    type={showNewPassword ? "text" : "password"}
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && handleRegister()}
+                    placeholder="Minimal 8 karakter"
+                    className="w-full rounded-xl border border-secondary-400 px-3 py-2.5 text-sm outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-all text-tertiary-900 placeholder:text-secondary-500"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowNewPassword((current) => !current)}
+                    className="absolute inset-y-0 right-3 flex items-center text-secondary-500 hover:text-tertiary-900"
+                  >
+                    {showNewPassword ? <FaEye /> : <FaEyeSlash />}
+                  </button>
+                </div>
                 {renderFieldErrors(fieldErrors.password)}
               </div>
 

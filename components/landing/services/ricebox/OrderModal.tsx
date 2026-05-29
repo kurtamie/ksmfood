@@ -50,28 +50,43 @@ const nasiOptions = [
 ];
 const laukUtamaGroups = {
   ayam: [
-    "Ayam Goreng Kalasan",
-    "Ayam Bakar Kecap",
-    "Ayam Rendang",
-    "Ayam Kremes",
+  "Ayam Goreng Kalasan",
+  "Ayam Rendang",
+  "Ayam Gulai Kare",
+  "Ayam Goreng Tepung",
+  "Ayam Goreng Padang",
+  "Ayam Bakar Kecap",
+  "Ayam Balado",
+  "Opor Ayam",
+  "Ayam Kremes",
+  "Ayam Goreng Pletok",
   ],
   ikan: [
-    "Ikan Balado",
-    "Ikan Bakar Kecap",
-    "Ikan Rica-rica",
-    "Ikan Asam Pedas",
+  "Ikan Rica-rica",
+  "Ikan Fillet Asam Manis",
+  "Ikan Balado",
+  "Ikan Bakar Kecap",
+  "Ikan Asam Pedas",
+  "Ikan Bandeng Presto",
+  "Ikan Gulai Kuning",
+  "Gulai Tongkol",
+  "Pepes Ikan",
   ],
   daging: [
-    "Rendang Daging",
-    "Daging Semur",
-    "Daging Bumbu Bali",
-    "Krensengan Daging",
+  "Dendeng Balado",
+  "Daging Sapi Lada Hitam",
+  "Rendang Daging",
+  "Daging Bumbu Bali",
+  "Gulai Daging Cincang",
+  "Daging Semur",
+  "Krengsengan Daging",
   ],
   seafood: [
-    "Udang Goreng Tepung",
-    "Udang Masak Cabe",
-    "Sotong Goreng Tepung",
-    "Sotong Pedas",
+  "Sotong Goreng Tepung",
+  "Udang Goreng Tepung",
+  "Sotong Pedas",
+  "Udang Masak Cabe",
+  "Sotong Gulai",
   ],
 };
 const sayurOptions = [
@@ -87,6 +102,9 @@ const sayurOptions = [
   "Cah Sawi Putih",
   "Capcay (+2.000)",
   "Sayur Asem (+2.000)",
+  "Tumis Kailan Muda (+2.000)",
+  "Tumis Bunga Kol (+2.000)",
+  "Tumis Sawi Minyak (+2.000)",
 ];
 const sambalOptions = [
   "Sambal Ijo",
@@ -129,22 +147,14 @@ export function OrderModal({ card, serviceName, onClose }: OrderModalProps) {
   const minumanValue = isPlus ? "Air Mineral 330ml" : "Air Mineral Gelas";
 
   const allLaukTambahanOptions = [
-    "Ayam Goreng Kalasan",
-    "Ayam Bakar Kecap",
-    "Ayam Rendang",
-    "Ayam Kremes",
-    "Ikan Balado",
-    "Ikan Bakar Kecap",
-    "Ikan Rica-rica",
-    "Ikan Asam Pedas",
-    "Rendang Daging",
-    "Daging Semur",
-    "Daging Bumbu Bali",
-    "Krensengan Daging",
-    "Udang Goreng Tepung",
-    "Udang Masak Cabe",
-    "Sotong Goreng Tepung",
-    "Sotong Pedas",
+  "Perkedel Kentang",
+  "Tempe/Tahu Goreng",
+  "Perkedel Tahu",
+  "Bakwan Jagung",
+  "Serut Kentang",
+  "Sambal Goreng Kentang Hati",
+  "Orak Arik Tahu Tempe",
+  "Tempe Mendoan",
   ];
 
   const [nasi, setNasi] = useState("");
@@ -165,7 +175,9 @@ export function OrderModal({ card, serviceName, onClose }: OrderModalProps) {
         );
 
   const priceNumber = parseInt(card.price.replace(/[^0-9]/g, ""), 10);
-  const subtotal = priceNumber * jumlah;
+  const nasiAddon = nasi.includes("+2.000") ? 2000 : 0;
+  const sayurAddon = sayur.includes("+2.000") ? 2000 : 0;
+  const subtotal = (priceNumber + nasiAddon + sayurAddon) * jumlah;
 
   const getPackageName = (title: string, subTitle?: string) =>
     [title, subTitle].filter(Boolean).join(" ");
@@ -208,6 +220,8 @@ export function OrderModal({ card, serviceName, onClose }: OrderModalProps) {
       ...(isPlus ? [{ label: "Puding", value: "puding", price: 0 }] : []),
     ];
 
+    const addonTotal = addOns.reduce((sum, a) => sum + a.price, 0);
+
     const newItem: CartItem = {
       id: `${card.packageType}-${card.id}__${addOns
         .map((a) => a.value)
@@ -216,7 +230,7 @@ export function OrderModal({ card, serviceName, onClose }: OrderModalProps) {
       productId: `${card.packageType}-${card.id}`,
       name: `${serviceName} — ${getPackageName(card.title, card.subTitle)}`,
       image: "",
-      basePrice: priceNumber,
+      basePrice: priceNumber + addonTotal,
       addOns,
       quantity: jumlah,
       slug: `ricebox/${card.id}`,
@@ -238,6 +252,26 @@ export function OrderModal({ card, serviceName, onClose }: OrderModalProps) {
   const handleCheckoutAll = async () => {
     if (!pendingItem) return;
 
+      if (typeof window !== "undefined") {
+    const allItems = [...state.items, pendingItem];
+    window.sessionStorage.setItem(
+      "ksm_order_summary",
+      JSON.stringify({
+        items: allItems.map((item) => ({
+          id: item.id,
+          productId: item.productId,
+          name: item.name,
+          image: item.image,
+          basePrice: item.basePrice, // sudah include addonTotal
+          addOns: item.addOns,       // lengkap dengan price per addon
+          quantity: item.quantity,
+          slug: item.slug,
+          category: item.category,
+        })),
+      }),
+    );
+  }
+  
     const checkout = await createCheckoutOrder([...state.items, pendingItem], {
       id: user?.customer?.id,
       documentId: user?.customer?.documentId,

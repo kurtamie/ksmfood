@@ -3,12 +3,15 @@
 import { useTranslations } from "next-intl";
 import { LuAward, LuCheck, LuPackageOpen } from "react-icons/lu";
 import { Button } from "@/components/ui/button";
-import { createWhatsappLink } from "@/const/whatsapp";
+import { useState } from "react";
+import { OrderModal } from "./OrderModal";
+import type { PackageCard } from "./OrderModal";
 
-const packageCards = [
+const packageCards: PackageCard[] = [
   {
     id: "a",
     title: "Paket A",
+    dish: ["Nasi Putih", "1 Lauk Utama", "1 Lauk Tambahan", "Sayur", "Sambal", "Kerupuk", "Buah", "Air Mineral Gelas"],
     items: [
       "Nasi Putih",
       "1 Lauk Utama",
@@ -20,11 +23,13 @@ const packageCards = [
       "Air Mineral Gelas",
     ],
     price: "Rp 34.000/porsi",
+    packageType: "A",
   },
   {
     id: "b",
     title: "Paket B",
     badge: true,
+    dish: ["Nasi Putih", "2 Lauk Utama", "1 Lauk Tambahan", "Sayur", "Sambal", "Kerupuk", "Buah", "Air Mineral Gelas"],
     items: [
       "Nasi Putih",
       "2 Lauk Utama",
@@ -36,10 +41,12 @@ const packageCards = [
       "Air Mineral Gelas",
     ],
     price: "Rp 42.000/porsi",
+    packageType: "B",
   },
   {
     id: "c",
     title: "Paket C",
+    dish: ["Nasi Putih", "3 Lauk Utama", "1 Lauk Tambahan", "Sayur", "Sambal", "Kerupuk", "Buah", "Air Mineral Gelas"],
     items: [
       "Nasi Putih",
       "3 Lauk Utama",
@@ -51,10 +58,12 @@ const packageCards = [
       "Air Mineral Gelas",
     ],
     price: "Rp 50.000/porsi",
+    packageType: "C",
   },
   {
     id: "a-plus",
     title: "Paket A+",
+    dish: ["Nasi Putih", "1 Lauk Utama", "1 Lauk Tambahan", "Sayur", "Sambal", "Kerupuk", "Buah", "Air Mineral Gelas", "Sup Sayur", "Puding"],
     items: [
       "Nasi Putih",
       "1 Lauk Utama",
@@ -68,10 +77,12 @@ const packageCards = [
       "Puding",
     ],
     price: "Rp 45.000/porsi",
+    packageType: "A+",
   },
   {
     id: "b-plus",
     title: "Paket B+",
+    dish: ["Nasi Putih", "2 Lauk Utama", "1 Lauk Tambahan", "Sayur", "Sambal", "Kerupuk", "Buah", "Air Mineral Gelas", "Sup Sayur", "Puding"],
     items: [
       "Nasi Putih",
       "2 Lauk Utama",
@@ -85,10 +96,12 @@ const packageCards = [
       "Puding",
     ],
     price: "Rp 51.000/porsi",
+    packageType: "B+",
   },
   {
     id: "c-plus",
     title: "Paket C+",
+    dish: ["Nasi Putih", "3 Lauk Utama", "1 Lauk Tambahan", "Sayur", "Sambal", "Kerupuk", "Buah", "Air Mineral Gelas", "Sup Sayur", "Puding"],
     items: [
       "Nasi Putih",
       "3 Lauk Utama",
@@ -102,6 +115,7 @@ const packageCards = [
       "Puding",
     ],
     price: "Rp 59.000/porsi",
+    packageType: "C+",
   },
 ];
 
@@ -109,9 +123,11 @@ export default function Menu() {
   const t = useTranslations("prasmananMenu");
   const commonT = useTranslations("common");
   const serviceName = "Prasmanan";
+  const [selectedCard, setSelectedCard] = useState<typeof packageCards[0] | null>(null);
 
   return (
-    <div className="mt-12 grid w-full max-w-6xl grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
+    <>
+      <div className="mt-12 grid w-full max-w-6xl grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
       {packageCards.map((card) => (
         <article
           key={card.id}
@@ -150,22 +166,23 @@ export default function Menu() {
             </p>
 
             <Button
-              asChild
+              onClick={() => setSelectedCard(card)}
               className="mt-4 h-11 rounded-lg bg-[#9F0404] font-bold text-white hover:bg-[#870000]"
             >
-              <a
-                href={createWhatsappLink(
-                  `Halo, saya ingin memesan ${serviceName} dengan ${card.title}.`,
-                )}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                {commonT("orderNowShort")}
-              </a>
+              {commonT("orderNowShort")}
             </Button>
           </div>
         </article>
       ))}
-    </div>
+      </div>
+
+      {selectedCard && (
+        <OrderModal
+          card={selectedCard}
+          serviceName={serviceName}
+          onClose={() => setSelectedCard(null)}
+        />
+      )}
+    </>
   );
 }
