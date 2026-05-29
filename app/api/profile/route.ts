@@ -92,6 +92,16 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    if (hasField(body, "subdistrict")) {
+      const subdistrict = normalizeText(body.subdistrict);
+      addIfChanged(
+        customerFields,
+        "subdistrict",
+        subdistrict,
+        currentUser.customer?.subdistrict,
+      );
+    }
+
     if (hasField(body, "latitude")) {
       const latitude = normalizeCoordinate(body.latitude);
       addIfChanged(
