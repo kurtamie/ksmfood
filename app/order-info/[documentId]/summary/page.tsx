@@ -269,24 +269,29 @@ export default function OrderSummaryPage() {
       ) : null}
 
       <div className="mx-auto max-w-6xl px-6 py-10">
+        {/* Stepper */}
         <div className="mb-8">
-          <div className="relative">
-            <div className="absolute inset-x-6 top-1/2 h-px bg-gray-200" />
-            <div className="grid grid-cols-2 gap-4">
-              <div className="relative flex flex-col items-center gap-3 text-center">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full border border-gray-300 bg-white text-secondary-500 text-sm font-bold">
+          <div className="relative flex items-start justify-center">
+            {/* Garis penghubung antar step */}
+            <div className="absolute left-1/4 right-1/4 top-[18px] h-px bg-gray-200" />
+
+            <div className="grid w-full max-w-sm grid-cols-2">
+              {/* Step 1 — selesai */}
+              <div className="relative flex flex-col items-center gap-2 text-center">
+                <div className="flex h-9 w-9 items-center justify-center rounded-full border border-gray-300 bg-white text-sm font-medium text-secondary-500">
                   1
                 </div>
-                <p className="text-sm text-secondary-500">
+                <p className="text-xs text-secondary-500">
                   Informasi Pesanan & Pengiriman
                 </p>
               </div>
 
-              <div className="relative flex flex-col items-center gap-3 text-center">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full border border-primary-500 bg-primary-500 text-white text-sm font-bold">
+              {/* Step 2 — aktif */}
+              <div className="relative flex flex-col items-center gap-2 text-center">
+                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary-600 text-sm font-medium text-white">
                   2
                 </div>
-                <p className="text-sm font-semibold text-tertiary-900">
+                <p className="text-xs font-semibold text-tertiary-900">
                   Ringkasan Pesanan
                 </p>
               </div>
@@ -294,13 +299,15 @@ export default function OrderSummaryPage() {
           </div>
         </div>
 
-        <h1 className="text-2xl font-semibold text-center text-tertiary-900 mb-6">
+        {/* Judul & Order ID */}
+        <h1 className="mb-1 text-center text-xl font-semibold text-tertiary-900">
           Ringkasan Pesanan
         </h1>
-        <p className="text-center text-sm text-secondary-600 mb-6">
+        <p className="mb-6 text-center text-xs text-secondary-500">
           Order ID: {documentId ?? summary.documentId ?? summary.orderId ?? "-"}
         </p>
 
+        {/* Pesan sukses / error */}
         {paymentMessage ? (
           <p className="mb-4 text-center text-sm text-green-700">
             {paymentMessage}
@@ -310,102 +317,117 @@ export default function OrderSummaryPage() {
           <p className="mb-4 text-center text-sm text-red-600">{payError}</p>
         ) : null}
 
-        <div className="grid grid-cols-1 gap-6 xl:grid-cols-[1.6fr_1fr]">
-          <div className="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
-            <div className="mt-6 space-y-4">
+        {/* Layout utama */}
+        <div className="grid grid-cols-1 gap-5 xl:grid-cols-[1.6fr_1fr]">
+          {/* Kolom kiri — detail pesanan */}
+          <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+            <h2 className="mb-4 text-sm font-semibold text-tertiary-900">
+              Detail Pesanan
+            </h2>
+
+            <div className="space-y-3">
               {summary.items?.map((item) => {
                 const addOnLabels = item.addOns.map((a) => a.label).join(", ");
-                const itemTotal =
-                  (item.basePrice +
-                    item.addOns.reduce((sum, addOn) => sum + addOn.price, 0)) *
-                  item.quantity;
+                const unitPrice =
+                  item.basePrice +
+                  item.addOns.reduce((sum, addOn) => sum + addOn.price, 0);
+                const itemTotal = unitPrice * item.quantity;
                 return (
                   <div
                     key={item.id}
-                    className="rounded-3xl border border-secondary-200 bg-gray-50 p-4"
+                    className="flex items-start justify-between gap-4 rounded-xl border border-gray-100 bg-gray-50 px-4 py-3"
                   >
-                    <div className="flex items-center justify-between gap-4">
-                      <div>
-                        <p className="font-semibold text-tertiary-900">
-                          {item.name}
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-semibold text-tertiary-900">
+                        {item.name}
+                      </p>
+                      {addOnLabels && (
+                        <p className="mt-0.5 text-xs text-secondary-500">
+                          + {addOnLabels}
                         </p>
-                        {addOnLabels && (
-                          <p className="mt-1 text-sm text-secondary-600">
-                            + {addOnLabels}
-                          </p>
-                        )}
-                      </div>
-                      <div className="text-right text-sm text-secondary-800">
-                        <p>
-                          {item.quantity} x{" "}
-                          {formatRupiah(
-                            item.basePrice +
-                              item.addOns.reduce(
-                                (sum, addOn) => sum + addOn.price,
-                                0,
-                              ),
-                          )}
-                        </p>
-                        <p className="font-semibold">
-                          {formatRupiah(itemTotal)}
-                        </p>
-                      </div>
+                      )}
+                    </div>
+                    <div className="shrink-0 text-right">
+                      <p className="text-xs text-secondary-500">
+                        {item.quantity} × {formatRupiah(unitPrice)}
+                      </p>
+                      <p className="text-sm font-semibold text-tertiary-900">
+                        {formatRupiah(itemTotal)}
+                      </p>
                     </div>
                   </div>
                 );
               })}
             </div>
 
-            <div className="mt-6 space-y-3 rounded-3xl border border-secondary-200 bg-gray-50 p-5 text-sm text-secondary-700">
-              <div className="flex justify-between">
-                <span>Sub Total Pesanan</span>
+            {/* Rincian biaya */}
+            <div className="mt-4 space-y-2 rounded-xl border border-gray-100 bg-gray-50 px-4 py-3 text-sm">
+              <div className="flex justify-between text-secondary-600">
+                <span>Sub total pesanan</span>
                 <span>{formatRupiah(total)}</span>
+              </div>
+              <div className="flex justify-between text-secondary-600">
+                <span>Biaya layanan</span>
+                <span>Rp 0</span>
               </div>
             </div>
 
-            <div className="mt-6 flex items-center justify-between border-t border-secondary-200 pt-4 text-lg font-semibold text-tertiary-900">
+            {/* Grand total */}
+            <div className="mt-4 flex items-center justify-between border-t border-gray-200 pt-4 text-base font-semibold text-tertiary-900">
               <span>Total yang harus dibayar</span>
               <span>{formatRupiah(total)}</span>
             </div>
           </div>
 
-          <div className="space-y-6">
-            <div className="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
-              <h2 className="text-lg font-semibold text-tertiary-900">
+          {/* Kolom kanan — info pengiriman + tombol */}
+          <div className="flex flex-col gap-4">
+            {/* Alamat pengiriman */}
+            <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+              <h2 className="mb-3 text-sm font-semibold text-tertiary-900">
                 Alamat Pengiriman
               </h2>
-              <div className="mt-4 space-y-2 text-sm text-secondary-700">
-                <p>{summary.addressName || "-"}</p>
+              <div className="space-y-1 text-sm text-secondary-600">
+                {summary.addressName && <p>{summary.addressName}</p>}
                 <p>{summary.addressLine || "-"}</p>
                 <p>{summary.subdistrict || "-"}</p>
-                <p>
-                  {summary.recipientName || "-"} •{" "}
-                  {summary.recipientPhone || "-"}
-                </p>
+                {(summary.recipientName || summary.recipientPhone) && (
+                  <p className="pt-1 text-xs text-secondary-500">
+                    {summary.recipientName || "-"} •{" "}
+                    {summary.recipientPhone || "-"}
+                  </p>
+                )}
               </div>
             </div>
 
-            <div className="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
-              <h2 className="text-lg font-semibold text-tertiary-900">
+            {/* Jadwal pengiriman */}
+            <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+              <h2 className="mb-3 text-sm font-semibold text-tertiary-900">
                 Jadwal Pengiriman
               </h2>
-              <div className="mt-4 space-y-2 text-sm text-secondary-700">
-                <p>Tanggal: {summary.deliveryDate || "-"}</p>
-                <p>Jam: {summary.deliveryTime || "-"}</p>
-                {summary.notes && <p>Catatan: {summary.notes}</p>}
+              <div className="space-y-1 text-sm text-secondary-600">
+                <p>
+                  Tanggal pengiriman:{" "}
+                  {summary.deliveryDate
+                    ? `${summary.deliveryDate}${summary.deliveryTime ? " " + summary.deliveryTime : ""}`
+                    : "-"}
+                </p>
+                {summary.notes && (
+                  <p className="pt-1 text-xs text-secondary-500">
+                    Catatan: {summary.notes}
+                  </p>
+                )}
               </div>
             </div>
 
-            <div className="mt-4">
-              <button
-                type="button"
-                onClick={() => void handlePayNow()}
-                disabled={isPaying || total <= 0}
-                className="w-full rounded-lg bg-red-600 py-3 text-sm font-bold text-white hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                {isPaying ? "Membuka pembayaran..." : "Bayar Sekarang"}
-              </button>
-            </div>
+            {/* Tombol bayar */}
+            <button
+              type="button"
+              onClick={() => void handlePayNow()}
+              disabled={isPaying || total <= 0}
+              className="w-full rounded-xl bg-primary-600 py-3 text-sm font-semibold text-white transition-colors hover:bg-primary-700 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {isPaying ? "Membuka pembayaran..." : "Bayar Sekarang"}
+            </button>
           </div>
         </div>
       </div>

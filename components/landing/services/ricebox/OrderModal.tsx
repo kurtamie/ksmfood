@@ -221,6 +221,7 @@ export function OrderModal({ card, serviceName, onClose }: OrderModalProps) {
       quantity: jumlah,
       slug: `ricebox/${card.id}`,
       category: serviceName,
+      packageName: getPackageName(card.title, card.subTitle),
     };
 
     setPendingItem(newItem);

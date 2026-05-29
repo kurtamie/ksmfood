@@ -199,6 +199,7 @@ function parseSavedAddresses(
   raw?: string | null,
   customerLatitude?: string | number | null,
   customerLongitude?: string | number | null,
+  customerSubdistrict?: string | null, 
 ): SavedAddress[] {
   if (!raw) return [];
 
@@ -234,7 +235,7 @@ function parseSavedAddresses(
         label: item?.name ?? item?.addressLine ?? item?.address ?? "Alamat",
         addressName: item?.name ?? item?.addressLine ?? item?.address ?? "",
         addressLine: item?.addressLine ?? item?.address ?? "",
-        subdistrict: item?.kelurahan ?? "",
+        subdistrict: customerSubdistrict ?? "",
         pinpoint: item?.pinpoint ?? "",
         recipientName: item?.recipientName ?? "",
         recipientPhone: item?.recipientPhone ?? "",
@@ -314,7 +315,6 @@ export default function OrderInfoPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [addressPickerOpen, setAddressPickerOpen] = useState(false);
-  const [creatingAddress, setCreatingAddress] = useState(false);
   const [selectedAddressId, setSelectedAddressId] = useState<string | null>(
     null,
   );
@@ -329,11 +329,13 @@ export default function OrderInfoPage() {
         user?.customer?.address,
         user?.customer?.latitude,
         user?.customer?.longitude,
+        user?.customer?.subdistrict,
       ),
     [
       user?.customer?.address,
       user?.customer?.latitude,
       user?.customer?.longitude,
+      user?.customer?.subdistrict,
     ],
   );
 
@@ -701,115 +703,156 @@ export default function OrderInfoPage() {
     ],
   );
 
-  async function handleSaveAndContinue() {
-    setSubmitError(null);
-    setIsSubmitting(true);
+async function handleSaveAndContinue() {
+  setSubmitError(null);
 
-    try {
-      if (!documentId) {
-        throw new Error("ID pesanan tidak valid.");
-      }
-
-      if (!orderItems.length) {
-        throw new Error("Detail pesanan belum tersedia.");
-      }
-
-      const response = await fetch(`/api/orders/${documentId}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(orderPayload),
-      });
-
-      const result = await response.json();
-
-      if (!response.ok || !result?.success) {
-        const message =
-          typeof result?.error === "string"
-            ? result.error
-            : "Gagal menyimpan pesanan. Coba lagi.";
-        throw new Error(message);
-      }
-
-      const orderRecord = result.data?.data ?? result.data ?? null;
-      const existingSummary = (() => {
-        try {
-          if (typeof window === "undefined") return null;
-          const raw = window.sessionStorage.getItem("ksm_order_summary");
-          return raw ? JSON.parse(raw) : null;
-        } catch {
-          return null;
-        }
-      })();
-      const savedOrderId =
-        orderRecord?.id ??
-        existingSummary?.orderId ??
-        result.data?.id ??
-        orderId ??
-        null;
-      const orderDocumentId =
-        orderRecord?.documentId ??
-        existingSummary?.documentId ??
-        documentId ??
-        (savedOrderId != null ? String(savedOrderId) : null);
-      const summaryData = {
-        ...existingSummary,
-        orderId: savedOrderId,
-        documentId: orderDocumentId,
-        deliveryDate,
-        deliveryTime,
-        addressName,
-        addressLine,
-        subdistrict,
-        pinpoint,
-        latitude,
-        longitude,
-        recipientName,
-        recipientPhone,
-        notes,
-        items: orderItems.map((item) => ({
-          id: item.id,
-          productId: item.id,
-          name: item.name,
-          image: "",
-          basePrice: item.unitPrice,
-          addOns: item.addOnLabels
-            ? item.addOnLabels.split(", ").map((label) => ({
-                label,
-                value: label,
-                price: 0,
-              }))
-            : [],
-          quantity: item.quantity,
-          slug: "",
-          category: "Pesanan",
-        })),
-        totals: { subtotal: orderTotal },
-      };
-
-      if (typeof window !== "undefined") {
-        window.sessionStorage.setItem(
-          "ksm_order_summary",
-          JSON.stringify(summaryData),
-        );
-      }
-
-      if (!orderDocumentId) {
-        throw new Error("Gagal mendapatkan ID pesanan dari server.");
-      }
-
-      router.push(`/order-info/${orderDocumentId}/summary`);
-    } catch (error) {
-      setSubmitError(
-        error instanceof Error
-          ? error.message
-          : "Gagal menyimpan pesanan. Coba lagi.",
-      );
-    } finally {
-      setIsSubmitting(false);
-    }
+  // Validasi field wajib
+  if (!addressLine.trim()) {
+    setSubmitError("Alamat lengkap wajib diisi.");
+    return;
   }
+  if (!subdistrict) {
+    setSubmitError("Kelurahan wajib dipilih.");
+    return;
+  }
+  if (!recipientName.trim()) {
+    setSubmitError("Nama penerima wajib diisi.");
+    return;
+  }
+  if (!recipientPhone.trim()) {
+    setSubmitError("Telepon penerima wajib diisi.");
+    return;
+  }
+
+  // Validasi tanggal minimal H+2
+  if (!date) {
+    setSubmitError("Tanggal pengiriman wajib diisi.");
+    return;
+  }
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const minDate = new Date(today);
+  minDate.setDate(today.getDate() + 2);
+  const selectedDate = new Date(date);
+  selectedDate.setHours(0, 0, 0, 0);
+  if (selectedDate < minDate) {
+    setSubmitError(
+      `Tanggal pengiriman minimal ${minDate.toLocaleDateString("id-ID", {
+        day: "2-digit",
+        month: "long",
+        year: "numeric",
+      })}.`,
+    );
+    return;
+  }
+
+  setIsSubmitting(true);
+
+  try {
+    if (!documentId) {
+      throw new Error("ID pesanan tidak valid.");
+    }
+
+    if (!orderItems.length) {
+      throw new Error("Detail pesanan belum tersedia.");
+    }
+
+    const response = await fetch(`/api/orders/${documentId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(orderPayload),
+    });
+
+    const result = await response.json();
+
+    if (!response.ok || !result?.success) {
+      const message =
+        typeof result?.error === "string"
+          ? result.error
+          : "Gagal menyimpan pesanan. Coba lagi.";
+      throw new Error(message);
+    }
+
+    const orderRecord = result.data?.data ?? result.data ?? null;
+    const existingSummary = (() => {
+      try {
+        if (typeof window === "undefined") return null;
+        const raw = window.sessionStorage.getItem("ksm_order_summary");
+        return raw ? JSON.parse(raw) : null;
+      } catch {
+        return null;
+      }
+    })();
+    const savedOrderId =
+      orderRecord?.id ??
+      existingSummary?.orderId ??
+      result.data?.id ??
+      orderId ??
+      null;
+    const orderDocumentId =
+      orderRecord?.documentId ??
+      existingSummary?.documentId ??
+      documentId ??
+      (savedOrderId != null ? String(savedOrderId) : null);
+    const summaryData = {
+      ...existingSummary,
+      orderId: savedOrderId,
+      documentId: orderDocumentId,
+      deliveryDate,
+      deliveryTime,
+      addressName,
+      addressLine,
+      subdistrict,
+      pinpoint,
+      latitude,
+      longitude,
+      recipientName,
+      recipientPhone,
+      notes,
+      items: orderItems.map((item) => ({
+        id: item.id,
+        productId: item.id,
+        name: item.name,
+        image: "",
+        basePrice: item.unitPrice,
+        addOns: item.addOnLabels
+          ? item.addOnLabels.split(", ").map((label) => ({
+              label,
+              value: label,
+              price: 0,
+            }))
+          : [],
+        quantity: item.quantity,
+        slug: "",
+        category: "Pesanan",
+      })),
+      totals: { subtotal: orderTotal },
+    };
+
+    if (typeof window !== "undefined") {
+      window.sessionStorage.setItem(
+        "ksm_order_summary",
+        JSON.stringify(summaryData),
+      );
+    }
+
+    if (!orderDocumentId) {
+      throw new Error("Gagal mendapatkan ID pesanan dari server.");
+    }
+
+    router.push(`/order-info/${orderDocumentId}/summary`);
+  } catch (error) {
+    setSubmitError(
+      error instanceof Error
+        ? error.message
+        : "Gagal menyimpan pesanan. Coba lagi.",
+    );
+  } finally {
+    setIsSubmitting(false);
+  }
+}
 
   function updateOrderQuantity(index: number, quantity: number) {
     if (quantity <= 0) return;
@@ -1045,102 +1088,63 @@ export default function OrderInfoPage() {
                 </button>
               </div>
 
-              {addressPickerOpen && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 px-4 py-6">
-                  <div className="w-full max-w-lg rounded-3xl bg-white p-6 shadow-xl">
-                    <div className="flex items-center justify-between">
-                      <h3 className="text-lg font-semibold">
-                        Lokasi Pengiriman
-                      </h3>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setAddressPickerOpen(false);
-                          setCreatingAddress(false);
-                        }}
-                        className="text-secondary-600 hover:text-tertiary-900"
-                      >
-                        ✕
-                      </button>
-                    </div>
+            {addressPickerOpen && (
+              <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 px-4 py-6">
+                <div className="w-full max-w-lg rounded-3xl bg-white p-6 shadow-xl">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-lg font-semibold">
+                      Lokasi Pengiriman
+                    </h3>
+                    <button
+                      type="button"
+                      onClick={() => setAddressPickerOpen(false)}
+                      className="text-secondary-600 hover:text-tertiary-900"
+                    >
+                      ✕
+                    </button>
+                  </div>
 
-                    {!creatingAddress ? (
-                      <div className="mt-5 space-y-4">
-                        <select
-                          value={selectedAddressId ?? ""}
-                          onChange={(e) => {
-                            const next = e.target.value;
-                            setSelectedAddressId(next);
-                            const address = savedAddresses.find(
-                              (item) => item.id === next,
-                            );
-                            if (address) {
-                              setAddressName(address.addressName);
-                              setAddressLine(address.addressLine);
-                              setSubdistrict(address.subdistrict);
-                              setPinpoint(address.pinpoint);
-                              setRecipientName(address.recipientName);
-                              setRecipientPhone(address.recipientPhone);
-                              setLatitude(address.latitude ?? null);
-                              setLongitude(address.longitude ?? null);
-                            }
-                          }}
-                          className="w-full rounded-lg border px-3 py-2"
-                        >
-                          <option value="">-- Pilih Alamat --</option>
-                          {savedAddresses.map((address) => (
-                            <option key={address.id} value={address.id}>
-                              {address.label}
-                            </option>
-                          ))}
-                        </select>
+                  <div className="mt-5 space-y-4">
+                    <select
+                      value={selectedAddressId ?? ""}
+                      onChange={(e) => setSelectedAddressId(e.target.value)}
+                      className="w-full rounded-lg border px-3 py-2"
+                    >
+                      <option value="">-- Pilih Alamat --</option>
+                      {savedAddresses.map((address) => (
+                        <option key={address.id} value={address.id}>
+                          {address.label}
+                        </option>
+                      ))}
+                    </select>
 
-                        <button
-                          type="button"
-                          onClick={() => setCreatingAddress(true)}
-                          className="w-full rounded-xl bg-primary-500 py-3 text-sm font-bold text-white hover:bg-primary-600"
-                        >
-                          Buat Alamat Baru
-                        </button>
-                      </div>
-                    ) : (
-                      <div className="mt-5 space-y-4">
-                        <div>
-                          <label className="mb-1 block text-sm font-medium text-gray-700">
-                            Nama Alamat
-                          </label>
-                          <input
-                            type="text"
-                            value={addressName}
-                            onChange={(e) => setAddressName(e.target.value)}
-                            className="w-full rounded-lg border px-3 py-2"
-                          />
-                        </div>
-                        <div>
-                          <label className="mb-1 block text-sm font-medium text-gray-700">
-                            Alamat Lengkap
-                          </label>
-                          <textarea
-                            value={addressLine}
-                            onChange={(e) => setAddressLine(e.target.value)}
-                            rows={3}
-                            className="w-full rounded-lg border px-3 py-2 text-sm"
-                          />
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setCreatingAddress(false);
-                          }}
-                          className="w-full rounded-xl bg-secondary-100 py-3 text-sm font-semibold text-secondary-800"
-                        >
-                          Kembali
-                        </button>
-                      </div>
-                    )}
+                    <button
+                      type="button"
+                      disabled={!selectedAddressId}
+                      onClick={() => {
+                        const address = savedAddresses.find(
+                          (item) => item.id === selectedAddressId,
+                        );
+                        if (address) {
+                          setAddressName(address.addressName);
+                          setAddressLine(address.addressLine);
+                          setSubdistrict(address.subdistrict);
+                          setPinpoint(address.pinpoint);
+                          setRecipientName(address.recipientName);
+                          setRecipientPhone(address.recipientPhone);
+                          setLatitude(address.latitude ?? null);
+                          setLongitude(address.longitude ?? null);
+                        }
+                        setAddressPickerOpen(false);
+                      }}
+                      className="w-full rounded-xl bg-primary-500 py-3 text-sm font-bold text-white hover:bg-primary-600 disabled:opacity-40 disabled:cursor-not-allowed"
+                    >
+                      Konfirmasi Pilihan
+                    </button>
                   </div>
                 </div>
-              )}
+              </div>
+            )}
 
               <div className="mt-6">
                 <label className="mb-2 block font-semibold">

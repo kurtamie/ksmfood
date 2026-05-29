@@ -27,6 +27,7 @@ export interface CartItem {
   quantity: number;
   slug: string;
   category: string;
+  packageName?: string;
 }
 
 export interface CartState {

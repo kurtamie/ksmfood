@@ -16,5 +16,6 @@ export interface Customer extends BaseEntity {
   orders?: Order[];
   latitude?: string | null;
   longitude?: string | null;
+  subdistrict?: string | null;
   user_sessions?: UserSession[];
 }

@@ -76,6 +76,7 @@ export default function AccountPage() {
   const [initialName, setInitialName] = useState<string>(customerName);
   const [initialPhone, setInitialPhone] = useState<string>(phone);
   const [initialAddress, setInitialAddress] = useState<string>(addressLine);
+  const [initialSubdistrict, setInitialSubdistrict] = useState("");
   const [initialLatitude, setInitialLatitude] = useState<number | null>(null);
   const [initialLongitude, setInitialLongitude] = useState<number | null>(null);
   const [toastMessage, setToastMessage] = useState("");
@@ -105,6 +106,7 @@ export default function AccountPage() {
     customerName !== initialName ||
     phone !== initialPhone ||
     addressLine !== initialAddress ||
+    subdistrict !== initialSubdistrict ||
     latitude !== initialLatitude ||
     longitude !== initialLongitude;
 
@@ -126,12 +128,14 @@ export default function AccountPage() {
     const nextName = currentUser.username ?? "";
     const nextPhone = currentUser.phone_no ?? "";
     const nextAddress = currentUser.customer?.address ?? "";
+    const nextSubdistrict = currentUser.customer?.subdistrict ?? "";
     const nextLatitude = toCoordinate(currentUser.customer?.latitude);
     const nextLongitude = toCoordinate(currentUser.customer?.longitude);
 
     setCustomerName(nextName);
     setPhone(nextPhone);
     setAddressLine(nextAddress);
+    setSubdistrict(nextSubdistrict);
     setLatitude(nextLatitude);
     setLongitude(nextLongitude);
     if (nextLatitude !== null && nextLongitude !== null) {
@@ -141,6 +145,7 @@ export default function AccountPage() {
     setInitialName(nextName);
     setInitialPhone(nextPhone);
     setInitialAddress(nextAddress);
+    setInitialSubdistrict(nextSubdistrict);
     setInitialLatitude(nextLatitude);
     setInitialLongitude(nextLongitude);
     localStorage.setItem("ksm_customer_address", nextAddress);
@@ -152,6 +157,7 @@ export default function AccountPage() {
       name?: string;
       phone?: string;
       address?: string;
+      subdistrict?: string;
       latitude?: number | null;
       longitude?: number | null;
     } = {};
@@ -159,6 +165,7 @@ export default function AccountPage() {
     if (customerName !== initialName) payload.name = customerName;
     if (phone !== initialPhone) payload.phone = phone;
     if (addressLine !== initialAddress) payload.address = addressLine;
+    if (subdistrict !== initialSubdistrict) payload.subdistrict = subdistrict;
     if (latitude !== initialLatitude) payload.latitude = latitude;
     if (longitude !== initialLongitude) payload.longitude = longitude;
 
@@ -198,6 +205,7 @@ export default function AccountPage() {
       setInitialName(customerName);
       setInitialPhone(phone);
       setInitialAddress(addressLine);
+      setInitialSubdistrict(subdistrict);
       setInitialLatitude(latitude);
       setInitialLongitude(longitude);
       showToast(successMessage);

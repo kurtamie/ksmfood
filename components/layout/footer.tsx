@@ -49,7 +49,7 @@ const Footer = () => {
               <div className="flex items-center gap-3">
                 <FaPhoneAlt className="shrink-0 text-gray-400" size={13} />
                 <div>
-                  <p className="font-medium text-white">Yuni</p>
+                  <p className="font-medium text-white">Admin 1</p>
                   <a
                     href="https://wa.me/6281371790122"
                     target="_blank"
@@ -63,7 +63,7 @@ const Footer = () => {
               <div className="flex items-center gap-3 pt-1">
                 <FaPhoneAlt className="shrink-0 text-gray-400" size={13} />
                 <div>
-                  <p className="font-medium text-white">Ksm Admin</p>
+                  <p className="font-medium text-white">Admin 2</p>
                   <a
                     href="https://wa.me/6282288175957"
                     target="_blank"

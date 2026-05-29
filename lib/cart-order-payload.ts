@@ -40,10 +40,10 @@ export function parseCartItemToOrderMenu(item: CartItem): CreateOrderMenuInput {
     additional_dish: additionalAddon?.label ?? undefined,
     vegetable: vegetableAddon?.label ?? undefined,
     sauce: sauceAddon?.label ?? undefined,
-    mineral_water: mineralWaterAddon?.label ?? undefined,
-    fruit: fruitAddon?.label ?? undefined,
-    chip: chipAddon ? "kerupuk" : undefined,
-    pudding: puddingAddon ? "Puding" : undefined,
+    mineral_water: mineralWaterAddon?.label ?? "Air Mineral Gelas",
+    fruit: fruitAddon?.label ?? "Pisang/Jeruk",
+    chip: chipAddon?.label ?? "Kerupuk",
+    pudding: puddingAddon?.label ?? "Puding",
   };
 }
 

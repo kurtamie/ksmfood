@@ -27,6 +27,9 @@ export async function createCheckoutOrder(
     0,
   );
 
+  const packageName = checkoutItems[0]?.packageName || "Paket Katering";
+  const productName = checkoutItems[0]?.category || packageName;
+
   const response = await fetch("/api/orders", {
     method: "POST",
     headers: {
@@ -36,6 +39,8 @@ export async function createCheckoutOrder(
       customer_id: customer?.id,
       customer_document_id: customer?.documentId,
       customer_type: "personal",
+      package_name: packageName,
+      product: productName,
       order_menus: checkoutItems.map(parseCartItemToOrderMenu),
       order_details: [buildAggregateOrderDetail(checkoutItems)],
     }),

@@ -34,6 +34,8 @@ export interface CreateOrderInput {
   /** documentId customer (Strapi v5) — disarankan dikirim bersama customer_id */
   customer_document_id?: string;
   customer_type?: string;
+  package_name?: string;
+  product?: string;
   delivery_date?: string;
   arrive_time?: string;
   leave?: string;
@@ -52,6 +54,7 @@ export interface Order extends BaseEntity {
   customer_id?: Customer | null;
   staff_id?: Staff | null;
   customer_type?: string | null;
+  package_name?: string | null;
   executor_name?: string | null;
   supplier?: string | null;
   product?: string | null;

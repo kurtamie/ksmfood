@@ -60,6 +60,7 @@ export async function POST(req: NextRequest) {
       name?: string | null;
       phone_no?: string | null;
       address?: string | null;
+      subdistrict?: string | null;
       latitude?: string | null;
       longitude?: string | null;
     } = {};
