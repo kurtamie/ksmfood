@@ -34,7 +34,8 @@ export function parseCartItemToOrderMenu(item: CartItem): CreateOrderMenuInput {
   );
   const vegetableAddon = item.addOns.find((a) => /^sayur_/i.test(a.value));
   const sauceAddon = item.addOns.find((a) => /^sambal_/i.test(a.value));
-  const mineralWaterAddon = item.addOns.find((a) => /^minuman_/i.test(a.value));
+  const mineralWaterAddon = item.addOns.find((a) => /^minuman_/i.test(a.value))
+  const boxAddon = item.addOns.find((a) => /^box_/i.test(a.value));
   const fruitAddon = item.addOns.find((a) => /(Pisang|Jeruk)/i.test(a.label));
   const chipAddon = item.addOns.find((a) => /kerupuk/i.test(a.label));
   const puddingAddon = item.addOns.find((a) => /puding/i.test(a.label));
@@ -51,6 +52,7 @@ export function parseCartItemToOrderMenu(item: CartItem): CreateOrderMenuInput {
     fruit: fruitAddon?.label ?? "Pisang/Jeruk",
     chip: chipAddon?.label ?? "Kerupuk",
     pudding: puddingAddon?.label ?? "Puding",
+    box: boxAddon?.label ?? "Kotak putih 18x18",
   };
 }
 
