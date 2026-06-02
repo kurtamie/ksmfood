@@ -18,6 +18,10 @@ import AuthModal from "@/components/auth/AuthModal";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/authContext";
 import { createCheckoutOrder } from "@/lib/client-checkout";
+import {
+  mainDishGroupLabels,
+  useServiceDishes,
+} from "@/components/landing/services/use-service-dishes";
 
 export interface PackageCard {
   id: string;
@@ -42,82 +46,6 @@ interface OrderModalProps {
   onClose: () => void;
 }
 
-const laukUtamaGroups = {
-  ayam: [
-    "Ayam Goreng Kalasan",
-    "Ayam Rendang",
-    "Ayam Gulai Kare",
-    "Ayam Goreng Tepung",
-    "Ayam Goreng Padang",
-    "Ayam Bakar Kecap",
-    "Ayam Balado",
-    "Opor Ayam",
-    "Ayam Kremes",
-    "Ayam Goreng Pletok",
-    "Ayam Fillet Saos Asam Pedas",
-    "Ayam Fillet Saos Asam Manis",
-    "Ayam Fillet Bakar Bumbu Padang",
-    "Ayam Fillet Bakar Bumbu Kecap",
-  ],
-  ikan: [
-    "Ikan Rica-rica",
-    "Ikan Fillet Asam Manis",
-    "Ikan Balado",
-    "Ikan Bakar Kecap",
-    "Ikan Asam Pedas",
-    "Ikan Bandeng Presto",
-    "Ikan Gulai Kuning",
-    "Gulai Tongkol",
-    "Pepes Ikan",
-    "Ikan Sambal Kacang",
-  ],
-  daging: [
-    "Dendeng Balado",
-    "Daging Sapi Lada Hitam",
-    "Rendang Daging",
-    "Daging Bumbu Bali",
-    "Gulai Daging Cincang",
-    "Semur Telur Balut Daging",
-    "Daging Semur",
-    "Krengsengan Daging",
-    "Telur Balut Daging",
-    "Sate Daging",
-    "Empal Daging",
-  ],
-  seafood: [
-    "Sotong Goreng Tepung",
-    "Udang Goreng Tepung",
-    "Sotong Pedas",
-    "Udang Masak Cabe",
-    "Sotong Gulai",
-  ],
-};
-const sayurOptions = [
-    "Capcay",
-    "Urap Sayuran",
-    "Pecel Sayuran",
-    "Sup Sayuran",
-    "Orak Arik Buncis",
-    "Tumis Taoge Teri",
-    "Sayur Lodeh",
-    "Gulai Labu Siam",
-    "Tumis Kacang Panjang",
-    "Lalapan",
-    "Cah Sawi Putih",
-    "Sayur Asem",
-    "Tumis Kailan Muda",
-    "Tumis Bunga Kol",
-    "Tumis Sawi Minyak",
-    "Gulai Nangka",
-    "Bening Bayam",
-];
-const sambalOptions = [
-  "Sambal Ijo",
-  "Sambal Terasi",
-  "Sambal Mangga",
-  "Sambal Bajak",
-];
-
 export function OrderModal({ card, serviceName, onClose }: OrderModalProps) {
   const t = useTranslations("riceboxMenu");
   const { addItem, state, clearCart } = useCart();
@@ -126,15 +54,15 @@ export function OrderModal({ card, serviceName, onClose }: OrderModalProps) {
   const isPlus = ["A", "B"].includes(card.packageType);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const router = useRouter();
+  const { optionsByType, mainDishGroups } = useServiceDishes("bento");
 
-  const visibleGroups = ["ayam", "ikan", "daging", "seafood"];
+  const visibleGroups = ["ayam", "ikan"].filter(
+    (group) => mainDishGroups[group]?.length,
+  );
 
-  const groupLabels: Record<string, string> = {
-    ayam: "Ayam",
-    ikan: "Ikan",
-    daging: "Daging",
-    seafood: "Seafood",
-  };
+  const nasi = optionsByType.rice[0] ?? "Nasi Putih";
+  const sayurOptions = optionsByType.vegetable;
+  const sambalOptions = optionsByType.sauce;
 
   const laukUtamaCount = card.packageType.startsWith("A")
     ? 1
@@ -143,22 +71,8 @@ export function OrderModal({ card, serviceName, onClose }: OrderModalProps) {
       : 3;
 
 
-  const allLaukTambahanOptions = [
-    "Sambal Goreng Kentang Hati",
-    "Perkedel Kentang",
-    "Tempe/Tahu Goreng",
-    "Perkedel Tahu",
-    "Perkedel Jagung",
-    "Tempe Mendoan",
-    "Rolade Tahu",
-    "Bihun Goreng",
-    "Tahu Bacem",
-    "Bakwan Jagung",
-    "Serut Kentang",
-    "Orak Arik Tahu Tempe",
-  ];
+  const allLaukTambahanOptions = optionsByType.additional_dish;
 
-  const [nasi, setNasi] = useState("");
   const [laukUtamaList, setLaukUtamaList] = useState<
     { kategori: string; menu: string }[]
   >(Array.from({ length: laukUtamaCount }, () => ({ kategori: "", menu: "" })));
@@ -299,7 +213,7 @@ export function OrderModal({ card, serviceName, onClose }: OrderModalProps) {
             {/* Nasi */}
             <div className={fieldClass}>
               <label className={labelClass}>Nasi</label>
-              <input readOnly value="Nasi Putih" className={readonlyClass} />
+              <input readOnly value={nasi} className={readonlyClass} />
             </div>
 
             {/* Lauk Utama */}
@@ -330,7 +244,7 @@ export function OrderModal({ card, serviceName, onClose }: OrderModalProps) {
                     >
                       {visibleGroups.map((group) => (
                         <SelectItem key={group} value={group}>
-                          {groupLabels[group]}
+                          {mainDishGroupLabels[group]}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -356,9 +270,7 @@ export function OrderModal({ card, serviceName, onClose }: OrderModalProps) {
                       className="z-[80]"
                     >
                       {val.kategori &&
-                        laukUtamaGroups[
-                          val.kategori as keyof typeof laukUtamaGroups
-                        ].map((o) => (
+                        mainDishGroups[val.kategori]?.map((o) => (
                           <SelectItem key={o} value={o}>
                             {o}
                           </SelectItem>

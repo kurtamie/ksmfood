@@ -172,9 +172,7 @@ export async function fetchOrderByDocumentId(
     "fields[7]": "delivery_note",
     "fields[8]": "arrive_time",
     "fields[9]": "created_date",
-    "populate[invoices][fields][0]": "invoice_no",
-    "populate[invoices][fields][1]": "payment_status",
-    "populate[invoices][fields][2]": "invoice_date",
+    "populate[invoices]": "true",
   });
 
   try {

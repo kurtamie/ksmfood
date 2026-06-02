@@ -17,6 +17,33 @@ export function getLeaveTime(arriveTime: string) {
 }
 
 export function parseCartItemToOrderMenu(item: CartItem): CreateOrderMenuInput {
+  if (item.slug.startsWith("snackbox/")) {
+    const snackAddons = item.addOns
+      .map((addOn) => {
+        const match = addOn.value.match(/^kue_([0-9]+)_/i);
+        if (!match) return null;
+        return {
+          index: Number(match[1]),
+          label: addOn.label
+            .replace(/^Kue\s+[0-9]+:\s*/i, "")
+            .replace(/\s*\(\+Rp\s*2\.000\)\s*$/i, ""),
+        };
+      })
+      .filter((addOn): addOn is { index: number; label: string } => addOn != null)
+      .sort((a, b) => a.index - b.index);
+    const mineralWaterAddon = item.addOns.find((a) =>
+      /^minuman_/i.test(a.value),
+    );
+
+    return {
+      snack: snackAddons[0]?.label ?? undefined,
+      snack2: snackAddons[1]?.label ?? undefined,
+      snack3: snackAddons[2]?.label ?? undefined,
+      snack4: snackAddons[3]?.label ?? undefined,
+      mineral_water: mineralWaterAddon?.label ?? undefined,
+    };
+  }
+
   const riceAddon = item.addOns.find((a) => /^nasi_/i.test(a.value));
   const mainDishAddons = item.addOns
     .map((addOn) => {
@@ -34,7 +61,9 @@ export function parseCartItemToOrderMenu(item: CartItem): CreateOrderMenuInput {
   );
   const vegetableAddon = item.addOns.find((a) => /^sayur_/i.test(a.value));
   const sauceAddon = item.addOns.find((a) => /^sambal_/i.test(a.value));
-  const mineralWaterAddon = item.addOns.find((a) => /^minuman_/i.test(a.value))
+  const mineralWaterAddon = item.addOns.find((a) =>
+    /^minuman_/i.test(a.value),
+  );
   const boxAddon = item.addOns.find((a) => /^box_/i.test(a.value));
   const fruitAddon = item.addOns.find((a) => /(Pisang|Jeruk)/i.test(a.label));
   const chipAddon = item.addOns.find((a) => /kerupuk/i.test(a.label));

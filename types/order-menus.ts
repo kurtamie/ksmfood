@@ -16,4 +16,7 @@ export interface OrderMenu extends BaseEntity {
   box?: string | null;
   pudding?: string | null;
   snack?: string | null;
+  snack2?: string | null;
+  snack3?: string | null;
+  snack4?: string | null;
 }

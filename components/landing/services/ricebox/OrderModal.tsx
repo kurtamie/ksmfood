@@ -18,6 +18,10 @@ import AuthModal from "@/components/auth/AuthModal";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/authContext";
 import { createCheckoutOrder } from "@/lib/client-checkout";
+import {
+  mainDishGroupLabels,
+  useServiceDishes,
+} from "@/components/landing/services/use-service-dishes";
 
 export interface PackageCard {
   id: number;
@@ -43,76 +47,6 @@ interface OrderModalProps {
   onClose: () => void;
 }
 
-const nasiOptions = [
-  "Nasi Putih",
-  "Nasi Kuning (+2.000)",
-  "Nasi Lemak (+2.000)",
-];
-const laukUtamaGroups = {
-  ayam: [
-  "Ayam Goreng Kalasan",
-  "Ayam Rendang",
-  "Ayam Gulai Kare",
-  "Ayam Goreng Tepung",
-  "Ayam Goreng Padang",
-  "Ayam Bakar Kecap",
-  "Ayam Balado",
-  "Opor Ayam",
-  "Ayam Kremes",
-  "Ayam Goreng Pletok",
-  ],
-  ikan: [
-  "Ikan Rica-rica",
-  "Ikan Fillet Asam Manis",
-  "Ikan Balado",
-  "Ikan Bakar Kecap",
-  "Ikan Asam Pedas",
-  "Ikan Bandeng Presto",
-  "Ikan Gulai Kuning",
-  "Gulai Tongkol",
-  "Pepes Ikan",
-  ],
-  daging: [
-  "Dendeng Balado",
-  "Daging Sapi Lada Hitam",
-  "Rendang Daging",
-  "Daging Bumbu Bali",
-  "Gulai Daging Cincang",
-  "Daging Semur",
-  "Krengsengan Daging",
-  ],
-  seafood: [
-  "Sotong Goreng Tepung",
-  "Udang Goreng Tepung",
-  "Sotong Pedas",
-  "Udang Masak Cabe",
-  "Sotong Gulai",
-  ],
-};
-const sayurOptions = [
-  "Urap Sayuran",
-  "Pecel Sayuran",
-  "Sup Sayuran",
-  "Tumis Buncis",
-  "Tumis Toge Teri",
-  "Sayur Lodeh",
-  "Gulai Labu Siam",
-  "Tumis Kacang Panjang",
-  "Lalapan",
-  "Cah Sawi Putih",
-  "Capcay (+2.000)",
-  "Sayur Asem (+2.000)",
-  "Tumis Kailan Muda (+2.000)",
-  "Tumis Bunga Kol (+2.000)",
-  "Tumis Sawi Minyak (+2.000)",
-];
-const sambalOptions = [
-  "Sambal Ijo",
-  "Sambal Terasi",
-  "Sambal Mangga",
-  "Sambal Bajak",
-];
-
 export function OrderModal({ card, serviceName, onClose }: OrderModalProps) {
   const t = useTranslations("riceboxMenu");
   const { addItem, state, clearCart } = useCart();
@@ -123,20 +57,16 @@ export function OrderModal({ card, serviceName, onClose }: OrderModalProps) {
   );
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const router = useRouter();
+  const { optionsByType, mainDishGroups } = useServiceDishes("ricebox");
 
-  const visibleGroups =
-    card.packageType === "A-ayam" || card.packageType === "A+-ayam"
-      ? ["ayam", "ikan"]
-      : card.packageType === "A-daging" || card.packageType === "A+-daging"
-        ? ["daging", "seafood"]
-        : ["ayam", "ikan", "daging", "seafood"];
+  const visibleGroups = ["ayam", "ikan"].filter(
+    (group) => mainDishGroups[group]?.length,
+  );
 
-  const groupLabels: Record<string, string> = {
-    ayam: "Ayam",
-    ikan: "Ikan",
-    daging: "Daging",
-    seafood: "Seafood",
-  };
+  const nasiOptions = optionsByType.rice;
+  const allLaukTambahanOptions = optionsByType.additional_dish;
+  const sayurOptions = optionsByType.vegetable;
+  const sambalOptions = optionsByType.sauce;
 
   const laukUtamaCount = card.packageType.startsWith("A")
     ? 1
@@ -145,17 +75,6 @@ export function OrderModal({ card, serviceName, onClose }: OrderModalProps) {
       : 3;
 
   const minumanValue = isPlus ? "Air Mineral 330ml" : "Air Mineral Gelas";
-
-  const allLaukTambahanOptions = [
-  "Perkedel Kentang",
-  "Tempe/Tahu Goreng",
-  "Perkedel Tahu",
-  "Bakwan Jagung",
-  "Serut Kentang",
-  "Sambal Goreng Kentang Hati",
-  "Orak Arik Tahu Tempe",
-  "Tempe Mendoan",
-  ];
 
   const [nasi, setNasi] = useState("");
   const [laukUtamaList, setLaukUtamaList] = useState<
@@ -373,7 +292,7 @@ export function OrderModal({ card, serviceName, onClose }: OrderModalProps) {
                     >
                       {visibleGroups.map((group) => (
                         <SelectItem key={group} value={group}>
-                          {groupLabels[group]}
+                          {mainDishGroupLabels[group]}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -399,9 +318,7 @@ export function OrderModal({ card, serviceName, onClose }: OrderModalProps) {
                       className="z-[80]"
                     >
                       {val.kategori &&
-                        laukUtamaGroups[
-                          val.kategori as keyof typeof laukUtamaGroups
-                        ].map((o) => (
+                        mainDishGroups[val.kategori]?.map((o) => (
                           <SelectItem key={o} value={o}>
                             {o}
                           </SelectItem>

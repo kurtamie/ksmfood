@@ -133,6 +133,22 @@ function getPrimaryInvoiceFromArray(
   return invoices?.[0] ?? null;
 }
 
+function getInvoiceSnapToken(invoice: InvoiceRow | null): string | null {
+  return invoice?.snap_token ?? invoice?.midtrans_snap_token ?? null;
+}
+
+function getInvoiceSnapRedirectUrl(invoice: InvoiceRow | null): string | null {
+  return (
+    invoice?.snap_redirect_url ??
+    invoice?.midtrans_redirect_url ??
+    null
+  );
+}
+
+function isOverduePaymentStatus(status: string | null | undefined): boolean {
+  return status === "overdue" || status === "expired";
+}
+
 export default function OrderDetailPage() {
   const params = useParams();
   const router = useRouter();
@@ -198,23 +214,31 @@ export default function OrderDetailPage() {
 
     if (!order) return;
 
-    // order.id adalah numeric ID dari OrderListItem
-    const numericOrderId = order.id;
-    const total = order.total;
+    const primaryInvoice = getPrimaryInvoiceFromArray(order.invoices);
+    const invoicePaymentStatus =
+      primaryInvoice?.payment_status ?? order.paymentStatus;
+    const snapToken = getInvoiceSnapToken(primaryInvoice);
+    const snapRedirectUrl = getInvoiceSnapRedirectUrl(primaryInvoice);
 
-    if (!numericOrderId || !Number.isFinite(numericOrderId)) {
-      setPayError("ID pesanan tidak valid.");
+    if (isOverduePaymentStatus(invoicePaymentStatus)) {
+      setPayError(
+        "Invoice sudah jatuh tempo. Pembayaran tidak dapat dilanjutkan.",
+      );
       return;
     }
-    if (!total || total <= 0) {
-      setPayError("Total pembayaran tidak tersedia.");
+    if (!snapToken && !snapRedirectUrl) {
+      setPayError(
+        "Data pembayaran Midtrans lama tidak tersedia untuk invoice ini.",
+      );
       return;
     }
-    if (!clientKey) {
+    const snapPay = window.snap?.pay;
+
+    if (snapToken && !clientKey) {
       setPayError("Midtrans client key belum dikonfigurasi.");
       return;
     }
-    if (!snapReady || !window.snap?.pay) {
+    if (snapToken && (!snapReady || !snapPay)) {
       setPayError("Midtrans Snap belum siap. Coba lagi sebentar.");
       return;
     }
@@ -222,33 +246,27 @@ export default function OrderDetailPage() {
     setIsPaying(true);
 
     try {
-      const res = await fetch("/api/midtrans/snap-token", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          orderId: numericOrderId,
-          grossAmount: total,
-          customerName: order.recipientName,
-          customerPhone: order.recipientPhone,
-        }),
-      });
-      const json = await res.json();
-
-      if (!res.ok || !json?.success || !json?.token) {
+      if (!snapToken && snapRedirectUrl) {
+        window.location.href = snapRedirectUrl;
+        return;
+      }
+      if (!snapPay) {
+        throw new Error("Midtrans Snap belum siap. Coba lagi sebentar.");
+      }
+      if (!snapToken) {
         throw new Error(
-          typeof json?.error === "string"
-            ? json.error
-            : "Gagal membuka pembayaran Midtrans.",
+          "Data pembayaran Midtrans lama tidak tersedia untuk invoice ini.",
         );
       }
 
-      window.snap.pay(json.token, {
+      snapPay(snapToken, {
         onSuccess: async () => {
           try {
             // Ambil invoice dari array invoices di order
             const primaryInvoice = getPrimaryInvoiceFromArray(order.invoices);
             const invoiceDocId = primaryInvoice?.documentId;
             const invoiceNumId = primaryInvoice?.id;
+            const numericOrderId = order.id;
 
             if (invoiceDocId) {
               await fetch(`/api/invoices/${invoiceDocId}`, {
@@ -335,6 +353,9 @@ export default function OrderDetailPage() {
   const status = order.paymentStatusLabel as PaymentStatusLabel;
   const paid = isPaidStatus(status);
   const primaryInvoice = getPrimaryInvoiceFromArray(order.invoices);
+  const invoicePaymentStatus =
+    primaryInvoice?.payment_status ?? order.paymentStatus;
+  const paymentOverdue = isOverduePaymentStatus(invoicePaymentStatus);
 
   const subTotal = order.orderDetails.reduce(
     (sum, detail) => sum + parseAmount(detail.total_amount ?? detail.amount),
@@ -402,10 +423,14 @@ export default function OrderDetailPage() {
               <button
                 type="button"
                 onClick={() => void handleResumePayment()}
-                disabled={isPaying}
+                disabled={isPaying || paymentOverdue}
                 className="inline-flex items-center justify-center rounded-lg bg-primary-600 px-5 py-2 text-sm font-semibold text-white hover:bg-primary-700 disabled:cursor-not-allowed disabled:opacity-60"
               >
-                {isPaying ? "Membuka pembayaran..." : "Lanjutkan Pembayaran"}
+                {paymentOverdue
+                  ? "Pembayaran Jatuh Tempo"
+                  : isPaying
+                    ? "Membuka pembayaran..."
+                    : "Lanjutkan Pembayaran"}
               </button>
             ) : null}
           </div>

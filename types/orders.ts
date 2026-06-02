@@ -28,6 +28,9 @@ export type CreateOrderMenuInput = Pick<
   | "box"
   | "pudding"
   | "snack"
+  | "snack2"
+  | "snack3"
+  | "snack4"
 >;
 
 /** Payload untuk POST /api/orders — selaras field Order di Strapi */

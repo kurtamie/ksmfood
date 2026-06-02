@@ -18,6 +18,7 @@ import AuthModal from "@/components/auth/AuthModal";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/authContext";
 import { createCheckoutOrder } from "@/lib/client-checkout";
+import { useServiceDishes } from "@/components/landing/services/use-service-dishes";
 
 export interface SnackPackageCard {
   id: string;
@@ -55,74 +56,20 @@ const minumanMap: Record<string, string> = {
   F: "Teh Kotak",
 };
 
-// Daftar kue per kategori
-const kueGroups: Record<string, { label: string; options: string[]; surcharge?: number }> = {
-  manis: {
-    label: "Manis",
-    options: [
-      "Sus Fla",
-      "Brownies",
-      "Bolu Gulung",
-      "Bolu Karamel",
-      "Klepon",
-      "Putu Ayu",
-      "Onde-onde",
-      "Talam Pandan",
-      "Talam Ubi Ungu",
-      "Kueku",
-      "Kue Lumpur",
-      "Bolu Tape",
-      "Pie Buah",
-      "Talam",
-      "Lapis Warna",
-    ],
-  },
-  asin: {
-    label: "Asin",
-    options: [
-      "Rol Ayam",
-      "Nugget Tahu",
-      "Semar Mendem",
-      "Luti Gendang",
-      "Epok-epok",
-      "Kroket Kentang",
-      "Samosa",
-      "Lemper",
-      "Sosis Solo",
-      "Tahu Kukus",
-      "Risoles",
-    ],
-  },
-  puding: {
-    label: "Puding",
-    options: [
-      "Puding Fla",
-      "Puding Ceria",
-      "Puding Rasa Buah",
-      "Puding Koktail",
-    ],
-  },
-  roti: {
-    label: "Roti (+Rp 2.000/pcs)",
-    options: [
-      "Roti Kacang Merah",
-      "Roti Abon",
-      "Pisang Cokelat",
-      "Pisang Keju Cokelat",
-      "Bomboloni",
-      "Donat Topping",
-      "Bolu Marmer",
-      "Roti Cokelat",
-      "Roti Srikaya",
-      "Roti Keju",
-    ],
-    surcharge: 2000,
-  },
-};
-
-const kueCategories = ["manis", "asin", "puding", "roti"] as const;
-
 type KueSelection = { kategori: string; menu: string };
+
+const rotiSnackNames = [
+  "pisang cokelat",
+  "pisang keju cokelat",
+  "bomboloni",
+  "donat topping",
+  "bolu marmer",
+];
+
+const isRotiSnack = (name: string) => {
+  const value = name.toLowerCase();
+  return value.includes("roti") || rotiSnackNames.includes(value);
+};
 
 export function SnackOrderModal({ card, serviceName, onClose }: SnackOrderModalProps) {
   const t = useTranslations("riceboxMenu");
@@ -131,9 +78,11 @@ export function SnackOrderModal({ card, serviceName, onClose }: SnackOrderModalP
   const [pendingItem, setPendingItem] = useState<CartItem | null>(null);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const router = useRouter();
+  const { optionsByType } = useServiceDishes("snackbox");
 
   const kueCount = kueCountMap[card.packageType];
   const minuman = minumanMap[card.packageType];
+  const snackOptions = optionsByType.snack;
 
   const [kueList, setKueList] = useState<KueSelection[]>(
     Array.from({ length: kueCount }, () => ({ kategori: "", menu: "" }))
@@ -145,23 +94,23 @@ export function SnackOrderModal({ card, serviceName, onClose }: SnackOrderModalP
   const priceNumber = parseInt(card.price.replace(/[^0-9]/g, ""), 10);
 
   // Hitung surcharge dari kue roti
-  const rotiSurcharge = kueList.filter((k) => k.kategori === "roti").length * 2000;
+  const rotiSurcharge = kueList.filter((k) => isRotiSnack(k.menu)).length * 2000;
   const subtotal = (priceNumber * jumlah) + (rotiSurcharge * jumlah);
 
   const getPackageName = (title: string, subTitle?: string) =>
     [title, subTitle].filter(Boolean).join(" ");
 
   const isFormValid =
-    kueList.every((k) => k.kategori !== "" && k.menu !== "") && !jumlahError;
+    kueList.every((k) => k.menu !== "") && !jumlahError;
 
   const handleOrder = () => {
     if (!isFormValid) return;
 
     const addOns = [
       ...kueList.map((k, i) => ({
-        label: `${kueCount > 1 ? `Kue ${i + 1}: ` : ""}${k.menu}${k.kategori === "roti" ? " (+Rp 2.000)" : ""}`,
+        label: `${kueCount > 1 ? `Kue ${i + 1}: ` : ""}${k.menu}${isRotiSnack(k.menu) ? " (+Rp 2.000)" : ""}`,
         value: `kue_${i}_${k.menu}`,
-        price: k.kategori === "roti" ? 2000 : 0,
+        price: isRotiSnack(k.menu) ? 2000 : 0,
       })),
       {
         label: minuman,
@@ -256,40 +205,16 @@ export function SnackOrderModal({ card, serviceName, onClose }: SnackOrderModalP
                   <span className="text-red-600"> *</span>
                 </label>
                 <div className="flex flex-1 flex-col gap-2">
-                  {/* Pilih Kategori */}
-                  <Select
-                    value={val.kategori}
-                    onValueChange={(newKategori) => {
-                      const updated = kueList.map((item, i) =>
-                        i === idx ? { kategori: newKategori, menu: "" } : item
-                      );
-                      setKueList(updated);
-                    }}
-                  >
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Pilih Kategori" />
-                    </SelectTrigger>
-                    <SelectContent
-                      position="popper"
-                      side="bottom"
-                      avoidCollisions={false}
-                      className="z-[80]"
-                    >
-                      {kueCategories.map((cat) => (
-                        <SelectItem key={cat} value={cat}>
-                          {kueGroups[cat].label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-
-                  {/* Pilih Menu */}
                   <Select
                     value={val.menu}
-                    disabled={!val.kategori}
                     onValueChange={(newMenu) => {
                       const updated = kueList.map((item, i) =>
-                        i === idx ? { ...item, menu: newMenu } : item
+                        i === idx
+                          ? {
+                              kategori: isRotiSnack(newMenu) ? "roti" : "snack",
+                              menu: newMenu,
+                            }
+                          : item
                       );
                       setKueList(updated);
                     }}
@@ -303,12 +228,11 @@ export function SnackOrderModal({ card, serviceName, onClose }: SnackOrderModalP
                       avoidCollisions={false}
                       className="z-[80]"
                     >
-                      {val.kategori &&
-                        kueGroups[val.kategori].options.map((o) => (
-                          <SelectItem key={o} value={o}>
-                            {o}
-                          </SelectItem>
-                        ))}
+                      {snackOptions.map((o) => (
+                        <SelectItem key={o} value={o}>
+                          {o}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>
@@ -351,7 +275,7 @@ export function SnackOrderModal({ card, serviceName, onClose }: SnackOrderModalP
             </div>
 
             {/* Info surcharge roti */}
-            {kueList.some((k) => k.kategori === "roti") && (
+            {kueList.some((k) => isRotiSnack(k.menu)) && (
               <p className="text-xs text-amber-700 bg-amber-50 rounded-lg px-3 py-2">
                 Pilihan kue kategori <strong>Roti</strong> dikenakan tambahan biaya{" "}
                 <strong>Rp 2.000/kotak</strong>.
