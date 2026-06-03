@@ -89,7 +89,7 @@ export function SnackOrderModal({ card, serviceName, onClose }: SnackOrderModalP
   );
   const [jumlahStr, setJumlahStr] = useState("1");
   const jumlah = parseInt(jumlahStr) || 0;
-  const jumlahError = jumlah < 1;
+  const jumlahError = jumlah < 100;
 
   const priceNumber = parseInt(card.price.replace(/[^0-9]/g, ""), 10);
 
@@ -254,7 +254,7 @@ export function SnackOrderModal({ card, serviceName, onClose }: SnackOrderModalP
                 <div className="flex items-center gap-3">
                   <input
                     type="number"
-                    min={50}
+                    min={100}
                     value={jumlahStr}
                     onChange={(e) => setJumlahStr(e.target.value)}
                     className={`w-24 rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-800 ${
@@ -268,7 +268,7 @@ export function SnackOrderModal({ card, serviceName, onClose }: SnackOrderModalP
               </div>
               {jumlahError && (
                 <p className="pl-36 text-xs text-red-600 mt-2">
-                  Jumlah pesanan tidak bisa di bawah 50. Untuk pesanan lebih
+                  Jumlah pesanan tidak bisa di bawah 100. Untuk pesanan lebih
                   sedikit, silahkan hubungi tim kami.
                 </p>
               )}
