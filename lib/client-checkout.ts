@@ -4,6 +4,7 @@ import type { CartItem } from "@/components/CartContext";
 import { getItemTotalPrice } from "@/components/CartContext";
 import {
   buildAggregateOrderDetail,
+  hasOrderMenuValues,
   mergeCartItems,
   parseCartItemToOrderMenu,
 } from "@/lib/cart-order-payload";
@@ -29,6 +30,9 @@ export async function createCheckoutOrder(
 
   const packageName = checkoutItems[0]?.packageName || "Paket Katering";
   const productName = checkoutItems[0]?.category || packageName;
+  const orderMenus = checkoutItems
+    .map(parseCartItemToOrderMenu)
+    .filter(hasOrderMenuValues);
 
   const response = await fetch("/api/orders", {
     method: "POST",
@@ -41,7 +45,7 @@ export async function createCheckoutOrder(
       customer_type: "personal",
       package_name: packageName,
       product: productName,
-      order_menus: checkoutItems.map(parseCartItemToOrderMenu),
+      order_menus: orderMenus,
       order_details: [buildAggregateOrderDetail(checkoutItems)],
     }),
   });

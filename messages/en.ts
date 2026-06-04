@@ -19,6 +19,11 @@ const serviceItems = {
     description:
       "Complete buffet spreads for weddings and special family celebrations.",
   },
+  "katering-pondokan": {
+    label: "Food Stall Catering",
+    description:
+      "Food stall menu options for weddings, family events, and special gatherings.",
+  },
   bento: {
     label: "Bento",
     description:

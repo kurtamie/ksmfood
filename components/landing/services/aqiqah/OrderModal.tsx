@@ -209,8 +209,6 @@ export function AqiqahOrderModal({ card, serviceName, onClose }: AqiqahOrderModa
         onClose={() => setIsAuthOpen(false)}
         onSuccess={() => {
           setIsAuthOpen(false);
-          setPendingItem(null);
-          onClose();
         }}
       />
     </>

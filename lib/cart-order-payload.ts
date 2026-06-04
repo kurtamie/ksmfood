@@ -17,6 +17,10 @@ export function getLeaveTime(arriveTime: string) {
 }
 
 export function parseCartItemToOrderMenu(item: CartItem): CreateOrderMenuInput {
+  if (item.slug.startsWith("pondokan/")) {
+    return {};
+  }
+
   if (item.slug.startsWith("snackbox/")) {
     const snackAddons = item.addOns
       .map((addOn) => {
@@ -139,4 +143,8 @@ export function mergeCartItems(items: CartItem[]): CartItem[] {
   }
 
   return Array.from(merged.values());
+}
+
+export function hasOrderMenuValues(menu: CreateOrderMenuInput): boolean {
+  return Object.values(menu).some((value) => value != null && value !== "");
 }

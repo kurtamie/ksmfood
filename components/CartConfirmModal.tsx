@@ -62,6 +62,7 @@ export default function CartConfirmModal({
   const pricePerItem =
     item.basePrice + item.addOns.reduce((s, a) => s + a.price, 0);
   const addOnLabels = item.addOns.map((a) => a.label).join(", ");
+  const unitLabel = item.unitLabel ?? "Kotak";
 
   const handleCheckout = async () => {
     if (!isLoggedIn) {
@@ -115,7 +116,7 @@ export default function CartConfirmModal({
               id="confirm-modal-title"
               className="text-xl font-semibold leading-tight text-primary-500"
             >
-              {item.quantity} Kotak
+              {item.quantity} {unitLabel}
             </h2>
             <p className="text-lg font-medium text-black">{item.name}</p>
           </div>
@@ -155,7 +156,7 @@ export default function CartConfirmModal({
                 {formatRupiah(totalPrice)}
               </p>
               <p className="text-xs text-secondary-800">
-                @ {formatRupiah(pricePerItem)} / kotak
+                @ {formatRupiah(pricePerItem)} / {unitLabel.toLowerCase()}
               </p>
             </div>
 

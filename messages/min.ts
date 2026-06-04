@@ -19,6 +19,11 @@ const serviceItems = {
     description:
       "Hidangan prasmanan langkok untuak pesta nikah jo acara keluarga nan istimewa.",
   },
+  "katering-pondokan": {
+    label: "Katering Pondokan",
+    description:
+      "Pilihan menu pondokan untuak malangkok-i pesta nikah, acara keluarga, jo jamuan istimewa.",
+  },
   bento: {
     label: "Bento",
     description:

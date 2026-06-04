@@ -25,12 +25,15 @@ export type OrderListItem = {
   id: number;
   documentId: string;
   orderNo: string | null;
+  packageName: string | null;
   createdAt: string | null;
   deliveryDate: string | null;
   deliveryAddress: string | null;
   total: number;
   paymentStatusLabel: string;
+  paymentStatus: string | null;
   invoiceNo: string | null;
+  step: OrderStep | null;
 };
 
 export type OrderDetailView = OrderListItem & {
@@ -74,6 +77,13 @@ export async function fetchOrdersByCustomerId(
     "filters[customer_id][id][$eq]": String(customerId),
     "sort[0]": "createdAt:desc",
     "pagination[pageSize]": "100",
+    "fields[0]": "step",
+    "fields[1]": "order_no",
+    "fields[2]": "package_name",
+    "fields[3]": "createdAt",
+    "fields[4]": "delivery_date",
+    "fields[5]": "delivery_address",
+    "fields[6]": "created_date",
     "populate[invoices][fields][0]": "invoice_no",
     "populate[invoices][fields][1]": "payment_status",
     "populate[invoices][fields][2]": "invoice_date",
@@ -162,16 +172,17 @@ export async function fetchOrderByDocumentId(
   const byDocumentSearch = new URLSearchParams({
     "filters[documentId][$eq]": documentId,
     "pagination[pageSize]": "1",
-    "fields[0]": "step",          // ← tambah ini
-    "fields[1]": "order_no",      // ← tambah ini
-    "fields[2]": "createdAt",
-    "fields[3]": "delivery_date",
-    "fields[4]": "delivery_address",
-    "fields[5]": "recipient_name",
-    "fields[6]": "recipient_phone_no",
-    "fields[7]": "delivery_note",
-    "fields[8]": "arrive_time",
-    "fields[9]": "created_date",
+    "fields[0]": "step", // ← tambah ini
+    "fields[1]": "order_no", // ← tambah ini
+    "fields[2]": "package_name",
+    "fields[3]": "createdAt",
+    "fields[4]": "delivery_date",
+    "fields[5]": "delivery_address",
+    "fields[6]": "recipient_name",
+    "fields[7]": "recipient_phone_no",
+    "fields[8]": "delivery_note",
+    "fields[9]": "arrive_time",
+    "fields[10]": "created_date",
     "populate[invoices]": "true",
   });
 
@@ -225,12 +236,15 @@ export async function mapOrderToListItem(
     id: order.id,
     documentId: order.documentId ?? String(order.id),
     orderNo: order.order_no ?? null,
+    packageName: order.package_name ?? null,
     createdAt: order.createdAt ?? order.created_date ?? null,
     deliveryDate: order.delivery_date ?? null,
     deliveryAddress: order.delivery_address ?? null,
     total,
     paymentStatusLabel: getOrderPaymentStatusLabel(order.invoices),
+    paymentStatus: invoice?.payment_status ?? null,
     invoiceNo: invoice?.invoice_no ?? null,
+    step: order.step ?? null,
   };
 }
 
@@ -250,7 +264,7 @@ export async function mapOrderToDetailView(
     deliveryNote: order.delivery_note ?? null,
     arriveTime: order.arrive_time ?? null,
     step: order.step ?? null,
-    paymentStatus: invoices[0]?.payment_status ?? null,
+    paymentStatus: invoices[0]?.payment_status ?? listItem.paymentStatus,
     orderDetails,
     orderMenus,
     invoices,

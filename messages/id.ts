@@ -19,6 +19,11 @@ const serviceItems = {
     description:
       "Sajian prasmanan lengkap untuk acara keluarga, gathering, dan kebutuhan katering skala besar.",
   },
+  "katering-pondokan": {
+    label: "Katering Pondokan",
+    description:
+      "Pilihan menu pondokan untuk melengkapi acara pernikahan, keluarga, dan kebutuhan jamuan spesial.",
+  },
   bento: {
     label: "Bento",
     description:

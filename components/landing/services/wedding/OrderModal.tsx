@@ -59,7 +59,7 @@ export function OrderModalPrasmanan({ card, serviceName, onClose }: OrderModalPr
   const { optionsByType, mainDishGroups } =
     useServiceDishes("prasmanan_wedding");
 
-  const visibleGroups = ["ayam", "ikan"].filter(
+  const visibleGroups = ["ikan", "ayam", "seafood", "daging"].filter(
     (group) => mainDishGroups[group]?.length,
   );
 
@@ -482,8 +482,6 @@ const subtotal = pricePerPortion * jumlah;
         onClose={() => setIsAuthOpen(false)}
         onSuccess={() => {
           setIsAuthOpen(false);
-          setPendingItem(null);
-          onClose();
         }}
       />
     </>

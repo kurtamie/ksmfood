@@ -56,7 +56,7 @@ export function OrderModal({ card, serviceName, onClose }: OrderModalProps) {
   const router = useRouter();
   const { optionsByType, mainDishGroups } = useServiceDishes("bento");
 
-  const visibleGroups = ["ayam", "ikan"].filter(
+  const visibleGroups = ["ikan", "ayam", "seafood", "daging"].filter(
     (group) => mainDishGroups[group]?.length,
   );
 
@@ -451,8 +451,6 @@ export function OrderModal({ card, serviceName, onClose }: OrderModalProps) {
         onClose={() => setIsAuthOpen(false)}
         onSuccess={() => {
           setIsAuthOpen(false);
-          setPendingItem(null);
-          onClose();
         }}
       />
     </>

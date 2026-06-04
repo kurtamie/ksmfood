@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import type { Dish, DishType, ServiceType } from "@/types/dish";
+import type { CategoryType, Dish, DishType, ServiceType } from "@/types/dish";
 
 const dishTypes: DishType[] = [
   "rice",
@@ -16,9 +16,21 @@ const dishTypes: DishType[] = [
   "snack",
 ];
 
+const mainDishCategories = ["ikan", "ayam", "seafood", "daging"] as const;
+const snackCategories = ["manis", "asin", "pudding", "roti"] as const;
+
 export const mainDishGroupLabels: Record<string, string> = {
-  ayam: "Ayam",
   ikan: "Ikan",
+  ayam: "Ayam",
+  seafood: "Seafood",
+  daging: "Daging",
+};
+
+export const snackGroupLabels: Record<string, string> = {
+  manis: "Manis",
+  asin: "Asin",
+  pudding: "Pudding",
+  roti: "Roti",
 };
 
 const createEmptyOptions = () =>
@@ -30,10 +42,14 @@ const createEmptyOptions = () =>
     {} as Record<DishType, string[]>,
   );
 
-const createEmptyMainDishGroups = (): Record<string, string[]> => ({
-  ayam: [],
-  ikan: [],
-});
+const createEmptyGroups = (categories: readonly string[]): Record<string, string[]> =>
+  categories.reduce(
+    (acc, category) => {
+      acc[category] = [];
+      return acc;
+    },
+    {} as Record<string, string[]>,
+  );
 
 const normalizeDishes = (payload: unknown): Dish[] => {
   if (Array.isArray(payload)) return payload as Dish[];
@@ -55,8 +71,17 @@ const inferMainDishGroup = (name: string) => {
 
   if (value.includes("ayam")) return "ayam";
   if (value.includes("ikan")) return "ikan";
+  if (value.includes("udang") || value.includes("cumi") || value.includes("seafood")) {
+    return "seafood";
+  }
+  if (value.includes("daging") || value.includes("sapi")) return "daging";
 
   return null;
+};
+
+const normalizeCategory = (category: CategoryType | null) => {
+  if (category === "puding") return "pudding";
+  return category;
 };
 
 export function useServiceDishes(service: ServiceType) {
@@ -118,27 +143,42 @@ export function useServiceDishes(service: ServiceType) {
   }, [serviceDishes]);
 
   const mainDishGroups = useMemo(() => {
-    const groups = createEmptyMainDishGroups();
+    const groups = createEmptyGroups(mainDishCategories);
 
-    optionsByType.main_dish.forEach((name) => {
-      const group = inferMainDishGroup(name);
+    serviceDishes
+      .filter((dish) => dish.type === "main_dish")
+      .forEach((dish) => {
+        const group = normalizeCategory(dish.category) ?? inferMainDishGroup(dish.name);
 
-      if (group) {
-        groups[group].push(name);
-        return;
-      }
-
-      groups.ayam.push(name);
-      groups.ikan.push(name);
-    });
+        if (group && group in groups && !groups[group].includes(dish.name)) {
+          groups[group].push(dish.name);
+        }
+      });
 
     return groups;
-  }, [optionsByType.main_dish]);
+  }, [serviceDishes]);
+
+  const snackGroups = useMemo(() => {
+    const groups = createEmptyGroups(snackCategories);
+
+    serviceDishes
+      .filter((dish) => dish.type === "snack")
+      .forEach((dish) => {
+        const group = normalizeCategory(dish.category);
+
+        if (group && group in groups && !groups[group].includes(dish.name)) {
+          groups[group].push(dish.name);
+        }
+      });
+
+    return groups;
+  }, [serviceDishes]);
 
   return {
     dishes: serviceDishes,
     optionsByType,
     mainDishGroups,
+    snackGroups,
     isLoading,
     error,
   };

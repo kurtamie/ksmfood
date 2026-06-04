@@ -7,6 +7,7 @@ import type { OrderMenu } from "./order-menus";
 import type { Invoice } from "./invoices";
 
 export type OrderStep = "packing" | "send" | "success";
+export type OrderDisplayStep = "waiting_payment" | OrderStep;
 
 export type CreateOrderDetailInput = Pick<
   OrderDetail,

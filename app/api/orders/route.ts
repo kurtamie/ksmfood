@@ -61,6 +61,45 @@ function formatStrapiError(body: unknown): string {
   return "Request gagal";
 }
 
+function buildUnpaidOrderLimitQuery(customer: ResolvedCustomer): string {
+  const params = new URLSearchParams({
+    "pagination[pageSize]": "3",
+    "fields[0]": "id",
+    "populate[invoices][fields][0]": "payment_status",
+    "filters[invoices][payment_status][$eq]": "unpaid",
+  });
+
+  if (customer.documentId) {
+    params.set("filters[customer_id][documentId][$eq]", customer.documentId);
+  } else {
+    params.set("filters[customer_id][id][$eq]", String(customer.id));
+  }
+
+  return `?${params.toString()}`;
+}
+
+async function countUnpaidOrdersForCustomer(
+  token: string | null,
+  customer: ResolvedCustomer,
+): Promise<number> {
+  const res = await fetch(getOrdersApiUrl(buildUnpaidOrderLimitQuery(customer)), {
+    method: "GET",
+    headers: buildHeaders(token),
+    cache: "no-store",
+  });
+
+  if (!res.ok) {
+    const body = await res.json().catch(() => null);
+    throw new Error(
+      `Gagal memeriksa pesanan belum dibayar: ${formatStrapiError(body)}`,
+    );
+  }
+
+  const body = await res.json().catch(() => null);
+  const rows = Array.isArray(body?.data) ? body.data : [];
+  return rows.length;
+}
+
 async function toNextResponse(res: Response) {
   const contentType = res.headers.get("content-type") ?? "";
   const body = contentType.includes("application/json")
@@ -242,6 +281,22 @@ export async function POST(request: NextRequest) {
             "Customer tidak ditemukan untuk akun ini. Silakan login ulang atau lengkapi profil.",
         },
         { status: 400 },
+      );
+    }
+
+    const unpaidOrderCount = await countUnpaidOrdersForCustomer(
+      token,
+      resolvedCustomer,
+    );
+
+    if (unpaidOrderCount >= 3) {
+      return NextResponse.json(
+        {
+          success: false,
+          error:
+            "Anda masih memiliki 3 pesanan yang belum dibayar. Silakan bayar salah satu invoice terlebih dahulu sebelum membuat pesanan baru.",
+        },
+        { status: 409 },
       );
     }
 

@@ -7,6 +7,13 @@ export const services = [
       "Sajian prasmanan lengkap untuk acara keluarga, gathering, dan kebutuhan katering skala besar.",
   },
   {
+    slug: "katering-pondokan",
+    label: "Katering Pondokan",
+    href: "/services/pondokan",
+    description:
+      "Pilihan menu pondokan untuk melengkapi acara pernikahan, keluarga, dan kebutuhan jamuan spesial.",
+  },
+  {
     slug: "nasi-kotak",
     label: "Nasi Kotak",
     href: "/services/ricebox",

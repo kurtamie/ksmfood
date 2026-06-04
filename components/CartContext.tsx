@@ -28,6 +28,7 @@ export interface CartItem {
   slug: string;
   category: string;
   packageName?: string;
+  unitLabel?: string;
 }
 
 export interface CartState {

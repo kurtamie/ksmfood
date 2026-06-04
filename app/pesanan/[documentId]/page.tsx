@@ -8,7 +8,7 @@ import { isPaidStatus } from "@/lib/order-status";
 import type { PaymentStatusLabel } from "@/lib/order-status";
 import type { OrderDetailView } from "@/lib/order-queries";
 import { parseAmount } from "@/lib/order-totals";
-import type { OrderStep } from "@/types/orders";
+import type { OrderDisplayStep, OrderStep } from "@/types/orders";
 import { OrderStepper } from "@/components/OrderStepper";
 
 const SNAP_SCRIPT_URL =
@@ -45,6 +45,7 @@ type InvoiceRow = OrderDetailView["invoices"][number];
 type OrderDisplayItem = {
   id: string;
   name: string;
+  packageName: string | null;
   addOnLabels: string;
   quantity: number;
   unitPrice: number;
@@ -57,9 +58,14 @@ const ORDER_STEP_LABEL: Record<OrderStep, string> = {
   success: "Pesanan Diterima",
 };
 
-function getOrderStepLabel(step: OrderDetailView["step"]): string | null {
+const DISPLAY_ORDER_STEP_LABEL: Record<OrderDisplayStep, string> = {
+  waiting_payment: "Menunggu Pembayaran",
+  ...ORDER_STEP_LABEL,
+};
+
+function getOrderStepLabel(step: OrderDisplayStep | null): string | null {
   if (!step) return null;
-  return ORDER_STEP_LABEL[step] ?? null;
+  return DISPLAY_ORDER_STEP_LABEL[step] ?? null;
 }
 
 function buildMenuLabels(menu: OrderMenuRow): string {
@@ -85,6 +91,7 @@ function buildMenuLabels(menu: OrderMenuRow): string {
 function toOrderDisplayItems(
   menus: OrderMenuRow[],
   details: OrderDetailRow[],
+  packageName: string | null,
 ): OrderDisplayItem[] {
   if (details.length === 1) {
     const detail = details[0];
@@ -95,7 +102,8 @@ function toOrderDisplayItems(
     return [
       {
         id: String(detail.documentId ?? detail.id ?? "order-detail"),
-        name: "Menu Pesanan",
+        name: packageName ?? "Menu Pesanan",
+        packageName,
         addOnLabels: menus.map(buildMenuLabels).filter(Boolean).join(" | "),
         quantity,
         unitPrice,
@@ -115,9 +123,16 @@ function toOrderDisplayItems(
       quantity * unitPrice;
     return {
       id: String(
-        detail?.documentId ?? detail?.id ?? menu?.documentId ?? menu?.id ?? index,
+        detail?.documentId ??
+          detail?.id ??
+          menu?.documentId ??
+          menu?.id ??
+          index,
       ),
-      name: `Menu Pesanan ${index + 1}`,
+      name: packageName
+        ? `${packageName} ${index + 1}`
+        : `Menu Pesanan ${index + 1}`,
+      packageName,
       addOnLabels: menu ? buildMenuLabels(menu) : "",
       quantity,
       unitPrice,
@@ -127,9 +142,7 @@ function toOrderDisplayItems(
 }
 
 /** Ambil invoice utama (index 0) dari array invoices */
-function getPrimaryInvoiceFromArray(
-  invoices: InvoiceRow[],
-): InvoiceRow | null {
+function getPrimaryInvoiceFromArray(invoices: InvoiceRow[]): InvoiceRow | null {
   return invoices?.[0] ?? null;
 }
 
@@ -138,15 +151,26 @@ function getInvoiceSnapToken(invoice: InvoiceRow | null): string | null {
 }
 
 function getInvoiceSnapRedirectUrl(invoice: InvoiceRow | null): string | null {
-  return (
-    invoice?.snap_redirect_url ??
-    invoice?.midtrans_redirect_url ??
-    null
-  );
+  return invoice?.snap_redirect_url ?? invoice?.midtrans_redirect_url ?? null;
 }
 
 function isOverduePaymentStatus(status: string | null | undefined): boolean {
   return status === "overdue" || status === "expired";
+}
+
+function isUnpaidPaymentStatus(status: string | null | undefined): boolean {
+  return !status || status === "unpaid";
+}
+
+function getDisplayOrderStep(
+  step: OrderDetailView["step"],
+  paymentStatus: string | null | undefined,
+): OrderDisplayStep | null {
+  if (!step) return null;
+  if (step === "packing" && isUnpaidPaymentStatus(paymentStatus)) {
+    return "waiting_payment";
+  }
+  return step;
 }
 
 export default function OrderDetailPage() {
@@ -166,32 +190,36 @@ export default function OrderDetailPage() {
 
   const clientKey = process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY ?? "";
 
-  useEffect(() => {
+  const fetchOrderData = useCallback(async () => {
     if (!documentId) {
-      setError("ID pesanan tidak valid.");
-      setIsLoading(false);
-      return;
+      throw new Error("ID pesanan tidak valid.");
     }
 
+    const res = await fetch(
+      `/api/orders/mine/${encodeURIComponent(documentId)}`,
+      { cache: "no-store" },
+    );
+    const json = await res.json();
+    if (!res.ok || !json?.success) {
+      throw new Error(
+        typeof json?.error === "string"
+          ? json.error
+          : "Gagal memuat detail pesanan.",
+      );
+    }
+
+    return json.data as OrderDetailView;
+  }, [documentId]);
+
+  useEffect(() => {
     let cancelled = false;
 
     async function loadOrder() {
       setIsLoading(true);
       setError(null);
       try {
-        const res = await fetch(
-          `/api/orders/mine/${encodeURIComponent(documentId!)}`,
-          { cache: "no-store" },
-        );
-        const json = await res.json();
-        if (!res.ok || !json?.success) {
-          throw new Error(
-            typeof json?.error === "string"
-              ? json.error
-              : "Gagal memuat detail pesanan.",
-          );
-        }
-        if (!cancelled) setOrder(json.data as OrderDetailView);
+        const data = await fetchOrderData();
+        if (!cancelled) setOrder(data);
       } catch (err) {
         if (!cancelled)
           setError(
@@ -206,7 +234,7 @@ export default function OrderDetailPage() {
     return () => {
       cancelled = true;
     };
-  }, [documentId]);
+  }, [fetchOrderData]);
 
   const handleResumePayment = useCallback(async () => {
     setPayError(null);
@@ -296,14 +324,18 @@ export default function OrderDetailPage() {
               "Pembayaran berhasil. Status akan diperbarui via notifikasi Midtrans.",
             );
           } finally {
+            const updatedOrder = await fetchOrderData().catch(() => null);
+            if (updatedOrder) setOrder(updatedOrder);
             setIsPaying(false);
             router.refresh();
           }
         },
-        onPending: () => {
+        onPending: async () => {
           setPaymentMessage(
             "Pembayaran menunggu konfirmasi. Status akan diperbarui setelah selesai.",
           );
+          const updatedOrder = await fetchOrderData().catch(() => null);
+          if (updatedOrder) setOrder(updatedOrder);
           setIsPaying(false);
         },
         onError: () => {
@@ -320,7 +352,7 @@ export default function OrderDetailPage() {
       );
       setIsPaying(false);
     }
-  }, [clientKey, documentId, order, router, snapReady]);
+  }, [clientKey, documentId, fetchOrderData, order, router, snapReady]);
 
   // ── Loading & error states ────────────────────────────────────────────────
 
@@ -351,22 +383,26 @@ export default function OrderDetailPage() {
   // ── Derived values ────────────────────────────────────────────────────────
 
   const status = order.paymentStatusLabel as PaymentStatusLabel;
-  const paid = isPaidStatus(status);
   const primaryInvoice = getPrimaryInvoiceFromArray(order.invoices);
   const invoicePaymentStatus =
     primaryInvoice?.payment_status ?? order.paymentStatus;
+  const paid = invoicePaymentStatus === "paid" || isPaidStatus(status);
   const paymentOverdue = isOverduePaymentStatus(invoicePaymentStatus);
 
   const subTotal = order.orderDetails.reduce(
     (sum, detail) => sum + parseAmount(detail.total_amount ?? detail.amount),
     0,
   );
-  const totalQty = order.orderDetails.reduce(
-    (sum, detail) => sum + parseAmount(detail.qty),
-    0,
+  const orderItems = toOrderDisplayItems(
+    order.orderMenus,
+    order.orderDetails,
+    order.packageName,
   );
-  const orderItems = toOrderDisplayItems(order.orderMenus, order.orderDetails);
-  const orderStepLabel = paid ? getOrderStepLabel(order.step) : null;
+  const displayOrderStep = getDisplayOrderStep(
+    order.step,
+    invoicePaymentStatus,
+  );
+  const orderStepLabel = getOrderStepLabel(displayOrderStep);
 
   // ── Render ────────────────────────────────────────────────────────────────
 
@@ -379,6 +415,9 @@ export default function OrderDetailPage() {
           strategy="afterInteractive"
           data-client-key={clientKey}
           onLoad={() => setSnapReady(true)}
+          onError={() =>
+            setPayError("Midtrans Snap gagal dimuat. Coba refresh halaman.")
+          }
         />
       ) : null}
 
@@ -403,13 +442,14 @@ export default function OrderDetailPage() {
 
         {/* Card utama */}
         <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
-
           {/* Baris status + tombol lanjutkan pembayaran */}
-          <div className="flex flex-col gap-3 border-b border-gray-100 px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex items-center gap-3">
-              <span className="text-sm text-secondary-500">Status Pembayaran</span>
+          <div className="flex flex-col gap-3 border-b border-gray-100 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
+              <span className="text-sm text-secondary-500">
+                Status Pembayaran
+              </span>
               <span
-                className={`rounded-full px-3 py-1 text-xs font-semibold ${
+                className={`w-fit rounded-full px-3 py-1 text-xs font-semibold ${
                   paid
                     ? "bg-emerald-100 text-emerald-700"
                     : "bg-amber-100 text-amber-700"
@@ -419,7 +459,7 @@ export default function OrderDetailPage() {
               </span>
             </div>
 
-          {!paid ? (
+            {!paid ? (
               <button
                 type="button"
                 onClick={() => void handleResumePayment()}
@@ -436,12 +476,12 @@ export default function OrderDetailPage() {
           </div>
 
           {/* Status pesanan — hanya muncul kalau sudah lunas dan ada step */}
-          {paid && order.step ? (
-            <div className="border-b border-gray-100 px-6 py-5">
+          {displayOrderStep ? (
+            <div className="border-b border-gray-100 px-4 py-5 sm:px-6">
               <p className="mb-4 text-sm font-semibold text-tertiary-900">
-                Status Pesanan
+                Status Pesanan: {orderStepLabel}
               </p>
-              <OrderStepper currentStep={order.step} />
+              <OrderStepper currentStep={displayOrderStep} />
             </div>
           ) : null}
 
@@ -471,7 +511,7 @@ export default function OrderDetailPage() {
               Informasi Pengiriman
             </p>
             <div className="space-y-2 text-sm">
-               {/* Nama penerima */}
+              {/* Nama penerima */}
               {order.recipientName ? (
                 <div className="flex gap-4">
                   <span className="w-36 shrink-0 text-secondary-500">
@@ -499,7 +539,9 @@ export default function OrderDetailPage() {
                 <span className="w-36 shrink-0 text-secondary-500">
                   Metode Pengiriman
                 </span>
-                <span className="text-tertiary-900">: Pengantaran oleh KSM Katering</span>
+                <span className="text-tertiary-900">
+                  : Pengantaran oleh KSM Katering
+                </span>
               </div>
               <div className="flex gap-4">
                 <span className="w-36 shrink-0 text-secondary-500">
@@ -516,7 +558,7 @@ export default function OrderDetailPage() {
                 <span className="w-36 shrink-0 text-secondary-500">Alamat</span>
                 <div className="text-tertiary-900">
                   <p className="whitespace-pre-line">
-                  :  {order.deliveryAddress || "-"}
+                    : {order.deliveryAddress || "-"}
                   </p>
                 </div>
               </div>
@@ -586,8 +628,6 @@ export default function OrderDetailPage() {
                 </p>
               )}
             </div>
-
-
           </div>
 
           {/* Rincian pembayaran + lacak pesanan */}
@@ -619,7 +659,6 @@ export default function OrderDetailPage() {
                     </p>
                   </div>
                 ) : null} */}
-
               </div>
             </div>
           </div>

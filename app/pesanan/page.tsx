@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { isPaidStatus } from "@/lib/order-status";
 import type { PaymentStatusLabel } from "@/lib/order-status";
 import type { OrderListItem } from "@/lib/order-queries";
+import type { OrderDisplayStep } from "@/types/orders";
 
 function formatRupiah(amount: number) {
   return new Intl.NumberFormat("id-ID", {
@@ -23,6 +24,21 @@ function formatOrderDate(value: string | null) {
     month: "long",
     year: "numeric",
   });
+}
+
+const ORDER_STEP_LABEL: Record<OrderDisplayStep, string> = {
+  waiting_payment: "Menunggu Pembayaran",
+  packing: "Packing",
+  send: "Pengiriman",
+  success: "Diterima",
+};
+
+function getDisplayOrderStep(order: OrderListItem): OrderDisplayStep | null {
+  if (!order.step) return null;
+  if (order.step === "packing" && order.paymentStatus !== "paid") {
+    return "waiting_payment";
+  }
+  return order.step;
 }
 
 export default function OrderHistoryPage() {
@@ -99,7 +115,11 @@ export default function OrderHistoryPage() {
       <div className="space-y-4">
         {orders.map((order) => {
           const status = order.paymentStatusLabel as PaymentStatusLabel;
-          const paid = isPaidStatus(status);
+          const paid = order.paymentStatus === "paid" || isPaidStatus(status);
+          const displayOrderStep = getDisplayOrderStep(order);
+          const stepLabel = displayOrderStep
+            ? ORDER_STEP_LABEL[displayOrderStep]
+            : null;
 
           return (
             <div
@@ -107,7 +127,7 @@ export default function OrderHistoryPage() {
               className="rounded-3xl border border-secondary-200 bg-white px-5 py-5 shadow-sm"
             >
               <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                <div className="flex flex-col gap-2">
+                <div className="min-w-0 flex flex-col gap-2">
                   <div className="flex flex-wrap items-center gap-3">
                     <span className="text-sm text-secondary-500">
                       {formatOrderDate(order.deliveryDate ?? order.createdAt)}
@@ -128,6 +148,17 @@ export default function OrderHistoryPage() {
                     ) : order.orderNo ? (
                       <span className="text-sm text-secondary-500">
                         {order.orderNo}
+                      </span>
+                    ) : null}
+                  </div>
+
+                  <div className="min-w-0">
+                    <p className="truncate text-base font-semibold text-tertiary-900 sm:text-lg">
+                      {order.packageName ?? "Paket pesanan"}
+                    </p>
+                    {stepLabel ? (
+                      <span className="mt-2 inline-flex w-fit rounded-full bg-gray-100 px-3 py-1 text-xs font-semibold text-gray-700">
+                        Status Pesanan: {stepLabel}
                       </span>
                     ) : null}
                   </div>

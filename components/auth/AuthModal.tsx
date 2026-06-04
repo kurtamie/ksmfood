@@ -7,7 +7,6 @@ import {
   resetPasswordWithPhoneAction,
   sendOtpAction,
   sendPasswordResetOtpAction,
-  verifyPasswordResetOtpAction,
   verifyOtpAction,
   registerAction,
 } from "@/app/data/actions/auth-actions";
@@ -208,16 +207,6 @@ export default function AuthModal({
     setFieldErrors({});
     if (otpCode.length < 6) {
       setErrorMsg("Masukkan 6 digit kode OTP.");
-      return;
-    }
-    setIsLoading(true);
-    const result = await verifyPasswordResetOtpAction({
-      phone_no: resetPhone,
-      otp_code: otpCode,
-    });
-    setIsLoading(false);
-    if (!result.success) {
-      applyActionErrors("Kode OTP tidak valid.", result);
       return;
     }
     setNewPassword("");

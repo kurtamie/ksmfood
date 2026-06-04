@@ -18,7 +18,10 @@ import AuthModal from "@/components/auth/AuthModal";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/authContext";
 import { createCheckoutOrder } from "@/lib/client-checkout";
-import { useServiceDishes } from "@/components/landing/services/use-service-dishes";
+import {
+  snackGroupLabels,
+  useServiceDishes,
+} from "@/components/landing/services/use-service-dishes";
 
 export interface SnackPackageCard {
   id: string;
@@ -78,16 +81,18 @@ export function SnackOrderModal({ card, serviceName, onClose }: SnackOrderModalP
   const [pendingItem, setPendingItem] = useState<CartItem | null>(null);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const router = useRouter();
-  const { optionsByType } = useServiceDishes("snackbox");
+  const { snackGroups } = useServiceDishes("snackbox");
 
   const kueCount = kueCountMap[card.packageType];
   const minuman = minumanMap[card.packageType];
-  const snackOptions = optionsByType.snack;
+  const visibleSnackGroups = ["manis", "asin", "pudding", "roti"].filter(
+    (group) => snackGroups[group]?.length,
+  );
 
   const [kueList, setKueList] = useState<KueSelection[]>(
     Array.from({ length: kueCount }, () => ({ kategori: "", menu: "" }))
   );
-  const [jumlahStr, setJumlahStr] = useState("1");
+  const [jumlahStr, setJumlahStr] = useState("100");
   const jumlah = parseInt(jumlahStr) || 0;
   const jumlahError = jumlah < 100;
 
@@ -101,7 +106,7 @@ export function SnackOrderModal({ card, serviceName, onClose }: SnackOrderModalP
     [title, subTitle].filter(Boolean).join(" ");
 
   const isFormValid =
-    kueList.every((k) => k.menu !== "") && !jumlahError;
+    kueList.every((k) => k.kategori !== "" && k.menu !== "") && !jumlahError;
 
   const handleOrder = () => {
     if (!isFormValid) return;
@@ -206,15 +211,39 @@ export function SnackOrderModal({ card, serviceName, onClose }: SnackOrderModalP
                 </label>
                 <div className="flex flex-1 flex-col gap-2">
                   <Select
-                    value={val.menu}
-                    onValueChange={(newMenu) => {
+                    value={val.kategori}
+                    onValueChange={(newKategori) => {
                       const updated = kueList.map((item, i) =>
                         i === idx
-                          ? {
-                              kategori: isRotiSnack(newMenu) ? "roti" : "snack",
-                              menu: newMenu,
-                            }
+                          ? { kategori: newKategori, menu: "" }
                           : item
+                      );
+                      setKueList(updated);
+                    }}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Pilih Kategori" />
+                    </SelectTrigger>
+                    <SelectContent
+                      position="popper"
+                      side="bottom"
+                      avoidCollisions={false}
+                      className="z-[80]"
+                    >
+                      {visibleSnackGroups.map((group) => (
+                        <SelectItem key={group} value={group}>
+                          {snackGroupLabels[group]}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+
+                  <Select
+                    value={val.menu}
+                    disabled={!val.kategori}
+                    onValueChange={(newMenu) => {
+                      const updated = kueList.map((item, i) =>
+                        i === idx ? { ...item, menu: newMenu } : item
                       );
                       setKueList(updated);
                     }}
@@ -228,11 +257,12 @@ export function SnackOrderModal({ card, serviceName, onClose }: SnackOrderModalP
                       avoidCollisions={false}
                       className="z-[80]"
                     >
-                      {snackOptions.map((o) => (
-                        <SelectItem key={o} value={o}>
-                          {o}
-                        </SelectItem>
-                      ))}
+                      {val.kategori &&
+                        snackGroups[val.kategori]?.map((o) => (
+                          <SelectItem key={o} value={o}>
+                            {o}
+                          </SelectItem>
+                        ))}
                     </SelectContent>
                   </Select>
                 </div>
@@ -315,8 +345,6 @@ export function SnackOrderModal({ card, serviceName, onClose }: SnackOrderModalP
         onClose={() => setIsAuthOpen(false)}
         onSuccess={() => {
           setIsAuthOpen(false);
-          setPendingItem(null);
-          onClose();
         }}
       />
     </>

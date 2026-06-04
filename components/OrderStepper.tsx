@@ -1,11 +1,32 @@
-import type { OrderStep } from "@/types/orders";
+import type { OrderDisplayStep } from "@/types/orders";
 
 const STEPS: {
-  key: OrderStep;
+  key: OrderDisplayStep;
   label: string;
   sublabel: string;
   icon: React.ReactNode;
 }[] = [
+  {
+    key: "waiting_payment",
+    label: "Menunggu Pembayaran",
+    sublabel: "Invoice belum dibayar",
+    icon: (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <circle cx="12" cy="12" r="10" />
+        <polyline points="12 6 12 12 16 14" />
+      </svg>
+    ),
+  },
   {
     key: "packing",
     label: "Packing",
@@ -25,7 +46,7 @@ const STEPS: {
         <path d="M16.5 9.4 7.55 4.24" />
         <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
         <polyline points="3.29 7 12 12 20.71 7" />
-        <line x1="12" y1="22" x2="12" y2="12" />
+        <line x1="12" x2="12" y1="22" y2="12" />
       </svg>
     ),
   },
@@ -75,58 +96,57 @@ const STEPS: {
   },
 ];
 
-const BANNER: Record<OrderStep, { bg: string; text: string; message: string }> =
-  {
-    packing: {
-      bg: "bg-amber-50",
-      text: "text-amber-800",
-      message: "Pesanan kamu sedang dikemas dengan teliti. Mohon menunggu ya!",
-    },
-    send: {
-      bg: "bg-blue-50",
-      text: "text-blue-800",
-      message:
-        "Pesanan sedang dalam perjalanan menuju alamatmu. Harap siapkan diri untuk menerima.",
-    },
-    success: {
-      bg: "bg-emerald-50",
-      text: "text-emerald-800",
-      message:
-        "Pesanan sudah diterima! Terima kasih telah memesan dari KSM Katering 🎉",
-    },
-  };
+const BANNER: Record<
+  OrderDisplayStep,
+  { bg: string; text: string; message: string }
+> = {
+  waiting_payment: {
+    bg: "bg-amber-50",
+    text: "text-amber-800",
+    message:
+      "Pesanan sudah dibuat dan menunggu pembayaran sebelum mulai diproses.",
+  },
+  packing: {
+    bg: "bg-amber-50",
+    text: "text-amber-800",
+    message: "Pesanan kamu sedang dikemas dengan teliti. Mohon menunggu ya!",
+  },
+  send: {
+    bg: "bg-blue-50",
+    text: "text-blue-800",
+    message:
+      "Pesanan sedang dalam perjalanan menuju alamatmu. Harap siapkan diri untuk menerima.",
+  },
+  success: {
+    bg: "bg-emerald-50",
+    text: "text-emerald-800",
+    message:
+      "Pesanan sudah diterima! Terima kasih telah memesan dari KSM Katering.",
+  },
+};
 
 interface OrderStepperProps {
-  currentStep: OrderStep;
+  currentStep: OrderDisplayStep;
 }
 
 export function OrderStepper({ currentStep }: OrderStepperProps) {
-  const currentIndex = STEPS.findIndex((s) => s.key === currentStep);
+  const currentIndex = Math.max(
+    STEPS.findIndex((step) => step.key === currentStep),
+    0,
+  );
   const banner = BANNER[currentStep];
 
   return (
     <div className="space-y-4">
-      {/* Stepper */}
-      <div className="relative flex items-start justify-between">
-        {/* Background line (gray) */}
+      <div className="relative grid grid-cols-4 items-start">
         <div
-          className="absolute left-0 right-0 top-[18px] h-0.5 bg-gray-200"
-          style={{ left: "calc(16.6%)", right: "calc(16.6%)" }}
+          className="absolute top-[18px] h-0.5 bg-gray-200"
+          style={{ left: "12.5%", right: "12.5%" }}
           aria-hidden="true"
         />
-
-        {/* Progress line (green) */}
         <div
           className="absolute top-[18px] h-0.5 bg-emerald-500 transition-all duration-500"
-          style={{
-            left: "calc(16.6%)",
-            width:
-              currentIndex === 0
-                ? "0%"
-                : currentIndex === 1
-                  ? "calc(50% - 0px)"
-                  : "calc(66.8%)",
-          }}
+          style={{ left: "12.5%", width: `${currentIndex * 25}%` }}
           aria-hidden="true"
         />
 
@@ -137,14 +157,13 @@ export function OrderStepper({ currentStep }: OrderStepperProps) {
           return (
             <div
               key={step.key}
-              className="relative z-10 flex flex-1 flex-col items-center gap-2"
+              className="relative z-10 flex min-w-0 flex-col items-center gap-2 px-1"
             >
-              {/* Circle */}
               <div
-                className={`flex h-9 w-9 items-center justify-center rounded-full transition-all duration-300 ${
+                className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition-all duration-300 ${
                   isDone
                     ? isActive
-                      ? "bg-emerald-500 ring-4 ring-emerald-100 text-white"
+                      ? "bg-emerald-500 text-white ring-4 ring-emerald-100"
                       : "bg-emerald-500 text-white"
                     : "bg-gray-100 text-gray-400"
                 }`}
@@ -152,16 +171,15 @@ export function OrderStepper({ currentStep }: OrderStepperProps) {
                 {step.icon}
               </div>
 
-              {/* Labels */}
-              <div className="flex flex-col items-center text-center">
+              <div className="flex min-w-0 flex-col items-center text-center">
                 <span
-                  className={`text-xs font-semibold ${
+                  className={`max-w-[5.5rem] text-xs font-semibold leading-tight ${
                     isDone ? "text-emerald-700" : "text-gray-400"
                   }`}
                 >
                   {step.label}
                 </span>
-                <span className="mt-0.5 text-[10px] leading-tight text-secondary-500">
+                <span className="mt-0.5 max-w-[5.5rem] text-[10px] leading-tight text-secondary-500">
                   {step.sublabel}
                 </span>
               </div>
@@ -170,7 +188,6 @@ export function OrderStepper({ currentStep }: OrderStepperProps) {
         })}
       </div>
 
-      {/* Banner info */}
       <div
         className={`rounded-xl px-4 py-3 text-sm ${banner.bg} ${banner.text}`}
       >

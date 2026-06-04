@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getToken } from "@/app/data/services/get-token";
-import type { Dish, DishType, ServiceType } from "@/types/dish";
+import type { CategoryType, Dish, DishType, ServiceType } from "@/types/dish";
 
 const dishTypes: DishType[] = [
   "rice",
@@ -21,6 +21,18 @@ const serviceTypes: ServiceType[] = [
   "prasmanan_wedding",
   "bento",
   "snackbox",
+];
+
+const categoryTypes: CategoryType[] = [
+  "ikan",
+  "ayam",
+  "seafood",
+  "daging",
+  "manis",
+  "asin",
+  "puding",
+  "pudding",
+  "roti",
 ];
 
 function getStrapiBaseUrl(): string {
@@ -53,6 +65,10 @@ function isServiceType(value: unknown): value is ServiceType {
   return typeof value === "string" && serviceTypes.includes(value as ServiceType);
 }
 
+function isCategoryType(value: unknown): value is CategoryType {
+  return typeof value === "string" && categoryTypes.includes(value as CategoryType);
+}
+
 function normalizeDish(entry: unknown): Dish | null {
   if (!entry || typeof entry !== "object") return null;
 
@@ -61,10 +77,14 @@ function normalizeDish(entry: unknown): Dish | null {
     name?: unknown;
     type?: unknown;
     service?: unknown;
+    category?: unknown;
+    categoryType?: unknown;
     attributes?: {
       name?: unknown;
       type?: unknown;
       service?: unknown;
+      category?: unknown;
+      categoryType?: unknown;
     };
   };
 
@@ -72,6 +92,11 @@ function normalizeDish(entry: unknown): Dish | null {
   const name = item.name ?? item.attributes?.name;
   const type = item.type ?? item.attributes?.type;
   const service = item.service ?? item.attributes?.service;
+  const category =
+    item.categoryType ??
+    item.category ??
+    item.attributes?.categoryType ??
+    item.attributes?.category;
 
   if (!Number.isFinite(id) || typeof name !== "string" || !isDishType(type)) {
     return null;
@@ -86,6 +111,7 @@ function normalizeDish(entry: unknown): Dish | null {
     name,
     type,
     service: service ?? null,
+    category: isCategoryType(category) ? category : null,
   };
 }
 

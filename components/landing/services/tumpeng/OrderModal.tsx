@@ -202,8 +202,6 @@ export function TumpengOrderModal({ card, serviceName, onClose }: TumpengOrderMo
         onClose={() => setIsAuthOpen(false)}
         onSuccess={() => {
           setIsAuthOpen(false);
-          setPendingItem(null);
-          onClose();
         }}
       />
     </>
