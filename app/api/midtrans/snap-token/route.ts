@@ -5,12 +5,22 @@ import {
   getMidtransSnapApiUrl,
 } from "@/lib/midtrans";
 import { getOrderPaymentAmount } from "@/lib/orders";
+import { getToken } from "@/app/data/services/get-token";
+import {
+  updateInvoiceMidtransPaymentData,
+  updateInvoiceMidtransPaymentDataByOrder,
+} from "@/lib/invoices";
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const orderId = Number(body?.orderId);
     const grossAmountFromClient = Number(body?.grossAmount);
+    const invoiceDocumentId =
+      typeof body?.invoiceDocumentId === "string"
+        ? body.invoiceDocumentId
+        : null;
+    const invoiceId = Number(body?.invoiceId);
 
     if (!Number.isFinite(orderId) || orderId <= 0) {
       return NextResponse.json(
@@ -80,6 +90,37 @@ export async function POST(request: NextRequest) {
         { success: false, error: message },
         { status: snapRes.status },
       );
+    }
+
+    const token = await getToken();
+    const invoiceIdentifier =
+      invoiceDocumentId ??
+      (Number.isFinite(invoiceId) && invoiceId > 0 ? invoiceId : null);
+
+    try {
+      if (invoiceIdentifier) {
+        await updateInvoiceMidtransPaymentData(
+          invoiceIdentifier,
+          {
+            midtransOrderId,
+            snapToken: snapData.token,
+            redirectUrl: snapData.redirect_url,
+          },
+          token,
+        );
+      } else {
+        await updateInvoiceMidtransPaymentDataByOrder(
+          orderId,
+          {
+            midtransOrderId,
+            snapToken: snapData.token,
+            redirectUrl: snapData.redirect_url,
+          },
+          token,
+        );
+      }
+    } catch (error) {
+      console.error("Failed to save Midtrans payment data:", error);
     }
 
     return NextResponse.json({

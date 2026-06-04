@@ -218,22 +218,26 @@ export default function Pondokan() {
       </div>
 
       <div className="mt-12 grid w-full max-w-6xl grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {packageCards.map((card) => {
+        {packageCards.map((card, index) => {
           const translatedCard = cards.find((item) => item.id === card.id);
           const title = translatedCard?.title ?? card.title;
+          const isLastOddItem =
+            packageCards.length % 2 !== 0 && index === packageCards.length - 1;
 
           return (
             <article
               key={card.id}
-              className="flex h-full flex-col items-center border border-black/10 bg-white p-5 text-center shadow-sm transition hover:-translate-y-1 hover:shadow-md"
+              className={`flex h-full flex-col items-center border border-black/10 bg-white p-5 text-center shadow-sm transition hover:-translate-y-1 hover:shadow-md ${
+                isLastOddItem
+                  ? "sm:col-span-4 sm:mx-auto sm:w-full sm:max-w-[calc((100%-0.75rem)/4)]"
+                  : ""
+              }`}
             >
-              <div className="flex h-40 w-full items-center justify-center">
-                <Image
-                  src={card.image}
-                  alt={title}
-                  className="h-36 w-full max-w-56 object-contain"
-                />
-              </div>
+              <Image
+                src={card.image}
+                alt={translatedCard?.title ?? card.title}
+                className="h-36 w-full max-w-56"
+              />
               <div className="flex grow flex-col justify-center gap-2 py-4">
                 <h3 className="text-xl font-bold text-[#332929] sm:text-2xl">
                   {title}

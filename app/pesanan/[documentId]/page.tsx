@@ -154,6 +154,10 @@ function getInvoiceSnapRedirectUrl(invoice: InvoiceRow | null): string | null {
   return invoice?.snap_redirect_url ?? invoice?.midtrans_redirect_url ?? null;
 }
 
+function getInvoiceMidtransOrderId(invoice: InvoiceRow | null): string | null {
+  return invoice?.midtrans_order_id ?? null;
+}
+
 function isOverduePaymentStatus(status: string | null | undefined): boolean {
   return status === "overdue" || status === "expired";
 }
@@ -245,8 +249,9 @@ export default function OrderDetailPage() {
     const primaryInvoice = getPrimaryInvoiceFromArray(order.invoices);
     const invoicePaymentStatus =
       primaryInvoice?.payment_status ?? order.paymentStatus;
-    const snapToken = getInvoiceSnapToken(primaryInvoice);
-    const snapRedirectUrl = getInvoiceSnapRedirectUrl(primaryInvoice);
+    let snapToken = getInvoiceSnapToken(primaryInvoice);
+    let snapRedirectUrl = getInvoiceSnapRedirectUrl(primaryInvoice);
+    const midtransOrderId = getInvoiceMidtransOrderId(primaryInvoice);
 
     if (isOverduePaymentStatus(invoicePaymentStatus)) {
       setPayError(
@@ -254,11 +259,83 @@ export default function OrderDetailPage() {
       );
       return;
     }
+
+    if (midtransOrderId) {
+      try {
+        const syncRes = await fetch("/api/midtrans/sync-status", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ midtransOrderId }),
+        });
+        const syncJson = await syncRes.json().catch(() => null);
+
+        if (syncJson?.paymentStatus === "overdue") {
+          const updatedOrder = await fetchOrderData().catch(() => null);
+          if (updatedOrder) setOrder(updatedOrder);
+          setPayError(
+            "Invoice sudah jatuh tempo. Pembayaran tidak dapat dilanjutkan.",
+          );
+          return;
+        }
+
+        if (syncJson?.paymentStatus === "paid") {
+          const updatedOrder = await fetchOrderData().catch(() => null);
+          if (updatedOrder) setOrder(updatedOrder);
+          setPaymentMessage("Pembayaran sudah terkonfirmasi.");
+          router.refresh();
+          return;
+        }
+      } catch {
+        // Jika status check gagal, user masih bisa mencoba membuka Snap lama.
+      }
+    }
+
     if (!snapToken && !snapRedirectUrl) {
-      setPayError(
-        "Data pembayaran Midtrans lama tidak tersedia untuk invoice ini.",
-      );
-      return;
+      if (!clientKey) {
+        setPayError("Midtrans client key belum dikonfigurasi.");
+        return;
+      }
+      if (!snapReady || !window.snap?.pay) {
+        setPayError("Midtrans Snap belum siap. Coba lagi sebentar.");
+        return;
+      }
+
+      setIsPaying(true);
+      try {
+        const tokenRes = await fetch("/api/midtrans/snap-token", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            orderId: order.id,
+            grossAmount: order.total,
+            customerName: order.recipientName,
+            customerPhone: order.recipientPhone,
+            invoiceDocumentId: primaryInvoice?.documentId,
+            invoiceId: primaryInvoice?.id,
+          }),
+        });
+        const tokenJson = await tokenRes.json();
+
+        if (!tokenRes.ok || !tokenJson?.success || !tokenJson?.token) {
+          throw new Error(
+            typeof tokenJson?.error === "string"
+              ? tokenJson.error
+              : "Gagal membuka pembayaran Midtrans.",
+          );
+        }
+
+        snapToken = tokenJson.token;
+        snapRedirectUrl = tokenJson.redirectUrl ?? null;
+
+        const updatedOrder = await fetchOrderData().catch(() => null);
+        if (updatedOrder) setOrder(updatedOrder);
+      } catch (err) {
+        setPayError(
+          err instanceof Error ? err.message : "Gagal memulai pembayaran.",
+        );
+        setIsPaying(false);
+        return;
+      }
     }
     const snapPay = window.snap?.pay;
 

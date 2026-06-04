@@ -138,12 +138,12 @@ export default async function WeddingPage() {
         </div>
       </section>
 
-      <section
+      {/* <section
         id="stand"
         className="flex w-full flex-col items-center px-6 py-16 sm:py-20"
       >
         <Stand />
-      </section>
+      </section> */}
 
       <section
         id="faq"

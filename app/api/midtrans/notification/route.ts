@@ -1,12 +1,16 @@
 import { createHash } from "crypto";
 import { NextRequest, NextResponse } from "next/server";
-import { updateInvoicePaymentStatusByOrder } from "@/lib/invoices";
+import {
+  updateInvoicePaymentStatusByMidtransOrder,
+  updateInvoicePaymentStatusByOrder,
+} from "@/lib/invoices";
 import {
   getMidtransServerKey,
   parseOrderIdFromMidtransOrderId,
 } from "@/lib/midtrans";
 
 const PAID_STATUSES = new Set(["capture", "settlement"]);
+const OVERDUE_STATUSES = new Set(["expire"]);
 
 function verifySignature(payload: Record<string, string>): boolean {
   const { order_id, status_code, gross_amount, signature_key } = payload;
@@ -51,6 +55,12 @@ export async function POST(request: NextRequest) {
           ? `INV/${payload.transaction_id}`
           : undefined,
       });
+    } else if (OVERDUE_STATUSES.has(transactionStatus)) {
+      await updateInvoicePaymentStatusByMidtransOrder(
+        orderId,
+        payload.order_id,
+        "overdue",
+      );
     }
 
     return NextResponse.json({ success: true });

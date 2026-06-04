@@ -13,7 +13,7 @@ export default function PondokanPage() {
       <section className="bg-[url('/images/services/wedding/hero.webp')] bg-cover bg-center shadow-[inset_0_0_0_2000px_rgba(63,59,59,0.52)]">
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-center px-6 py-16 text-center text-white sm:py-20 lg:min-h-96">
           <p className="text-3xl font-bold sm:text-4xl lg:text-6xl">
-            Pondokan
+            Katering Pondokan
           </p>
           <h1 className="mt-4 max-w-3xl text-xl leading-tight sm:text-3xl lg:text-4xl">
             Pilih menu pondokan favorit dan pesan sesuai kebutuhan acara.

@@ -1,5 +1,7 @@
 const SANDBOX_SNAP_BASE = "https://app.sandbox.midtrans.com";
 const PRODUCTION_SNAP_BASE = "https://app.midtrans.com";
+const SANDBOX_API_BASE = "https://api.sandbox.midtrans.com";
+const PRODUCTION_API_BASE = "https://api.midtrans.com";
 
 export function isMidtransProduction(): boolean {
   return process.env.MIDTRANS_IS_PRODUCTION === "true";
@@ -15,6 +17,14 @@ export function getMidtransSnapScriptUrl(): string {
 
 export function getMidtransSnapApiUrl(): string {
   return `${getMidtransSnapBaseUrl()}/snap/v1/transactions`;
+}
+
+export function getMidtransApiBaseUrl(): string {
+  return isMidtransProduction() ? PRODUCTION_API_BASE : SANDBOX_API_BASE;
+}
+
+export function getMidtransTransactionStatusUrl(orderId: string): string {
+  return `${getMidtransApiBaseUrl()}/v2/${encodeURIComponent(orderId)}/status`;
 }
 
 export function getMidtransServerKey(): string {
