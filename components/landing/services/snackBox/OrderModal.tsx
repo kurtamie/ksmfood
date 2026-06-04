@@ -22,6 +22,11 @@ import {
   snackGroupLabels,
   useServiceDishes,
 } from "@/components/landing/services/use-service-dishes";
+import {
+  formatDishAddonLabel,
+  formatDishOptionLabel,
+  getDishSurcharge,
+} from "@/components/landing/services/dish-surcharge";
 
 export interface SnackPackageCard {
   id: string;
@@ -61,19 +66,6 @@ const minumanMap: Record<string, string> = {
 
 type KueSelection = { kategori: string; menu: string };
 
-const rotiSnackNames = [
-  "pisang cokelat",
-  "pisang keju cokelat",
-  "bomboloni",
-  "donat topping",
-  "bolu marmer",
-];
-
-const isRotiSnack = (name: string) => {
-  const value = name.toLowerCase();
-  return value.includes("roti") || rotiSnackNames.includes(value);
-};
-
 export function SnackOrderModal({ card, serviceName, onClose }: SnackOrderModalProps) {
   const t = useTranslations("riceboxMenu");
   const { addItem, state, clearCart } = useCart();
@@ -98,9 +90,11 @@ export function SnackOrderModal({ card, serviceName, onClose }: SnackOrderModalP
 
   const priceNumber = parseInt(card.price.replace(/[^0-9]/g, ""), 10);
 
-  // Hitung surcharge dari kue roti
-  const rotiSurcharge = kueList.filter((k) => isRotiSnack(k.menu)).length * 2000;
-  const subtotal = (priceNumber * jumlah) + (rotiSurcharge * jumlah);
+  const selectedDishSurcharge = kueList.reduce(
+    (sum, kue) => sum + getDishSurcharge(kue.menu),
+    0,
+  );
+  const subtotal = (priceNumber + selectedDishSurcharge) * jumlah;
 
   const getPackageName = (title: string, subTitle?: string) =>
     [title, subTitle].filter(Boolean).join(" ");
@@ -113,9 +107,9 @@ export function SnackOrderModal({ card, serviceName, onClose }: SnackOrderModalP
 
     const addOns = [
       ...kueList.map((k, i) => ({
-        label: `${kueCount > 1 ? `Kue ${i + 1}: ` : ""}${k.menu}${isRotiSnack(k.menu) ? " (+Rp 2.000)" : ""}`,
+        label: `${kueCount > 1 ? `Kue ${i + 1}: ` : ""}${formatDishAddonLabel(k.menu)}`,
         value: `kue_${i}_${k.menu}`,
-        price: isRotiSnack(k.menu) ? 2000 : 0,
+        price: getDishSurcharge(k.menu),
       })),
       {
         label: minuman,
@@ -260,7 +254,7 @@ export function SnackOrderModal({ card, serviceName, onClose }: SnackOrderModalP
                       {val.kategori &&
                         snackGroups[val.kategori]?.map((o) => (
                           <SelectItem key={o} value={o}>
-                            {o}
+                            {formatDishOptionLabel(o)}
                           </SelectItem>
                         ))}
                     </SelectContent>
@@ -304,10 +298,10 @@ export function SnackOrderModal({ card, serviceName, onClose }: SnackOrderModalP
               )}
             </div>
 
-            {/* Info surcharge roti */}
-            {kueList.some((k) => isRotiSnack(k.menu)) && (
+            {/* Info surcharge */}
+            {selectedDishSurcharge > 0 && (
               <p className="text-xs text-amber-700 bg-amber-50 rounded-lg px-3 py-2">
-                Pilihan kue kategori <strong>Roti</strong> dikenakan tambahan biaya{" "}
+                Pilihan kue tertentu dikenakan tambahan biaya{" "}
                 <strong>Rp 2.000/kotak</strong>.
               </p>
             )}

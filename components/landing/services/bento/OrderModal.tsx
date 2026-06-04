@@ -22,6 +22,11 @@ import {
   mainDishGroupLabels,
   useServiceDishes,
 } from "@/components/landing/services/use-service-dishes";
+import {
+  formatDishAddonLabel,
+  formatDishOptionLabel,
+  getDishSurcharge,
+} from "@/components/landing/services/dish-surcharge";
 
 export interface PackageCard {
   id: string;
@@ -90,7 +95,12 @@ export function OrderModal({ card, serviceName, onClose }: OrderModalProps) {
         );
 
   const priceNumber = parseInt(card.price.replace(/[^0-9]/g, ""), 10);
-  const subtotal = priceNumber * jumlah;
+  const selectedDishSurcharge =
+    getDishSurcharge(nasi) +
+    laukUtamaList.reduce((sum, lauk) => sum + getDishSurcharge(lauk.menu), 0) +
+    getDishSurcharge(laukTambahan) +
+    getDishSurcharge(sayur);
+  const subtotal = (priceNumber + selectedDishSurcharge) * jumlah;
 
   const getPackageName = (title: string, subTitle?: string) =>
     [title, subTitle].filter(Boolean).join(" ");
@@ -109,24 +119,24 @@ export function OrderModal({ card, serviceName, onClose }: OrderModalProps) {
 
     const addOns = [
       {
-        label: nasi,
+        label: formatDishAddonLabel(nasi),
         value: `nasi_${nasi}`,
-        price: nasi.includes("+2.000") ? 2000 : 0,
+        price: getDishSurcharge(nasi),
       },
       ...laukUtamaList.map((l, i) => ({
-        label: `${laukUtamaCount > 1 ? `Lauk ${i + 1}: ` : ""}${l.menu}`,
+        label: `${laukUtamaCount > 1 ? `Lauk ${i + 1}: ` : ""}${formatDishAddonLabel(l.menu)}`,
         value: `lauk_${i}_${l.menu}`,
-        price: 0,
+        price: getDishSurcharge(l.menu),
       })),
       {
-        label: laukTambahan,
+        label: formatDishAddonLabel(laukTambahan),
         value: `lauk_tambahan_${laukTambahan}`,
-        price: 0,
+        price: getDishSurcharge(laukTambahan),
       },
       {
-        label: sayur,
+        label: formatDishAddonLabel(sayur),
         value: `sayur_${sayur}`,
-        price: sayur.includes("+2.000") ? 2000 : 0,
+        price: getDishSurcharge(sayur),
       },
       { label: sambal, value: `sambal_${sambal}`, price: 0 },
     ];
@@ -213,7 +223,11 @@ export function OrderModal({ card, serviceName, onClose }: OrderModalProps) {
             {/* Nasi */}
             <div className={fieldClass}>
               <label className={labelClass}>Nasi</label>
-              <input readOnly value={nasi} className={readonlyClass} />
+              <input
+                readOnly
+                value={formatDishOptionLabel(nasi)}
+                className={readonlyClass}
+              />
             </div>
 
             {/* Lauk Utama */}
@@ -272,7 +286,7 @@ export function OrderModal({ card, serviceName, onClose }: OrderModalProps) {
                       {val.kategori &&
                         mainDishGroups[val.kategori]?.map((o) => (
                           <SelectItem key={o} value={o}>
-                            {o}
+                            {formatDishOptionLabel(o)}
                           </SelectItem>
                         ))}
                     </SelectContent>
@@ -298,7 +312,7 @@ export function OrderModal({ card, serviceName, onClose }: OrderModalProps) {
                 >
                   {allLaukTambahanOptions.map((o) => (
                     <SelectItem key={o} value={o}>
-                      {o}
+                      {formatDishOptionLabel(o)}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -322,7 +336,7 @@ export function OrderModal({ card, serviceName, onClose }: OrderModalProps) {
                 >
                   {sayurOptions.map((o) => (
                     <SelectItem key={o} value={o}>
-                      {o}
+                      {formatDishOptionLabel(o)}
                     </SelectItem>
                   ))}
                 </SelectContent>

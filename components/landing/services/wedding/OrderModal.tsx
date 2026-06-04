@@ -22,6 +22,11 @@ import {
   mainDishGroupLabels,
   useServiceDishes,
 } from "@/components/landing/services/use-service-dishes";
+import {
+  formatDishAddonLabel,
+  formatDishOptionLabel,
+  getDishSurcharge,
+} from "@/components/landing/services/dish-surcharge";
 
 export interface PackageCard {
   id: string;
@@ -92,11 +97,13 @@ export function OrderModalPrasmanan({ card, serviceName, onClose }: OrderModalPr
           (s) => s === "Sambal Ijo" || s === "Sambal Terasi",
         );
 
-const priceNumber = parseInt(card.price.replace(/[^0-9]/g, ""), 10);
-const nasiExtra = nasi.includes("+2.000") ? 2000 : 0;
-const sayurExtra = sayur.includes("+2.000") ? 2000 : 0;
-const pricePerPortion = priceNumber + nasiExtra + sayurExtra;
-const subtotal = pricePerPortion * jumlah;
+  const priceNumber = parseInt(card.price.replace(/[^0-9]/g, ""), 10);
+  const selectedDishSurcharge =
+    getDishSurcharge(nasi) +
+    laukUtamaList.reduce((sum, lauk) => sum + getDishSurcharge(lauk.menu), 0) +
+    getDishSurcharge(laukTambahan) +
+    getDishSurcharge(sayur);
+  const subtotal = (priceNumber + selectedDishSurcharge) * jumlah;
 
   const getPackageName = (title: string, subTitle?: string) =>
     [title, subTitle].filter(Boolean).join(" ");
@@ -115,24 +122,24 @@ const subtotal = pricePerPortion * jumlah;
 
     const addOns = [
       {
-        label: nasi,
+        label: formatDishAddonLabel(nasi),
         value: `nasi_${nasi}`,
-        price: nasi.includes("+2.000") ? 2000 : 0,
+        price: getDishSurcharge(nasi),
       },
       ...laukUtamaList.map((l, i) => ({
-        label: `${laukUtamaCount > 1 ? `Lauk ${i + 1}: ` : ""}${l.menu}`,
+        label: `${laukUtamaCount > 1 ? `Lauk ${i + 1}: ` : ""}${formatDishAddonLabel(l.menu)}`,
         value: `lauk_${i}_${l.menu}`,
-        price: 0,
+        price: getDishSurcharge(l.menu),
       })),
       {
-        label: laukTambahan,
+        label: formatDishAddonLabel(laukTambahan),
         value: `lauk_tambahan_${laukTambahan}`,
-        price: 0,
+        price: getDishSurcharge(laukTambahan),
       },
       {
-        label: sayur,
+        label: formatDishAddonLabel(sayur),
         value: `sayur_${sayur}`,
-        price: sayur.includes("+2.000") ? 2000 : 0,
+        price: getDishSurcharge(sayur),
       },
       { label: sambal, value: `sambal_${sambal}`, price: 0 },
       ...(isPlus ? [{ label: "Puding", value: "puding", price: 0 }] : []),
@@ -146,7 +153,7 @@ const subtotal = pricePerPortion * jumlah;
       productId: `${card.packageType}-${card.id}`,
       name: `${serviceName} — ${getPackageName(card.title, card.subTitle)}`,
       image: "",
-      basePrice: pricePerPortion,
+      basePrice: priceNumber,
       addOns,
       quantity: jumlah,
       slug: `ricebox/${card.id}`,
@@ -234,7 +241,7 @@ const subtotal = pricePerPortion * jumlah;
                 >
                   {nasiOptions.map((o) => (
                     <SelectItem key={o} value={o}>
-                      {o}
+                      {formatDishOptionLabel(o)}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -297,7 +304,7 @@ const subtotal = pricePerPortion * jumlah;
                       {val.kategori &&
                         mainDishGroups[val.kategori]?.map((o) => (
                           <SelectItem key={o} value={o}>
-                            {o}
+                            {formatDishOptionLabel(o)}
                           </SelectItem>
                         ))}
                     </SelectContent>
@@ -323,7 +330,7 @@ const subtotal = pricePerPortion * jumlah;
                 >
                   {allLaukTambahanOptions.map((o) => (
                     <SelectItem key={o} value={o}>
-                      {o}
+                      {formatDishOptionLabel(o)}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -347,7 +354,7 @@ const subtotal = pricePerPortion * jumlah;
                 >
                   {sayurOptions.map((o) => (
                     <SelectItem key={o} value={o}>
-                      {o}
+                      {formatDishOptionLabel(o)}
                     </SelectItem>
                   ))}
                 </SelectContent>
