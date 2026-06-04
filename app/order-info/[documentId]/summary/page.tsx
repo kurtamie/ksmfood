@@ -48,7 +48,14 @@ type OrderSummary = {
   invoiceId?: number | null;
   /** documentId invoice (Strapi v5) — lebih diutamakan untuk update */
   invoiceDocumentId?: string | null;
+  snapToken?: string | null;
+  snapRedirectUrl?: string | null;
+  midtransOrderId?: string | null;
 };
+
+function saveOrderSummary(summary: OrderSummary) {
+  window.sessionStorage.setItem("ksm_order_summary", JSON.stringify(summary));
+}
 
 export default function OrderSummaryPage() {
   const router = useRouter();
@@ -173,27 +180,51 @@ export default function OrderSummaryPage() {
     setIsPaying(true);
 
     try {
-      const res = await fetch("/api/midtrans/snap-token", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          orderId: numericOrderId,
-          grossAmount: total,
-          customerName: summary?.recipientName,
-          customerPhone: summary?.recipientPhone,
-        }),
-      });
-      const json = await res.json();
+      let snapToken = summary?.snapToken ?? null;
 
-      if (!res.ok || !json?.success || !json?.token) {
-        throw new Error(
-          typeof json?.error === "string"
-            ? json.error
-            : "Gagal membuka pembayaran Midtrans.",
-        );
+      if (!snapToken) {
+        const res = await fetch("/api/midtrans/snap-token", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            orderId: numericOrderId,
+            grossAmount: total,
+            customerName: summary?.recipientName,
+            customerPhone: summary?.recipientPhone,
+            invoiceDocumentId: summary?.invoiceDocumentId,
+            invoiceId: summary?.invoiceId,
+          }),
+        });
+        const json = await res.json();
+
+        if (!res.ok || !json?.success || !json?.token) {
+          throw new Error(
+            typeof json?.error === "string"
+              ? json.error
+              : "Gagal membuka pembayaran Midtrans.",
+          );
+        }
+
+        snapToken = json.token;
+
+        setSummary((current) => {
+          if (!current) return current;
+          const nextSummary = {
+            ...current,
+            snapToken,
+            snapRedirectUrl: json.redirectUrl ?? null,
+            midtransOrderId: json.midtransOrderId ?? null,
+          };
+          saveOrderSummary(nextSummary);
+          return nextSummary;
+        });
       }
 
-      window.snap.pay(json.token, {
+      if (!snapToken) {
+        throw new Error("Data pembayaran Midtrans tidak tersedia.");
+      }
+
+      window.snap.pay(snapToken, {
         onSuccess: async (result) => {
           try {
             // Update invoice yang sudah ada menjadi "paid"
@@ -242,6 +273,9 @@ export default function OrderSummaryPage() {
     router,
     markInvoicePaid,
     snapReady,
+    summary?.invoiceDocumentId,
+    summary?.invoiceId,
+    summary?.snapToken,
     summary?.recipientName,
     summary?.recipientPhone,
     total,

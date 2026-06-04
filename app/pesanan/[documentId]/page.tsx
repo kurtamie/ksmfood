@@ -52,6 +52,16 @@ type OrderDisplayItem = {
   total: number;
 };
 
+type StoredOrderSummaryPayment = {
+  orderId?: string | number | null;
+  documentId?: string | null;
+  invoiceId?: number | null;
+  invoiceDocumentId?: string | null;
+  snapToken?: string | null;
+  snapRedirectUrl?: string | null;
+  midtransOrderId?: string | null;
+};
+
 const ORDER_STEP_LABEL: Record<OrderStep, string> = {
   packing: "Pesanan sedang di packing",
   send: "Dalam pengiriman",
@@ -147,15 +157,73 @@ function getPrimaryInvoiceFromArray(invoices: InvoiceRow[]): InvoiceRow | null {
 }
 
 function getInvoiceSnapToken(invoice: InvoiceRow | null): string | null {
-  return invoice?.snap_token ?? invoice?.midtrans_snap_token ?? null;
+  return invoice?.midtrans_snap_token ?? null;
 }
 
 function getInvoiceSnapRedirectUrl(invoice: InvoiceRow | null): string | null {
-  return invoice?.snap_redirect_url ?? invoice?.midtrans_redirect_url ?? null;
+  return invoice?.midtrans_redirect_url ?? null;
 }
 
 function getInvoiceMidtransOrderId(invoice: InvoiceRow | null): string | null {
   return invoice?.midtrans_order_id ?? null;
+}
+
+function getStoredOrderSummaryPayment(
+  order: OrderDetailView,
+): StoredOrderSummaryPayment | null {
+  try {
+    const raw = window.sessionStorage.getItem("ksm_order_summary");
+    if (!raw) return null;
+
+    const parsed = JSON.parse(raw) as StoredOrderSummaryPayment;
+    const sameOrderId =
+      parsed.orderId != null && String(parsed.orderId) === String(order.id);
+    const sameDocumentId =
+      parsed.documentId != null &&
+      parsed.documentId === order.documentId;
+
+    if (!sameOrderId && !sameDocumentId) return null;
+    return parsed;
+  } catch {
+    return null;
+  }
+}
+
+async function persistStoredPaymentToInvoice(
+  invoice: InvoiceRow | null,
+  storedPayment: StoredOrderSummaryPayment,
+) {
+  const invoiceDocumentId =
+    invoice?.documentId ?? storedPayment.invoiceDocumentId ?? null;
+
+  if (!invoiceDocumentId) return;
+  if (
+    !storedPayment.snapToken &&
+    !storedPayment.snapRedirectUrl &&
+    !storedPayment.midtransOrderId
+  ) {
+    return;
+  }
+
+  await fetch(`/api/invoices/${invoiceDocumentId}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      ...(storedPayment.midtransOrderId
+        ? { midtrans_order_id: storedPayment.midtransOrderId }
+        : {}),
+      ...(storedPayment.snapToken
+        ? {
+            midtrans_snap_token: storedPayment.snapToken,
+          }
+        : {}),
+      ...(storedPayment.snapRedirectUrl
+        ? {
+            midtrans_redirect_url: storedPayment.snapRedirectUrl,
+          }
+        : {}),
+    }),
+  });
 }
 
 function isOverduePaymentStatus(status: string | null | undefined): boolean {
@@ -251,7 +319,20 @@ export default function OrderDetailPage() {
       primaryInvoice?.payment_status ?? order.paymentStatus;
     let snapToken = getInvoiceSnapToken(primaryInvoice);
     let snapRedirectUrl = getInvoiceSnapRedirectUrl(primaryInvoice);
-    const midtransOrderId = getInvoiceMidtransOrderId(primaryInvoice);
+    let midtransOrderId = getInvoiceMidtransOrderId(primaryInvoice);
+
+    if (!snapToken && !snapRedirectUrl) {
+      const storedPayment = getStoredOrderSummaryPayment(order);
+      if (storedPayment) {
+        snapToken = storedPayment.snapToken ?? null;
+        snapRedirectUrl = storedPayment.snapRedirectUrl ?? null;
+        midtransOrderId = storedPayment.midtransOrderId ?? midtransOrderId;
+
+        if (snapToken || snapRedirectUrl || midtransOrderId) {
+          void persistStoredPaymentToInvoice(primaryInvoice, storedPayment);
+        }
+      }
+    }
 
     if (isOverduePaymentStatus(invoicePaymentStatus)) {
       setPayError(
@@ -291,51 +372,10 @@ export default function OrderDetailPage() {
     }
 
     if (!snapToken && !snapRedirectUrl) {
-      if (!clientKey) {
-        setPayError("Midtrans client key belum dikonfigurasi.");
-        return;
-      }
-      if (!snapReady || !window.snap?.pay) {
-        setPayError("Midtrans Snap belum siap. Coba lagi sebentar.");
-        return;
-      }
-
-      setIsPaying(true);
-      try {
-        const tokenRes = await fetch("/api/midtrans/snap-token", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            orderId: order.id,
-            grossAmount: order.total,
-            customerName: order.recipientName,
-            customerPhone: order.recipientPhone,
-            invoiceDocumentId: primaryInvoice?.documentId,
-            invoiceId: primaryInvoice?.id,
-          }),
-        });
-        const tokenJson = await tokenRes.json();
-
-        if (!tokenRes.ok || !tokenJson?.success || !tokenJson?.token) {
-          throw new Error(
-            typeof tokenJson?.error === "string"
-              ? tokenJson.error
-              : "Gagal membuka pembayaran Midtrans.",
-          );
-        }
-
-        snapToken = tokenJson.token;
-        snapRedirectUrl = tokenJson.redirectUrl ?? null;
-
-        const updatedOrder = await fetchOrderData().catch(() => null);
-        if (updatedOrder) setOrder(updatedOrder);
-      } catch (err) {
-        setPayError(
-          err instanceof Error ? err.message : "Gagal memulai pembayaran.",
-        );
-        setIsPaying(false);
-        return;
-      }
+      setPayError(
+        "Data pembayaran Midtrans lama tidak tersedia untuk invoice ini.",
+      );
+      return;
     }
     const snapPay = window.snap?.pay;
 

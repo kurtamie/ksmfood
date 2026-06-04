@@ -7,6 +7,8 @@ import {
 import { getOrderPaymentAmount } from "@/lib/orders";
 import { getToken } from "@/app/data/services/get-token";
 import {
+  findInvoiceByIdentifier,
+  findInvoiceByOrderId,
   updateInvoiceMidtransPaymentData,
   updateInvoiceMidtransPaymentDataByOrder,
 } from "@/lib/invoices";
@@ -27,6 +29,39 @@ export async function POST(request: NextRequest) {
         { success: false, error: "orderId tidak valid." },
         { status: 400 },
       );
+    }
+
+    const token = await getToken();
+    const invoiceIdentifier =
+      invoiceDocumentId ??
+      (Number.isFinite(invoiceId) && invoiceId > 0 ? invoiceId : null);
+    const invoice = invoiceIdentifier
+      ? await findInvoiceByIdentifier(invoiceIdentifier, token)
+      : await findInvoiceByOrderId(orderId, token);
+    const existingSnapToken = invoice?.midtrans_snap_token ?? null;
+    const existingRedirectUrl = invoice?.midtrans_redirect_url ?? null;
+
+    if (
+      invoice?.payment_status === "overdue" ||
+      invoice?.payment_status === "expired"
+    ) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Invoice sudah jatuh tempo. Pembayaran tidak dapat dilanjutkan.",
+        },
+        { status: 409 },
+      );
+    }
+
+    if (existingSnapToken || existingRedirectUrl) {
+      return NextResponse.json({
+        success: true,
+        token: existingSnapToken,
+        redirectUrl: existingRedirectUrl,
+        midtransOrderId: invoice?.midtrans_order_id ?? null,
+        reused: true,
+      });
     }
 
     const payment =
@@ -92,35 +127,47 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const token = await getToken();
-    const invoiceIdentifier =
-      invoiceDocumentId ??
-      (Number.isFinite(invoiceId) && invoiceId > 0 ? invoiceId : null);
-
     try {
-      if (invoiceIdentifier) {
-        await updateInvoiceMidtransPaymentData(
-          invoiceIdentifier,
+      const saveResult = invoiceIdentifier
+        ? await updateInvoiceMidtransPaymentData(
+            invoiceIdentifier,
+            {
+              midtransOrderId,
+              snapToken: snapData.token,
+              redirectUrl: snapData.redirect_url,
+            },
+            token,
+          )
+        : await updateInvoiceMidtransPaymentDataByOrder(
+            orderId,
+            {
+              midtransOrderId,
+              snapToken: snapData.token,
+              redirectUrl: snapData.redirect_url,
+            },
+            token,
+          );
+
+      if (!saveResult) {
+        return NextResponse.json(
           {
-            midtransOrderId,
-            snapToken: snapData.token,
-            redirectUrl: snapData.redirect_url,
+            success: false,
+            error: "Invoice pembayaran tidak ditemukan untuk menyimpan Snap.",
           },
-          token,
-        );
-      } else {
-        await updateInvoiceMidtransPaymentDataByOrder(
-          orderId,
-          {
-            midtransOrderId,
-            snapToken: snapData.token,
-            redirectUrl: snapData.redirect_url,
-          },
-          token,
+          { status: 404 },
         );
       }
     } catch (error) {
-      console.error("Failed to save Midtrans payment data:", error);
+      return NextResponse.json(
+        {
+          success: false,
+          error:
+            error instanceof Error
+              ? error.message
+              : "Gagal menyimpan data pembayaran Midtrans ke invoice.",
+        },
+        { status: 500 },
+      );
     }
 
     return NextResponse.json({

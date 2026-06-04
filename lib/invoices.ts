@@ -129,6 +129,43 @@ export async function findInvoiceByOrderId(
   return rows[0] ?? null;
 }
 
+export async function findInvoiceByIdentifier(
+  invoiceId: number | string,
+  token?: string | null,
+): Promise<(Invoice & { id: number; documentId?: string }) | null> {
+  const authToken = token !== undefined ? token : await getStrapiToken();
+  const baseUrl = getStrapiBaseUrl();
+  const idValue = String(invoiceId);
+
+  if (!/^\d+$/.test(idValue)) {
+    const res = await fetch(`${baseUrl}/api/invoices/${idValue}`, {
+      method: "GET",
+      headers: buildStrapiHeaders(authToken),
+      cache: "no-store",
+    });
+
+    if (!res.ok) return null;
+    const body = await res.json().catch(() => null);
+    return unwrapStrapiEntity<Invoice>(body?.data) as
+      | (Invoice & { id: number; documentId?: string })
+      | null;
+  }
+
+  const res = await fetch(
+    `${baseUrl}/api/invoices?filters[id][$eq]=${idValue}&pagination[pageSize]=1`,
+    {
+      method: "GET",
+      headers: buildStrapiHeaders(authToken),
+      cache: "no-store",
+    },
+  );
+
+  if (!res.ok) return null;
+  const body = await res.json().catch(() => null);
+  const rows = unwrapStrapiList<Invoice>(getStrapiListData(body));
+  return rows[0] ?? null;
+}
+
 export async function updateInvoiceMidtransPaymentData(
   invoiceId: number | string,
   data: {
@@ -149,8 +186,6 @@ export async function updateInvoiceMidtransPaymentData(
         midtrans_order_id: data.midtransOrderId,
         midtrans_snap_token: data.snapToken ?? null,
         midtrans_redirect_url: data.redirectUrl ?? null,
-        snap_token: data.snapToken ?? null,
-        snap_redirect_url: data.redirectUrl ?? null,
       },
     }),
   });
