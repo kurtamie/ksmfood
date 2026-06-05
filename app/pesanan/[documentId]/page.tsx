@@ -372,10 +372,52 @@ export default function OrderDetailPage() {
     }
 
     if (!snapToken && !snapRedirectUrl) {
-      setPayError(
-        "Data pembayaran Midtrans lama tidak tersedia untuk invoice ini.",
-      );
-      return;
+      if (!clientKey) {
+        setPayError("Midtrans client key belum dikonfigurasi.");
+        return;
+      }
+      if (!snapReady || !window.snap?.pay) {
+        setPayError("Midtrans Snap belum siap. Coba lagi sebentar.");
+        return;
+      }
+
+      setIsPaying(true);
+      try {
+        const tokenRes = await fetch("/api/midtrans/snap-token", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            orderId: order.id,
+            grossAmount: order.total,
+            customerName: order.recipientName,
+            customerPhone: order.recipientPhone,
+            invoiceDocumentId: primaryInvoice?.documentId,
+            invoiceId: primaryInvoice?.id,
+          }),
+        });
+        const tokenJson = await tokenRes.json();
+
+        if (!tokenRes.ok || !tokenJson?.success) {
+          throw new Error(
+            typeof tokenJson?.error === "string"
+              ? tokenJson.error
+              : "Gagal membuka pembayaran Midtrans.",
+          );
+        }
+
+        snapToken = tokenJson.token ?? null;
+        snapRedirectUrl = tokenJson.redirectUrl ?? null;
+        midtransOrderId = tokenJson.midtransOrderId ?? midtransOrderId;
+
+        const updatedOrder = await fetchOrderData().catch(() => null);
+        if (updatedOrder) setOrder(updatedOrder);
+      } catch (err) {
+        setPayError(
+          err instanceof Error ? err.message : "Gagal memulai pembayaran.",
+        );
+        setIsPaying(false);
+        return;
+      }
     }
     const snapPay = window.snap?.pay;
 
