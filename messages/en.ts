@@ -893,6 +893,7 @@ const messages = {
     sideTitle: "Sides",
   },
   weddingStand: {
+    orderNow: "Order Now",
     mainTitle: "Food Stall Catering",
     cards: [
       {

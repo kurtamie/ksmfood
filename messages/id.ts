@@ -515,7 +515,7 @@ const messages = {
         price: "Mulai dari Rp 80.000/kemasan",
       },
       { id: 6, title: "Snack Kotak", price: "Mulai dari Rp 13.000" },
-      { id: 7, title: "Aqiqah", price: "Mulao dari Rp 3.400.000" },
+      { id: 7, title: "Aqiqah", price: "Mulai dari Rp 3.400.000" },
       { id: 8, title: "Tumpeng", price: "Mulai dari Rp 700.000" },
       { id: 9, title: "Katering Korporat", price: "Harga disesuaikan" },
     ],
@@ -889,6 +889,7 @@ const messages = {
     sideTitle: "Pendamping",
   },
   weddingStand: {
+    orderNow: "Pesan Sekarang",
     mainTitle: "Katering Pondokan",
     cards: [
       {
