@@ -196,3 +196,18 @@
     @apply font-sans;
   }
 }
+
+.leaflet-container {
+  z-index: 0 !important;
+}
+.leaflet-container .leaflet-pane,
+.leaflet-container .leaflet-overlay-pane,
+.leaflet-container .leaflet-marker-pane,
+.leaflet-container .leaflet-shadow-pane,
+.leaflet-container .leaflet-shadow-pane,
+.leaflet-container .leaflet-tile-pane {
+  z-index: 0 !important;
+}
+.leaflet-container .leaflet-control {
+  z-index: 1000 !important;
+}

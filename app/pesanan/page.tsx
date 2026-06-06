@@ -1,0 +1,226 @@
+"use client";
+
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
+import type { OrderListItem } from "@/lib/order-queries";
+import type { OrderDisplayStep } from "@/types/orders";
+import type { InvoiceStatus } from "@/types/invoices";
+
+function formatRupiah(amount: number) {
+  return new Intl.NumberFormat("id-ID", {
+    style: "currency",
+    currency: "IDR",
+    minimumFractionDigits: 0,
+  }).format(amount);
+}
+
+function formatOrderDate(value: string | null) {
+  if (!value) return "-";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  return date.toLocaleDateString("id-ID", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+}
+
+const ORDER_STEP_LABEL: Record<OrderDisplayStep, string> = {
+  waiting_payment: "Menunggu Pembayaran",
+  packing: "Dikemas",
+  send: "Pengiriman",
+  success: "Diterima",
+};
+
+const OVERDUE_STATUSES = ["overdue", "expired", "jatuh tempo", "kedaluwarsa"];
+
+function isOverdueStatus(paymentStatus: string | null | undefined): boolean {
+  if (!paymentStatus) return false;
+  return OVERDUE_STATUSES.some((s) => paymentStatus.toLowerCase().includes(s));
+}
+
+function getPaymentStatusKey(
+  paymentStatus: string | null | undefined,
+): InvoiceStatus {
+  if (
+    paymentStatus === "paid" ||
+    paymentStatus === "unpaid" ||
+    paymentStatus === "overdue" ||
+    paymentStatus === "expired"
+  ) {
+    return paymentStatus;
+  }
+  return "unpaid";
+}
+
+function getDisplayOrderStep(order: OrderListItem): OrderDisplayStep | null {
+  if (!order.step) return null;
+  if (
+    order.step === "packing" &&
+    (order.paymentStatus !== "paid" || isOverdueStatus(order.paymentStatus))
+  ) {
+    return "waiting_payment";
+  }
+  return order.step;
+}
+
+export default function OrderHistoryPage() {
+  const t = useTranslations("orderHistory");
+  const [orders, setOrders] = useState<OrderListItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadOrders() {
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        const res = await fetch("/api/orders/mine", { cache: "no-store" });
+        const json = await res.json();
+
+        if (!res.ok || !json?.success) {
+          throw new Error(
+            typeof json?.error === "string"
+              ? json.error
+              : t("errors.loadFailed"),
+          );
+        }
+
+        if (!cancelled) {
+          setOrders(Array.isArray(json.data) ? json.data : []);
+        }
+      } catch (err) {
+        if (!cancelled) {
+          setError(
+            err instanceof Error
+              ? err.message
+              : t("errors.loadFailed"),
+          );
+        }
+      } finally {
+        if (!cancelled) setIsLoading(false);
+      }
+    }
+
+    void loadOrders();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  return (
+    <div className="mx-auto max-w-5xl px-6 py-10">
+      <div className="mb-8">
+        <h1 className="text-3xl font-semibold text-tertiary-900">
+          {t("title")}
+        </h1>
+        <p className="mt-2 max-w-2xl text-sm text-secondary-600">
+          {t("description")}
+        </p>
+      </div>
+
+      {isLoading ? (
+        <p className="text-sm text-secondary-600">{t("loading")}</p>
+      ) : null}
+
+      {error ? <p className="text-sm text-red-600">{error}</p> : null}
+
+      {!isLoading && !error && orders.length === 0 ? (
+        <p className="text-sm text-secondary-600">
+          {t("empty")}
+        </p>
+      ) : null}
+
+      <div className="space-y-4">
+        {orders.map((order) => {
+          const paymentStatusKey = getPaymentStatusKey(order.paymentStatus);
+          const paid = paymentStatusKey === "paid";
+          const overdue =
+            paymentStatusKey === "overdue" || paymentStatusKey === "expired";
+          const displayOrderStep = getDisplayOrderStep(order);
+          const stepLabel = displayOrderStep
+            ? ORDER_STEP_LABEL[displayOrderStep]
+            : null;
+
+          return (
+            <div
+              key={order.documentId}
+              className="rounded-3xl border border-secondary-200 bg-white px-5 py-5 shadow-sm"
+            >
+              <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                <div className="flex min-w-0 flex-col gap-2">
+                  <div className="flex flex-wrap items-center gap-3">
+                    <span className="text-sm text-secondary-500">
+                      {formatOrderDate(order.deliveryDate ?? order.createdAt)}
+                    </span>
+
+                    {/* Badge status pembayaran — merah kalau overdue */}
+                    <span
+                      className={`rounded-full px-3 py-1 text-xs font-semibold ${
+                        paid
+                          ? "bg-emerald-100 text-emerald-700"
+                          : overdue
+                            ? "bg-red-100 text-red-700"
+                            : "bg-amber-100 text-amber-700"
+                      }`}
+                    >
+                      {t(`paymentStatuses.${paymentStatusKey}`)}
+                    </span>
+
+                    {order.invoiceNo ? (
+                      <span className="text-sm text-secondary-500">
+                        {order.invoiceNo}
+                      </span>
+                    ) : order.orderNo ? (
+                      <span className="text-sm text-secondary-500">
+                        {order.orderNo}
+                      </span>
+                    ) : null}
+                  </div>
+
+                  <div className="min-w-0">
+                    <p className="truncate text-base font-semibold text-tertiary-900 sm:text-lg">
+                      {order.packageName ?? "Paket pesanan"}
+                    </p>
+                    {stepLabel ? (
+                      <span
+                        className={`mt-2 inline-flex w-fit rounded-full px-3 py-1 text-xs font-semibold ${
+                          overdue
+                            ? "bg-red-50 text-red-700"
+                            : "bg-gray-100 text-gray-700"
+                        }`}
+                      >
+                        {t("orderStatus")}:{" "}
+                        {overdue && displayOrderStep === "waiting_payment"
+                          ? t("steps.expired")
+                          : stepLabel
+                            ? t(`steps.${displayOrderStep}`)
+                            : stepLabel}
+                      </span>
+                    ) : null}
+                  </div>
+
+                  <p className="text-lg font-semibold text-tertiary-900">
+                    {formatRupiah(order.total)}
+                  </p>
+                </div>
+
+                <Link
+                  href={`/pesanan/${encodeURIComponent(order.documentId)}`}
+                  className="inline-flex h-11 items-center justify-center rounded-full bg-[#184d16] px-5 text-sm font-semibold text-white transition hover:bg-[#0f3910]"
+                >
+                  {t("actions.viewDetail")}
+                </Link>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}

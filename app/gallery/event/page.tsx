@@ -7,7 +7,7 @@ export default async function GalleryEventPage() {
   return (
     <main className="w-full overflow-x-clip px-4 py-6 sm:px-6 lg:px-8">
       <div className="mx-auto w-full max-w-7xl">
-        <GalleryGrid items={items} showCaption={false}/>
+        <GalleryGrid items={items} showCaption={false} />
       </div>
     </main>
   );

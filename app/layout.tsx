@@ -4,7 +4,9 @@ import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
 import SiteShell from "@/components/layout/site-shell";
 import { defaultLocale, hasLocale, localeCookieName } from "@/i18n/routing";
+import { CartProvider } from "@/components/CartContext";
 import "./globals.css";
+import { AuthProvider } from "@/context/authContext";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL?.startsWith("http")
   ? process.env.NEXT_PUBLIC_SITE_URL
@@ -66,9 +68,13 @@ export default async function RootLayout({
   return (
     <html lang={locale} className="h-full w-full overflow-x-clip antialiased">
       <body className="flex min-h-full w-full flex-col overflow-x-clip">
-        <NextIntlClientProvider locale={locale} messages={messages}>
-          <SiteShell>{children}</SiteShell>
-        </NextIntlClientProvider>
+        <AuthProvider>
+          <CartProvider>
+            <NextIntlClientProvider locale={locale} messages={messages}>
+              <SiteShell>{children}</SiteShell>
+            </NextIntlClientProvider>
+          </CartProvider>
+        </AuthProvider>
       </body>
     </html>
   );

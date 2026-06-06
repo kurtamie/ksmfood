@@ -14,22 +14,29 @@ const MAPS_EMBED_URL =
 
 const contacts = [
   {
-    name: "Yuni Irdayanti",
-    role: "Marketing",
+    name: "Admin 1",
+    role: "Admin KSM Katering",
     phoneLabel: "0813-7179-0122",
     phoneHref: "https://wa.me/6281371790122",
     emailLabel: "ksmpromotionbatam@gmail.com",
-    emailHref: "mailto:service@ksmpromotionbatam@gmail.com",
+    emailHref: "mailto:ksmpromotionbatam@gmail.com",
   },
   {
-    name: "Ksm Admin",
-    role: "Admin",
+    name: "Admin 2",
+    role: "Admin KSM Katering",
     phoneLabel: "0822-8817-5957",
     phoneHref: "https://wa.me/6282288175957",
-    emailLabel: "ksmpromotionbatam@gmail.com",
-    emailHref: "mailto:service@ksmpromotionbatam@gmail.com",
+    emailLabel: "-",
+    emailHref: undefined,
   },
-] as const;
+] as const satisfies ReadonlyArray<{
+  name: string;
+  role: string;
+  phoneLabel: string;
+  phoneHref: string;
+  emailLabel: string;
+  emailHref?: string;
+}>;
 
 export default async function ContactPage() {
   const t = await getTranslations("contactPage");
@@ -73,8 +80,8 @@ export default async function ContactPage() {
           <div className="mx-auto flex w-full max-w-6xl flex-col gap-12 lg:gap-16">
             <div className="flex flex-col gap-6 items-center justify-center">
               <h2 className="text-center text-4xl font-bold text-[#1A1A1A] sm:text-5xl lg:text-[4rem]">
-                Tim Kami Siap{" "}
-                <span className="text-[#8D0000]">Membantu Anda</span>
+                {t("team.titleLead")}{" "}
+                <span className="text-[#8D0000]">{t("team.titleAccent")}</span>
               </h2>
 
               <div className="grid gap-4 sm:grid-cols-2 sm:gap-8 max-w-5xl mt-14">
@@ -110,15 +117,24 @@ export default async function ContactPage() {
                         </span>
                       </a>
 
-                      <a
-                        href={contact.emailHref}
-                        className="flex items-start gap-3 transition hover:text-[#8D0000]"
-                      >
-                        <FaEnvelope className="mt-0.5 shrink-0" size={13} />
-                        <span className="break-all font-medium">
-                          {contact.emailLabel}
-                        </span>
-                      </a>
+                      {contact.emailHref ? (
+                        <a
+                          href={contact.emailHref}
+                          className="flex items-start gap-3 transition hover:text-[#8D0000]"
+                        >
+                          <FaEnvelope className="mt-0.5 shrink-0" size={13} />
+                          <span className="break-all font-medium">
+                            {contact.emailLabel}
+                          </span>
+                        </a>
+                      ) : (
+                        <div className="flex items-start gap-3 text-red-800">
+                          <FaEnvelope className="mt-0.5 shrink-0" size={13} />
+                          <span className="font-medium">
+                            {contact.emailLabel}
+                          </span>
+                        </div>
+                      )}
                     </div>
                   </article>
                 ))}
@@ -127,7 +143,8 @@ export default async function ContactPage() {
 
             <div className="flex flex-col gap-6">
               <h2 className="text-center text-4xl font-bold text-[#1A1A1A] sm:text-5xl lg:text-[4rem]">
-                Lokasi <span className="text-[#8D0000]">Kami</span>
+                {t("location.titleLead")}{" "}
+                <span className="text-[#8D0000]">{t("location.titleAccent")}</span>
               </h2>
 
               <div className="grid items-stretch gap-4 lg:grid-cols-[1.1fr_0.9fr] lg:gap-5 mt-14">
@@ -140,7 +157,7 @@ export default async function ContactPage() {
                     allowFullScreen={true}
                     loading="lazy"
                     referrerPolicy="no-referrer-when-downgrade"
-                    title="Lokasi KSM Katering"
+                    title={t("location.mapTitle")}
                     className="min-h-80 w-full"
                   />
                 </div>
@@ -171,10 +188,10 @@ export default async function ContactPage() {
                       />
                       <p className="leading-relaxed text-[#8D0000]">
                         <span className="font-bold text-[#1A1A1A]">
-                          Jam Operasional:
+                          {t("location.hoursLabel")}:
                         </span>
                         <br />
-                        Senin - Minggu, 08.00 - 17.00
+                        {t("location.hoursValue")}
                       </p>
                     </div>
                   </div>
