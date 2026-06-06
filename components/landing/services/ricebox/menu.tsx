@@ -2,9 +2,10 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { LuAward, LuCheck, LuPackageOpen } from "react-icons/lu";
 import { OrderModal, type PackageCard } from "./OrderModal";
+import { localizePriceUnit } from "@/lib/price-unit";
 const packageCards = [
   {
     id: 1,
@@ -147,6 +148,7 @@ const packageCards = [
 
 function Menu() {
   const t = useTranslations("riceboxMenu");
+  const locale = useLocale();
   const serviceName = "Nasi Kotak";
 
   const [selectedCard, setSelectedCard] = useState<PackageCard | null>(null);
@@ -200,7 +202,7 @@ function Menu() {
                 </div>
 
                 <p className="mt-5 text-center text-lg font-bold text-red-800">
-                  {card.price}
+                  {localizePriceUnit(card.price, locale)}
                 </p>
 
                 <Button

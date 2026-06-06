@@ -4,6 +4,7 @@ import { useEffect, useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
 import { CartItem, getItemTotalPrice } from "@/components/CartContext";
 import { useAuth } from "@/context/authContext";
+import { useLocale, useTranslations } from "next-intl";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -25,6 +26,14 @@ function formatRupiah(amount: number): string {
   }).format(amount);
 }
 
+function localizeUnitLabel(unitLabel: string, locale: string): string {
+  if (locale !== "en") return unitLabel;
+  if (/^kotak$/i.test(unitLabel)) return "Box";
+  if (/^porsi$/i.test(unitLabel)) return "Portion";
+  if (/^paket$/i.test(unitLabel)) return "Package";
+  return unitLabel;
+}
+
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export default function CartConfirmModal({
@@ -35,6 +44,8 @@ export default function CartConfirmModal({
   onRequireLogin,
 }: CartConfirmModalProps) {
   const router = useRouter();
+  const locale = useLocale();
+  const t = useTranslations("cartConfirm");
   const { isLoggedIn } = useAuth();
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
   const [isCheckingOut, setIsCheckingOut] = useState(false);
@@ -62,7 +73,7 @@ export default function CartConfirmModal({
   const pricePerItem =
     item.basePrice + item.addOns.reduce((s, a) => s + a.price, 0);
   const addOnLabels = item.addOns.map((a) => a.label).join(", ");
-  const unitLabel = item.unitLabel ?? "Kotak";
+  const unitLabel = localizeUnitLabel(item.unitLabel ?? "Kotak", locale);
 
   const handleCheckout = async () => {
     if (!isLoggedIn) {
@@ -81,7 +92,7 @@ export default function CartConfirmModal({
       setCheckoutError(
         error instanceof Error
           ? error.message
-          : "Gagal membuat pesanan. Coba lagi.",
+          : t("checkoutError"),
       );
     } finally {
       setIsCheckingOut(false);
@@ -110,7 +121,7 @@ export default function CartConfirmModal({
         <div className="flex items-start justify-between px-6 pt-5">
           <div>
             <p className="text-sm text-secondary-800">
-              Terima kasih, pesanan anda
+              {t("thanks")}
             </p>
             <h2
               id="confirm-modal-title"
@@ -123,7 +134,7 @@ export default function CartConfirmModal({
 
           <button
             onClick={onBack ?? onClose}
-            aria-label="Tutup modal"
+            aria-label={t("close")}
             className="
               mt-0.5 rounded-lg p-1.5
               text-secondary-800 transition-colors
@@ -182,7 +193,7 @@ export default function CartConfirmModal({
               >
                 <polyline points="20 6 9 17 4 12" />
               </svg>
-              Pesanan siap ditambahkan ke keranjang
+              {t("ready")}
             </p>
           </div>
         </div>
@@ -197,7 +208,7 @@ export default function CartConfirmModal({
         {/* ── Footer ── */}
         <div className="flex flex-row gap-2 px-6 py-4">
           {/* Tambah menu lainnya → addItem + tutup semua */}
-          <button
+          {/* <button
             onClick={onClose}
             className="
               flex flex-1 items-center justify-center gap-1.5
@@ -222,8 +233,8 @@ export default function CartConfirmModal({
               <circle cx="20" cy="21" r="1" />
               <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
             </svg>
-            Tambah Menu Lainnya
-          </button>
+            {t("addMore")}
+          </button> */}
 
           {/* Checkout → addItem + redirect */}
           <button
@@ -251,7 +262,7 @@ export default function CartConfirmModal({
               <line x1="5" y1="12" x2="19" y2="12" />
               <polyline points="12 5 19 12 12 19" />
             </svg>
-            {isCheckingOut ? "Memproses..." : "Checkout"}
+            {isCheckingOut ? t("processing") : t("checkout")}
           </button>
         </div>
       </div>

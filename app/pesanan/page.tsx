@@ -2,10 +2,10 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { isPaidStatus } from "@/lib/order-status";
-import type { PaymentStatusLabel } from "@/lib/order-status";
+import { useTranslations } from "next-intl";
 import type { OrderListItem } from "@/lib/order-queries";
 import type { OrderDisplayStep } from "@/types/orders";
+import type { InvoiceStatus } from "@/types/invoices";
 
 function formatRupiah(amount: number) {
   return new Intl.NumberFormat("id-ID", {
@@ -40,6 +40,20 @@ function isOverdueStatus(paymentStatus: string | null | undefined): boolean {
   return OVERDUE_STATUSES.some((s) => paymentStatus.toLowerCase().includes(s));
 }
 
+function getPaymentStatusKey(
+  paymentStatus: string | null | undefined,
+): InvoiceStatus {
+  if (
+    paymentStatus === "paid" ||
+    paymentStatus === "unpaid" ||
+    paymentStatus === "overdue" ||
+    paymentStatus === "expired"
+  ) {
+    return paymentStatus;
+  }
+  return "unpaid";
+}
+
 function getDisplayOrderStep(order: OrderListItem): OrderDisplayStep | null {
   if (!order.step) return null;
   if (
@@ -52,6 +66,7 @@ function getDisplayOrderStep(order: OrderListItem): OrderDisplayStep | null {
 }
 
 export default function OrderHistoryPage() {
+  const t = useTranslations("orderHistory");
   const [orders, setOrders] = useState<OrderListItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -71,7 +86,7 @@ export default function OrderHistoryPage() {
           throw new Error(
             typeof json?.error === "string"
               ? json.error
-              : "Gagal memuat riwayat pesanan.",
+              : t("errors.loadFailed"),
           );
         }
 
@@ -83,7 +98,7 @@ export default function OrderHistoryPage() {
           setError(
             err instanceof Error
               ? err.message
-              : "Gagal memuat riwayat pesanan.",
+              : t("errors.loadFailed"),
           );
         }
       } finally {
@@ -102,32 +117,31 @@ export default function OrderHistoryPage() {
     <div className="mx-auto max-w-5xl px-6 py-10">
       <div className="mb-8">
         <h1 className="text-3xl font-semibold text-tertiary-900">
-          Riwayat Pemesanan
+          {t("title")}
         </h1>
         <p className="mt-2 max-w-2xl text-sm text-secondary-600">
-          Lihat semua pesanan terakhir kamu, status pembayaran, dan detail
-          pesanan.
+          {t("description")}
         </p>
       </div>
 
       {isLoading ? (
-        <p className="text-sm text-secondary-600">Memuat pesanan...</p>
+        <p className="text-sm text-secondary-600">{t("loading")}</p>
       ) : null}
 
       {error ? <p className="text-sm text-red-600">{error}</p> : null}
 
       {!isLoading && !error && orders.length === 0 ? (
         <p className="text-sm text-secondary-600">
-          Belum ada pesanan. Mulai pesan dari halaman layanan kami.
+          {t("empty")}
         </p>
       ) : null}
 
       <div className="space-y-4">
         {orders.map((order) => {
-          const status = order.paymentStatusLabel as PaymentStatusLabel;
-          const paid = order.paymentStatus === "paid" || isPaidStatus(status);
+          const paymentStatusKey = getPaymentStatusKey(order.paymentStatus);
+          const paid = paymentStatusKey === "paid";
           const overdue =
-            isOverdueStatus(order.paymentStatus) || isOverdueStatus(status);
+            paymentStatusKey === "overdue" || paymentStatusKey === "expired";
           const displayOrderStep = getDisplayOrderStep(order);
           const stepLabel = displayOrderStep
             ? ORDER_STEP_LABEL[displayOrderStep]
@@ -155,7 +169,7 @@ export default function OrderHistoryPage() {
                             : "bg-amber-100 text-amber-700"
                       }`}
                     >
-                      {status}
+                      {t(`paymentStatuses.${paymentStatusKey}`)}
                     </span>
 
                     {order.invoiceNo ? (
@@ -181,10 +195,12 @@ export default function OrderHistoryPage() {
                             : "bg-gray-100 text-gray-700"
                         }`}
                       >
-                        Status Pesanan:{" "}
+                        {t("orderStatus")}:{" "}
                         {overdue && displayOrderStep === "waiting_payment"
-                          ? "Pembayaran Kedaluwarsa"
-                          : stepLabel}
+                          ? t("steps.expired")
+                          : stepLabel
+                            ? t(`steps.${displayOrderStep}`)
+                            : stepLabel}
                       </span>
                     ) : null}
                   </div>
@@ -198,7 +214,7 @@ export default function OrderHistoryPage() {
                   href={`/pesanan/${encodeURIComponent(order.documentId)}`}
                   className="inline-flex h-11 items-center justify-center rounded-full bg-[#184d16] px-5 text-sm font-semibold text-white transition hover:bg-[#0f3910]"
                 >
-                  Lihat Detail
+                  {t("actions.viewDetail")}
                 </Link>
               </div>
             </div>

@@ -34,6 +34,7 @@ export function TumpengOrderModal({
   onClose,
 }: TumpengOrderModalProps) {
   const t = useTranslations("riceboxMenu");
+  const modalT = useTranslations("orderModal");
   const { addItem, state, clearCart } = useCart();
   const { user } = useAuth();
   const [pendingItem, setPendingItem] = useState<CartItem | null>(null);
@@ -124,13 +125,13 @@ export function TumpengOrderModal({
                 {serviceName} — {getPackageName(card.title, card.subTitle)}
               </h2>
               <p className="mt-1 text-sm text-gray-500">
-                Detail paket sudah termasuk semua item di bawah.
+                {modalT("messages.includedDetails")}
               </p>
             </div>
 
             {/* Items paket (read-only list) */}
             <div className={fieldClass}>
-              <label className={labelClass}>Isi Paket</label>
+              <label className={labelClass}>{modalT("fields.packageContents")}</label>
               <div className="flex flex-1 flex-col gap-1.5">
                 {card.items.map((item) => (
                   <div
@@ -147,7 +148,7 @@ export function TumpengOrderModal({
             <div className="flex flex-col gap-1">
               <div className="flex items-center gap-4">
                 <label className="w-36 shrink-0 text-sm font-semibold">
-                  Jumlah Pesanan <span className="text-red-600">*</span>
+                  {modalT("fields.quantity")} <span className="text-red-600">*</span>
                 </label>
                 <div className="flex items-center gap-3">
                   <input
@@ -161,12 +162,15 @@ export function TumpengOrderModal({
                         : "border-gray-200 bg-gray-50"
                     }`}
                   />
-                  <span className="text-sm text-gray-600">Tumpeng</span>
+                  <span className="text-sm text-gray-600">{modalT("units.tumpeng")}</span>
                 </div>
               </div>
               {jumlahError && (
                 <p className="pl-40 text-xs text-red-600 mt-1">
-                  Jumlah pesanan minimal 1 tumpeng.
+                  {modalT("messages.minimumPackage", {
+                    count: 1,
+                    unit: modalT("units.tumpeng").toLowerCase(),
+                  })}
                 </p>
               )}
             </div>
@@ -174,7 +178,7 @@ export function TumpengOrderModal({
             {/* Subtotal */}
             <div className="flex items-center gap-4">
               <span className="w-36 shrink-0 text-sm font-semibold">
-                Subtotal Pesanan
+                {modalT("fields.subtotal")}
               </span>
               <span className="text-2xl font-bold">
                 Rp {subtotal.toLocaleString("id-ID")}

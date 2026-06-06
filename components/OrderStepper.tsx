@@ -1,15 +1,12 @@
 import type { OrderDisplayStep } from "@/types/orders";
+import { useTranslations } from "next-intl";
 
 const STEPS: {
   key: OrderDisplayStep;
-  label: string;
-  sublabel: string;
   icon: React.ReactNode;
 }[] = [
   {
     key: "waiting_payment",
-    label: "Menunggu Pembayaran",
-    sublabel: "Tagihan belum dibayar",
     icon: (
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -29,8 +26,6 @@ const STEPS: {
   },
   {
     key: "packing",
-    label: "Packing",
-    sublabel: "Pesanan sedang disiapkan",
     icon: (
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -52,8 +47,6 @@ const STEPS: {
   },
   {
     key: "send",
-    label: "Pengiriman",
-    sublabel: "Dalam perjalanan",
     icon: (
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -75,8 +68,6 @@ const STEPS: {
   },
   {
     key: "success",
-    label: "Diterima",
-    sublabel: "Pesanan selesai",
     icon: (
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -96,32 +87,22 @@ const STEPS: {
   },
 ];
 
-const BANNER: Record<
-  OrderDisplayStep,
-  { bg: string; text: string; message: string }
-> = {
+const BANNER_STYLE: Record<OrderDisplayStep, { bg: string; text: string }> = {
   waiting_payment: {
     bg: "bg-amber-50",
     text: "text-amber-800",
-    message:
-      "Pesanan sudah dibuat dan menunggu pembayaran sebelum mulai diproses.",
   },
   packing: {
     bg: "bg-amber-50",
     text: "text-amber-800",
-    message: "Pesanan kamu sedang dikemas dengan teliti. Mohon menunggu ya!",
   },
   send: {
     bg: "bg-blue-50",
     text: "text-blue-800",
-    message:
-      "Pesanan sedang dalam perjalanan menuju alamatmu. Harap siapkan diri untuk menerima.",
   },
   success: {
     bg: "bg-emerald-50",
     text: "text-emerald-800",
-    message:
-      "Pesanan sudah diterima! Terima kasih telah memesan dari KSM Katering.",
   },
 };
 
@@ -155,19 +136,21 @@ export function OrderStepper({
   currentStep,
   isExpired = false,
 }: OrderStepperProps) {
+  const t = useTranslations("orderStepper");
   const currentIndex = Math.max(
     STEPS.findIndex((step) => step.key === currentStep),
     0,
   );
 
-  const banner = isExpired
+  const bannerStyle = isExpired
     ? {
         bg: "bg-red-50",
         text: "text-red-800",
-        message:
-          "Pembayaran untuk pesanan ini sudah kedaluwarsa. Pesanan tidak dapat diproses lebih lanjut.",
       }
-    : BANNER[currentStep];
+    : BANNER_STYLE[currentStep];
+  const bannerMessage = isExpired
+    ? t("banner.expired")
+    : t(`banner.${currentStep}`);
 
   return (
     <div className="space-y-4">
@@ -217,8 +200,12 @@ export function OrderStepper({
           // Label khusus untuk step waiting_payment saat expired
           const label =
             isExpired && step.key === "waiting_payment"
-              ? "Pembayaran Kedaluwarsa"
-              : step.label;
+              ? t("steps.expired.label")
+              : t(`steps.${step.key}.label`);
+          const sublabel =
+            isExpired && step.key === "waiting_payment"
+              ? t("steps.expired.sublabel")
+              : t(`steps.${step.key}.sublabel`);
 
           return (
             <div
@@ -256,7 +243,7 @@ export function OrderStepper({
                   {label}
                 </span>
                 <span className="mt-0.5 max-w-[5.5rem] text-[10px] leading-tight text-secondary-500">
-                  {step.sublabel}
+                  {sublabel}
                 </span>
               </div>
             </div>
@@ -265,9 +252,9 @@ export function OrderStepper({
       </div>
 
       <div
-        className={`rounded-xl px-4 py-3 text-sm ${banner.bg} ${banner.text}`}
+        className={`rounded-xl px-4 py-3 text-sm ${bannerStyle.bg} ${bannerStyle.text}`}
       >
-        {banner.message}
+        {bannerMessage}
       </div>
     </div>
   );

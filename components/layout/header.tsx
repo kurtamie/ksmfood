@@ -38,6 +38,7 @@ function Header() {
   const [logoutOpen, setLogoutOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const t = useTranslations("header");
+  const accountT = useTranslations("accountMenu");
   const serviceT = useTranslations("services");
   const navT = useTranslations("navigation");
   const links = [{ href: "/", label: t("home") }];
@@ -136,7 +137,7 @@ function Header() {
           <div className="hidden items-center gap-3 md:flex">
             <LanguageSwitcher />
 
-            <CartButton totalQuantity={totalQuantity} onClick={toggleCart} />
+            {/* <CartButton totalQuantity={totalQuantity} onClick={toggleCart} /> */}
 
             {isLoggedIn ? (
               <DropdownMenu>
@@ -161,7 +162,7 @@ function Header() {
                 <DropdownMenuContent className="w-56" align="end">
                   {/* blok 1: info user */}
                   <div className="px-3 py-2">
-                    <p className="text-xs text-gray-500">Masuk sebagai</p>
+                    <p className="text-xs text-gray-500">{accountT("signedInAs")}</p>
                     <p className="text-sm font-semibold text-gray-900 truncate">
                       {user?.username}
                     </p>
@@ -179,7 +180,7 @@ function Header() {
                         href="/profile"
                         className="flex items-center gap-2 cursor-pointer"
                       >
-                        Akun Saya
+                        {accountT("myAccount")}
                       </Link>
                     </DropdownMenuItem>
 
@@ -188,7 +189,7 @@ function Header() {
                         href="/pesanan"
                         className="flex items-center gap-2 cursor-pointer"
                       >
-                        Riwayat Pemesanan
+                        {accountT("orderHistory")}
                       </Link>
                     </DropdownMenuItem>
                   </DropdownMenuGroup>
@@ -201,7 +202,7 @@ function Header() {
                       onClick={() => setLogoutOpen(true)}
                       className="flex items-center gap-2 text-red-600 focus:text-red-600 focus:bg-red-50 cursor-pointer"
                     >
-                      <span>Keluar</span>
+                      <span>{accountT("logout")}</span>
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         width="15"
@@ -226,14 +227,14 @@ function Header() {
                 onClick={() => setIsAuthOpen(true)}
                 className="cursor-pointer bg-[#8D0000] px-5 py-5"
               >
-                Masuk
+                {accountT("login")}
               </Button>
             )}
           </div>
 
           {/* Mobile right side */}
           <div className="ml-auto flex items-center gap-2 md:hidden">
-            <CartButton totalQuantity={totalQuantity} onClick={toggleCart} />
+            {/* <CartButton totalQuantity={totalQuantity} onClick={toggleCart} /> */}
 
             <button
               type="button"
@@ -341,7 +342,7 @@ function Header() {
                 <div className="mt-4 flex flex-col rounded-2xl border border-red-100 bg-red-50/60 overflow-hidden">
                   {/* Info user */}
                   <div className="px-4 py-3 border-b border-red-100">
-                    <p className="text-xs text-secondary-500">Masuk sebagai</p>
+                    <p className="text-xs text-secondary-500">{accountT("signedInAs")}</p>
                     <p className="text-sm font-semibold text-tertiary-900">
                       {user?.username}
                     </p>
@@ -351,11 +352,11 @@ function Header() {
                   </div>
 
                   <Link
-                    href="/profile/account"
+                    href="/profile"
                     onClick={closeMenu}
                     className="flex items-center gap-2 px-4 py-3 text-sm font-semibold text-[#332929] hover:bg-red-100 transition-colors"
                   >
-                    Akun Saya
+                    {accountT("myAccount")}
                   </Link>
 
                   <Link
@@ -363,7 +364,7 @@ function Header() {
                     onClick={closeMenu}
                     className="flex items-center gap-2 px-4 py-3 text-sm font-semibold text-[#332929] hover:bg-red-100 transition-colors"
                   >
-                    Riwayat Pemesanan
+                    {accountT("orderHistory")}
                   </Link>
 
                   <button
@@ -388,7 +389,7 @@ function Header() {
                       <polyline points="16 17 21 12 16 7" />
                       <line x1="21" y1="12" x2="9" y2="12" />
                     </svg>
-                    Keluar
+                    {accountT("logout")}
                   </button>
                 </div>
               ) : (
@@ -399,7 +400,7 @@ function Header() {
                   }}
                   className="mt-4 h-12 rounded-2xl bg-[#8D0000] text-base"
                 >
-                  Masuk
+                  {accountT("login")}
                 </Button>
               )}
             </nav>
@@ -407,7 +408,7 @@ function Header() {
         </div>
       </header>
 
-      <CartSidebar />
+      {/* <CartSidebar /> */}
 
       <AuthModal
         isOpen={isAuthOpen}

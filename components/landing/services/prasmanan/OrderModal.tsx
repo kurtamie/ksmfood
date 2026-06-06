@@ -47,6 +47,7 @@ interface OrderModalProps {
 
 export function OrderModal({ card, serviceName, onClose }: OrderModalProps) {
   const t = useTranslations("riceboxMenu");
+  const modalT = useTranslations("orderModal");
   const { addItem, state, clearCart } = useCart();
   const { user } = useAuth();
   const [pendingItem, setPendingItem] = useState<CartItem | null>(null);
@@ -222,11 +223,11 @@ export function OrderModal({ card, serviceName, onClose }: OrderModalProps) {
             {/* Nasi */}
             <div className={fieldClass}>
               <label className={labelClass}>
-                Nasi <span className="text-red-600">*</span>
+                {modalT("fields.rice")} <span className="text-red-600">*</span>
               </label>
               <Select value={nasi} onValueChange={setNasi}>
                 <SelectTrigger className="flex-1">
-                  <SelectValue placeholder="Pilih Nasi" />
+                  <SelectValue placeholder={modalT("placeholders.rice")} />
                 </SelectTrigger>
                 <SelectContent
                   position="popper"
@@ -247,7 +248,9 @@ export function OrderModal({ card, serviceName, onClose }: OrderModalProps) {
             {laukUtamaList.map((val, idx) => (
               <div key={idx} className="flex items-start gap-4">
                 <label className="w-32 shrink-0 pt-2 text-sm font-semibold">
-                  {laukUtamaCount > 1 ? `Lauk Utama ${idx + 1}` : "Lauk Utama"}
+                  {laukUtamaCount > 1
+                    ? `${modalT("fields.mainDish")} ${idx + 1}`
+                    : modalT("fields.mainDish")}
                   <span className="text-red-600"> *</span>
                 </label>
                 <div className="flex flex-1 flex-col gap-2">
@@ -261,7 +264,7 @@ export function OrderModal({ card, serviceName, onClose }: OrderModalProps) {
                     }}
                   >
                     <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Pilih Kategori" />
+                      <SelectValue placeholder={modalT("placeholders.category")} />
                     </SelectTrigger>
                     <SelectContent
                       position="popper"
@@ -288,7 +291,7 @@ export function OrderModal({ card, serviceName, onClose }: OrderModalProps) {
                     }}
                   >
                     <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Pilih Menu" />
+                      <SelectValue placeholder={modalT("placeholders.menu")} />
                     </SelectTrigger>
                     <SelectContent
                       position="popper"
@@ -311,11 +314,11 @@ export function OrderModal({ card, serviceName, onClose }: OrderModalProps) {
             {/* Lauk Tambahan */}
             <div className={fieldClass}>
               <label className={labelClass}>
-                Lauk Tambahan <span className="text-red-600">*</span>
+                {modalT("fields.additionalDish")} <span className="text-red-600">*</span>
               </label>
               <Select value={laukTambahan} onValueChange={setLaukTambahan}>
                 <SelectTrigger className="flex-1">
-                  <SelectValue placeholder="Pilih Lauk Tambahan" />
+                  <SelectValue placeholder={modalT("placeholders.additionalDish")} />
                 </SelectTrigger>
                 <SelectContent
                   position="popper"
@@ -335,11 +338,11 @@ export function OrderModal({ card, serviceName, onClose }: OrderModalProps) {
             {/* Sayur */}
             <div className={fieldClass}>
               <label className={labelClass}>
-                Sayur <span className="text-red-600">*</span>
+                {modalT("fields.vegetable")} <span className="text-red-600">*</span>
               </label>
               <Select value={sayur} onValueChange={setSayur}>
                 <SelectTrigger className="flex-1">
-                  <SelectValue placeholder="Pilih Sayur" />
+                  <SelectValue placeholder={modalT("placeholders.vegetable")} />
                 </SelectTrigger>
                 <SelectContent
                   position="popper"
@@ -358,13 +361,13 @@ export function OrderModal({ card, serviceName, onClose }: OrderModalProps) {
 
             {/* Kerupuk */}
             <div className={fieldClass}>
-              <label className={labelClass}>Kerupuk</label>
+              <label className={labelClass}>{modalT("fields.cracker")}</label>
               <input readOnly value="Kerupuk" className={readonlyClass} />
             </div>
 
             {/* Buah */}
             <div className={fieldClass}>
-              <label className={labelClass}>Buah</label>
+              <label className={labelClass}>{modalT("fields.fruit")}</label>
               <input
                 readOnly
                 value="Pisang / Jeruk"
@@ -374,20 +377,20 @@ export function OrderModal({ card, serviceName, onClose }: OrderModalProps) {
 
             {/* Minuman */}
             <div className={fieldClass}>
-              <label className={labelClass}>Minuman</label>
+              <label className={labelClass}>{modalT("fields.drink")}</label>
               <input readOnly value={minumanValue} className={readonlyClass} />
             </div>
 
             {/* Sup Sayuran */}
             <div className={fieldClass}>
-              <label className={labelClass}>Sup Sayuran</label>
+              <label className={labelClass}>{modalT("fields.soup")}</label>
               <input readOnly value="Sup Sayuran" className={readonlyClass} />
             </div>
 
             {/* Puding */}
             {isPlus && (
               <div className={fieldClass}>
-                <label className={labelClass}>Puding</label>
+                <label className={labelClass}>{modalT("fields.pudding")}</label>
                 <input readOnly value="Puding" className={readonlyClass} />
               </div>
             )}
@@ -396,7 +399,7 @@ export function OrderModal({ card, serviceName, onClose }: OrderModalProps) {
             <div className="flex flex-col gap-1">
               <div className={fieldClass}>
                 <label className={labelClass}>
-                  Jumlah Pesanan <span className="text-red-600">*</span>
+                  {modalT("fields.quantity")} <span className="text-red-600">*</span>
                 </label>
                 <div className="flex items-center gap-3">
                   <input
@@ -414,13 +417,12 @@ export function OrderModal({ card, serviceName, onClose }: OrderModalProps) {
                         : "border-gray-200 bg-gray-50"
                     }`}
                   />
-                  <span className="text-sm text-gray-600">Porsi</span>
+                  <span className="text-sm text-gray-600">{modalT("units.portion")}</span>
                 </div>
               </div>
               {jumlahError && (
                 <p className="pl-36 text-xs text-red-600 mt-2">
-                  Jumlah pesanan tidak bisa di bawah 150. Untuk pesanan lebih
-                  sedikit, silahkan hubungi tim kami.
+                  {modalT("messages.minimum", { count: 150 })}
                 </p>
               )}
             </div>
@@ -429,11 +431,11 @@ export function OrderModal({ card, serviceName, onClose }: OrderModalProps) {
             {!jumlahError && jumlah > 0 && (
               <div className={fieldClass}>
                 <label className={labelClass}>
-                  Sambal <span className="text-red-600">*</span>
+                  {modalT("fields.sauce")} <span className="text-red-600">*</span>
                 </label>
                 <Select value={sambal} onValueChange={setSambal}>
                   <SelectTrigger className="flex-1">
-                    <SelectValue placeholder="Pilih Sambal" />
+                    <SelectValue placeholder={modalT("placeholders.sauce")} />
                   </SelectTrigger>
                   <SelectContent
                     position="popper"
@@ -453,7 +455,7 @@ export function OrderModal({ card, serviceName, onClose }: OrderModalProps) {
 
             {/* Subtotal */}
             <div className={fieldClass}>
-              <span className={labelClass}>Subtotal Pesanan</span>
+              <span className={labelClass}>{modalT("fields.subtotal")}</span>
               <span className="text-2xl font-bold">
                 Rp {subtotal.toLocaleString("id-ID")}
               </span>

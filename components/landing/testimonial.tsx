@@ -214,7 +214,7 @@ function Testimonial() {
           aria-label={t("sliderLabel")}
         />
       </div>
-      <div className="flex items-center justify-center py-6">
+      {/* <div className="flex items-center justify-center py-6">
         <Button
           asChild
           variant="outline"
@@ -222,7 +222,7 @@ function Testimonial() {
         >
           <a href="/gallery/testimonial">{t("cta")}</a>
         </Button>
-      </div>
+      </div> */}
     </div>
   );
 }

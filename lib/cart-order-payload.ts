@@ -1,4 +1,5 @@
 import type { CartItem } from "@/components/CartContext";
+import { clampToMinimumOrderQuantity } from "@/lib/order-minimums";
 import type {
   CreateOrderDetailInput,
   CreateOrderMenuInput,
@@ -92,10 +93,11 @@ export function parseCartItemToOrderMenu(item: CartItem): CreateOrderMenuInput {
 export function parseCartItemToOrderDetail(
   item: CartItem,
 ): CreateOrderDetailInput {
-  const qty = item.quantity;
+  const normalizedItem = clampToMinimumOrderQuantity(item);
+  const qty = normalizedItem.quantity;
   // Fix: ikut sertakan add-on price dalam selling_price
-  const addOnTotal = item.addOns.reduce((sum, a) => sum + a.price, 0);
-  const sellingPrice = item.basePrice + addOnTotal;
+  const addOnTotal = normalizedItem.addOns.reduce((sum, a) => sum + a.price, 0);
+  const sellingPrice = normalizedItem.basePrice + addOnTotal;
   const amount = qty * sellingPrice;
   const amountString = String(amount);
 
@@ -134,7 +136,7 @@ export function mergeCartItems(items: CartItem[]): CartItem[] {
   for (const item of items) {
     const existing = merged.get(item.id);
     if (!existing) {
-      merged.set(item.id, item);
+      merged.set(item.id, clampToMinimumOrderQuantity(item));
       continue;
     }
 

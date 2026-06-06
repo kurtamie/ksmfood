@@ -10,6 +10,7 @@ import React, {
   ReactNode,
 } from "react";
 import { useAuth } from "@/context/authContext";
+import { clampToMinimumOrderQuantity, getMinimumOrderQuantity } from "@/lib/order-minimums";
 
 export interface CartAddOn {
   label: string;
@@ -74,9 +75,10 @@ function cartReducer(state: CartState, action: CartAction): CartState {
     case "HYDRATE":
       return { ...state, items: action.payload };
     case "ADD_ITEM": {
+      const payload = clampToMinimumOrderQuantity(action.payload);
       const id = generateCartItemId(
-        action.payload.productId,
-        action.payload.addOns,
+        payload.productId,
+        payload.addOns,
       );
       const existing = state.items.find((i) => i.id === id);
       if (existing) {
@@ -84,12 +86,12 @@ function cartReducer(state: CartState, action: CartAction): CartState {
           ...state,
           items: state.items.map((i) =>
             i.id === id
-              ? { ...i, quantity: i.quantity + action.payload.quantity }
+              ? { ...i, quantity: i.quantity + payload.quantity }
               : i,
           ),
         };
       }
-      return { ...state, items: [...state.items, { ...action.payload, id }] };
+      return { ...state, items: [...state.items, { ...payload, id }] };
     }
     case "REMOVE_ITEM":
       return {
@@ -97,10 +99,15 @@ function cartReducer(state: CartState, action: CartAction): CartState {
         items: state.items.filter((i) => i.id !== action.payload.id),
       };
     case "UPDATE_QUANTITY": {
-      if (action.payload.quantity <= 0) {
+      const existingItem = state.items.find((i) => i.id === action.payload.id);
+      if (!existingItem) return state;
+      const minimumQuantity = getMinimumOrderQuantity(existingItem);
+      if (action.payload.quantity < minimumQuantity) {
         return {
           ...state,
-          items: state.items.filter((i) => i.id !== action.payload.id),
+          items: state.items.map((i) =>
+            i.id === action.payload.id ? { ...i, quantity: minimumQuantity } : i,
+          ),
         };
       }
       return {

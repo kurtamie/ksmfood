@@ -1,10 +1,11 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { LuAward, LuCheck, LuPackageOpen } from "react-icons/lu";
 import { useState } from "react";
 import { OrderModal, type PackageCard } from "./OrderModal";
+import { localizePriceUnit } from "@/lib/price-unit";
 
 const packageCards: PackageCard[] = [
   {
@@ -68,6 +69,7 @@ const packageCards: PackageCard[] = [
 
 function Menu() {
   const t = useTranslations("bentoMenu");
+  const locale = useLocale();
   const serviceName = "Bento";
   const [selectedCard, setSelectedCard] = useState<
     (typeof packageCards)[0] | null
@@ -117,7 +119,7 @@ function Menu() {
                 </div>
 
                 <p className="mt-5 text-center text-lg font-bold text-red-800">
-                  {card.price}
+                  {localizePriceUnit(card.price, locale)}
                 </p>
 
                 <Button

@@ -1,5 +1,5 @@
 import React from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { BiSolidDish } from "react-icons/bi";
 import { BsPlusCircleFill } from "react-icons/bs";
 import { FaCarrot } from "react-icons/fa";
@@ -8,6 +8,7 @@ import { IoFish } from "react-icons/io5";
 import { LuDot } from "react-icons/lu";
 import { PiCowBold } from "react-icons/pi";
 import { FaAppleWhole } from "react-icons/fa6";
+import { localizePriceUnit } from "@/lib/price-unit";
 
 type DishGroup = {
   subName: string;
@@ -198,6 +199,7 @@ function renderDishList(items: DishItem[]) {
 
 function MenuServices() {
   const t = useTranslations("riceboxMenuServices");
+  const locale = useLocale();
 
   return (
     <div className="mt-16 flex w-full flex-col items-center justify-center gap-6 text-center sm:mt-24">
@@ -221,7 +223,7 @@ function MenuServices() {
                   </h2>
                   {card.subName && (
                     <p className="text-sm italic text-red-800">
-                      {card.subName}
+                      {localizePriceUnit(card.subName, locale)}
                     </p>
                   )}
                 </div>
@@ -256,7 +258,7 @@ function MenuServices() {
                   </h2>
                   {card.subName && (
                     <p className="text-base font-bold text-red-800 sm:text-xl">
-                      {card.subName}
+                      {localizePriceUnit(card.subName, locale)}
                     </p>
                   )}
                 </div>

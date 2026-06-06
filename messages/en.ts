@@ -60,6 +60,236 @@ const messages = {
     orderNowShort: "Order Now",
     free: "Free",
   },
+  cart: {
+    title: "Cart",
+    ariaLabel: "Shopping cart",
+    clear: "Clear",
+    close: "Close cart",
+    removeItem: "Remove item",
+    decrease: "Decrease",
+    emptyTitle: "Your cart is empty",
+    emptyDescription: "Add an order from our service pages",
+    total: "Order Total",
+    checkout: "Continue to Checkout",
+    processing: "Processing...",
+    checkoutError: "Failed to create order. Please try again.",
+  },
+  cartConfirm: {
+    thanks: "Thank you, your order",
+    close: "Close modal",
+    ready: "Order is ready to be added to cart",
+    addMore: "Add More Menus",
+    checkout: "Checkout Now",
+    processing: "Processing...",
+    checkoutError: "Failed to create order. Please try again.",
+  },
+  orderModal: {
+    checkout: "Order Now",
+    fields: {
+      rice: "Rice",
+      mainDish: "Main Dish",
+      additionalDish: "Additional Dish",
+      vegetable: "Vegetable",
+      sauce: "Sauce",
+      cracker: "Cracker",
+      fruit: "Fruit",
+      drink: "Drink",
+      pudding: "Pudding",
+      soup: "Vegetable Soup",
+      snack: "Snack",
+      pricePerPackage: "Price / Package",
+      packageContents: "Package Contents",
+      quantity: "Order Quantity",
+      subtotal: "Order Subtotal",
+      qty: "Qty",
+    },
+    placeholders: {
+      rice: "Select Rice",
+      category: "Select Category",
+      menu: "Select Menu",
+      additionalDish: "Select Additional Dish",
+      vegetable: "Select Vegetable",
+      sauce: "Select Sauce",
+      snack: "Select Snack",
+    },
+    units: {
+      box: "Box",
+      portion: "Portion",
+      package: "Package",
+      tumpeng: "Tumpeng",
+    },
+    messages: {
+      includedDetails: "Package details include all items below.",
+      minimum: "Order quantity cannot be below {count}. For smaller orders, please contact our team.",
+      minimumPackage: "Minimum order quantity is {count} {unit}.",
+      pondokanMinimum: "Minimum qty is {count} portions.",
+      surcharge: "Certain snack choices include an additional charge",
+    },
+  },
+  accountMenu: {
+    signedInAs: "Signed in as",
+    myAccount: "My Account",
+    orderHistory: "Order History",
+    logout: "Log Out",
+    login: "Log In",
+  },
+  logoutConfirm: {
+    title: "Log out of your account?",
+    description:
+      "You will be logged out of your KSM Katering account. The cart for this session will be cleared and pages that require login cannot be accessed until you log in again.",
+    cancel: "Cancel",
+    confirm: "Yes, Log Out",
+    loading: "Logging out...",
+  },
+  profile: {
+    title: "Profile and Address",
+    fields: {
+      customerName: "Customer Name",
+      phone: "Phone Number",
+      fullAddress: "Full Address",
+      subdistrict: "Subdistrict",
+      pinpoint: "Location Pinpoint",
+      coordinates: "Coordinates",
+    },
+    placeholders: {
+      subdistrict: "Select Subdistrict",
+      pinpoint: "Search location / type place name",
+    },
+    address: {
+      title: "Delivery Address",
+      empty: "No saved address yet.",
+      editTitle: "EDIT ADDRESS",
+      addTitle: "ADD ADDRESS",
+    },
+    actions: {
+      save: "Save",
+      saving: "Saving...",
+      cancel: "Cancel",
+      editAddress: "Edit Address",
+      addAddress: "Add New Address",
+    },
+    messages: {
+      noChanges: "No changes",
+      saveProfileFailed: "Failed to save profile",
+      profileUpdated: "Profile updated successfully",
+      addressRequired: "Full address is required",
+      pinpointRequired: "Location pinpoint is required",
+      addressSaved: "Address saved successfully",
+    },
+    mapAriaLabel: "Customer address map",
+    mapHelp:
+      "Click the map to mark the location and save the latitude/longitude.",
+  },
+  orderHistory: {
+    title: "Order History",
+    description:
+      "View your latest orders, payment status, and order details.",
+    loading: "Loading orders...",
+    empty: "No orders yet. Start ordering from our service pages.",
+    orderStatus: "Order Status",
+    paymentStatuses: {
+      paid: "Paid",
+      unpaid: "Unpaid",
+      overdue: "Overdue",
+      expired: "Overdue",
+    },
+    actions: {
+      viewDetail: "View Detail",
+    },
+    steps: {
+      waiting_payment: "Waiting for Payment",
+      packing: "Being Packed",
+      send: "Delivery",
+      success: "Received",
+      expired: "Payment Expired",
+    },
+    errors: {
+      loadFailed: "Failed to load order history.",
+    },
+  },
+  orderDetail: {
+    title: "Order Detail",
+    loading: "Loading order detail...",
+    notFound: "Order not found.",
+    paymentStatus: "Payment Status",
+    paymentStatuses: {
+      paid: "Paid",
+      unpaid: "Unpaid",
+      overdue: "Overdue",
+      expired: "Overdue",
+    },
+    orderStatus: "Order Status",
+    orderedAt: "Order Date",
+    invoiceNo: "Invoice No.",
+    deliveryInfo: "Delivery Information",
+    recipientName: "Recipient Name",
+    phoneNo: "Phone No.",
+    deliveryMethod: "Delivery Method",
+    deliveryByKsm: "Delivered by KSM Katering",
+    deliveryDate: "Delivery Date",
+    address: "Address",
+    notes: "Notes",
+    orderItems: "Order Details",
+    qty: "Qty",
+    unit: "box",
+    emptyItems: "Item details are not available yet.",
+    paymentDetails: "Payment Details",
+    subtotal: "Subtotal",
+    total: "Order Total",
+    actions: {
+      backToHistory: "Back to History",
+      createNewOrder: "Create New Order",
+      openingPayment: "Opening payment...",
+      resumePayment: "Continue Payment",
+    },
+    expiredBanner: {
+      title: "This order cannot be processed",
+      description:
+        "Payment for this order has expired, so the order cannot continue. Please create a new order to order again.",
+    },
+    steps: {
+      waiting_payment: "Waiting for Payment",
+      packing: "Order is being packed",
+      send: "In Delivery",
+      success: "Order Received",
+    },
+  },
+  orderStepper: {
+    steps: {
+      waiting_payment: {
+        label: "Waiting for Payment",
+        sublabel: "Invoice is unpaid",
+      },
+      packing: {
+        label: "Packing",
+        sublabel: "Order is being prepared",
+      },
+      send: {
+        label: "Delivery",
+        sublabel: "On the way",
+      },
+      success: {
+        label: "Received",
+        sublabel: "Order completed",
+      },
+      expired: {
+        label: "Payment Expired",
+        sublabel: "Invoice has expired",
+      },
+    },
+    banner: {
+      waiting_payment:
+        "Your order has been created and is waiting for payment before processing starts.",
+      packing:
+        "Your order is being carefully packed. Please wait a moment.",
+      send:
+        "Your order is on the way to your address. Please be ready to receive it.",
+      success:
+        "Your order has been received. Thank you for ordering from KSM Katering.",
+      expired:
+        "Payment for this order has expired. The order cannot be processed further.",
+    },
+  },
   languages: {
     trigger: "English",
     label: "Language",
@@ -143,6 +373,7 @@ const messages = {
         "Recipient phone must be 10-15 digits and start with 62 or 08.",
       deliveryDateRequired: "Delivery date is required.",
       deliveryDateMin: "Delivery date must be at least {date}.",
+      minimumQuantity: "Minimum order quantity is {count}.",
       invalidOrderId: "Invalid order ID.",
       orderIdUnavailable: "Failed to get order ID from server.",
       orderDetailUnavailable: "Order details are not available yet.",
@@ -164,6 +395,14 @@ const messages = {
       pending:
         "Payment is waiting for confirmation. Status will update after completion.",
       error: "Payment failed or was cancelled.",
+    },
+    leaveConfirm: {
+      title: "Leave order page?",
+      description:
+        "This order has not continued to summary yet. If you leave this page, the order will be cancelled and deleted from the database.",
+      cancel: "Cancel",
+      confirm: "Yes, Continue",
+      deleting: "Deleting...",
     },
   },
   header: {
@@ -980,6 +1219,17 @@ const messages = {
       eyebrow: "Contact KSM Katering",
       title:
         "We are ready to help you. For more information about our services and best offers, please contact our team. We are committed to providing fast, responsive, and professional service for your catering needs.",
+    },
+    team: {
+      titleLead: "Our Team Is Ready",
+      titleAccent: "To Help You",
+    },
+    location: {
+      titleLead: "Our",
+      titleAccent: "Location",
+      mapTitle: "KSM Katering Location",
+      hoursLabel: "Operating Hours",
+      hoursValue: "Monday - Sunday, 08.00 - 17.00",
     },
     vision: {
       titleLead: "Vision & Mission",

@@ -72,6 +72,7 @@ export function SnackOrderModal({
   onClose,
 }: SnackOrderModalProps) {
   const t = useTranslations("riceboxMenu");
+  const modalT = useTranslations("orderModal");
   const { addItem, state, clearCart } = useCart();
   const { user } = useAuth();
   const [pendingItem, setPendingItem] = useState<CartItem | null>(null);
@@ -88,9 +89,9 @@ export function SnackOrderModal({
   const [kueList, setKueList] = useState<KueSelection[]>(
     Array.from({ length: kueCount }, () => ({ kategori: "", menu: "" })),
   );
-  const [jumlahStr, setJumlahStr] = useState("1");
+  const [jumlahStr, setJumlahStr] = useState("100");
   const jumlah = parseInt(jumlahStr) || 0;
-  const jumlahError = jumlah < 1;
+  const jumlahError = jumlah < 100;
 
   const priceNumber = parseInt(card.price.replace(/[^0-9]/g, ""), 10);
 
@@ -204,7 +205,9 @@ export function SnackOrderModal({
             {kueList.map((val, idx) => (
               <div key={idx} className="flex items-start gap-4">
                 <label className="w-32 shrink-0 pt-2 text-sm font-semibold">
-                  {kueCount > 1 ? `Kue ${idx + 1}` : "Kue"}
+                  {kueCount > 1
+                    ? `${modalT("fields.snack")} ${idx + 1}`
+                    : modalT("fields.snack")}
                   <span className="text-red-600"> *</span>
                 </label>
                 <div className="flex flex-1 flex-col gap-2">
@@ -218,7 +221,7 @@ export function SnackOrderModal({
                     }}
                   >
                     <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Pilih Kategori" />
+                      <SelectValue placeholder={modalT("placeholders.category")} />
                     </SelectTrigger>
                     <SelectContent
                       position="popper"
@@ -245,7 +248,7 @@ export function SnackOrderModal({
                     }}
                   >
                     <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Pilih Kue" />
+                      <SelectValue placeholder={modalT("placeholders.snack")} />
                     </SelectTrigger>
                     <SelectContent
                       position="popper"
@@ -267,7 +270,7 @@ export function SnackOrderModal({
 
             {/* Minuman (read-only) */}
             <div className={fieldClass}>
-              <label className={labelClass}>Minuman</label>
+              <label className={labelClass}>{modalT("fields.drink")}</label>
               <input readOnly value={minuman} className={readonlyClass} />
             </div>
 
@@ -275,7 +278,7 @@ export function SnackOrderModal({
             <div className="flex flex-col gap-1">
               <div className={fieldClass}>
                 <label className={labelClass}>
-                  Jumlah Pesanan <span className="text-red-600">*</span>
+                  {modalT("fields.quantity")} <span className="text-red-600">*</span>
                 </label>
                 <div className="flex items-center gap-3">
                   <input
@@ -289,13 +292,12 @@ export function SnackOrderModal({
                         : "border-gray-200 bg-gray-50"
                     }`}
                   />
-                  <span className="text-sm text-gray-600">Kotak</span>
+                  <span className="text-sm text-gray-600">{modalT("units.box")}</span>
                 </div>
               </div>
               {jumlahError && (
                 <p className="pl-36 text-xs text-red-600 mt-2">
-                  Jumlah pesanan tidak bisa di bawah 100. Untuk pesanan lebih
-                  sedikit, silahkan hubungi tim kami.
+                  {modalT("messages.minimum", { count: 100 })}
                 </p>
               )}
             </div>
@@ -303,14 +305,14 @@ export function SnackOrderModal({
             {/* Info surcharge */}
             {selectedDishSurcharge > 0 && (
               <p className="text-xs text-amber-700 bg-amber-50 rounded-lg px-3 py-2">
-                Pilihan kue tertentu dikenakan tambahan biaya{" "}
-                <strong>Rp 2.000/kotak</strong>.
+                {modalT("messages.surcharge")}{" "}
+                <strong>Rp 2.000/{modalT("units.box").toLowerCase()}</strong>.
               </p>
             )}
 
             {/* Subtotal */}
             <div className={fieldClass}>
-              <span className={labelClass}>Subtotal Pesanan</span>
+              <span className={labelClass}>{modalT("fields.subtotal")}</span>
               <span className="text-2xl font-bold">
                 Rp {subtotal.toLocaleString("id-ID")}
               </span>

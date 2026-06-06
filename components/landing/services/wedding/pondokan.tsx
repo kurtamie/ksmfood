@@ -64,15 +64,16 @@ function PondokanOrderModal({
   card: PondokanCard;
   onClose: () => void;
 }) {
+  const modalT = useTranslations("orderModal");
   const router = useRouter();
   const { addItem, state, clearCart } = useCart();
   const { user } = useAuth();
-  const [qtyStr, setQtyStr] = useState("1");
+  const [qtyStr, setQtyStr] = useState("150");
   const [pendingItem, setPendingItem] = useState<CartItem | null>(null);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
 
   const qty = parseInt(qtyStr, 10) || 0;
-  const qtyError = qty < 1;
+  const qtyError = qty < 150;
   const subtotal = qty * PRICE_PER_PORTION;
 
   const buildItem = (): CartItem => ({
@@ -137,18 +138,19 @@ function PondokanOrderModal({
                 {card.title}
               </h2>
               <p className="mt-1 text-sm text-gray-600">
-                {formatRupiah(PRICE_PER_PORTION)} / porsi
+                {formatRupiah(PRICE_PER_PORTION)} /{" "}
+                {modalT("units.portion").toLowerCase()}
               </p>
             </div>
 
             <div className="flex flex-col gap-2">
               <label className="text-sm font-semibold text-[#332929]">
-                Qty <span className="text-red-600">*</span>
+                {modalT("fields.qty")} <span className="text-red-600">*</span>
               </label>
               <div className="flex items-center gap-3">
                 <input
                   type="number"
-                  min={1}
+                  min={150}
                   value={qtyStr}
                   onChange={(event) => setQtyStr(event.target.value)}
                   className={`h-11 w-28 rounded-lg border px-3 text-sm outline-none focus:ring-2 focus:ring-red-800 ${
@@ -157,16 +159,18 @@ function PondokanOrderModal({
                       : "border-gray-200 bg-gray-50"
                   }`}
                 />
-                <span className="text-sm text-gray-600">Porsi</span>
+                <span className="text-sm text-gray-600">{modalT("units.portion")}</span>
               </div>
               {qtyError ? (
-                <p className="text-xs text-red-600">Qty minimal 1 porsi.</p>
+                <p className="text-xs text-red-600">
+                  {modalT("messages.pondokanMinimum", { count: 150 })}
+                </p>
               ) : null}
             </div>
 
             <div className="flex items-center justify-between border-t border-gray-200 pt-4">
               <span className="text-sm font-semibold text-gray-600">
-                Subtotal
+                {modalT("fields.subtotal")}
               </span>
               <span className="text-2xl font-bold text-[#332929]">
                 {formatRupiah(subtotal)}
@@ -178,7 +182,7 @@ function PondokanOrderModal({
               onClick={handleOrder}
               className="h-11 w-full bg-red-800 text-white hover:bg-red-900 disabled:opacity-50"
             >
-              Pesan Sekarang
+              {modalT("checkout")}
             </Button>
           </div>
         </div>
@@ -250,7 +254,7 @@ export default function Pondokan() {
                 onClick={() => setSelectedCard({ ...card, title })}
                 className="mt-auto h-10 w-full bg-red-800 text-white hover:bg-red-900"
               >
-                Pesan Sekarang
+                {t("orderNow")}
               </Button>
             </article>
           );

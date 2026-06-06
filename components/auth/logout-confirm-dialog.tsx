@@ -10,6 +10,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { useTranslations } from "next-intl";
 
 type LogoutConfirmDialogProps = {
   open: boolean;
@@ -24,19 +25,19 @@ export default function LogoutConfirmDialog({
   onConfirm,
   isLoading = false,
 }: LogoutConfirmDialogProps) {
+  const t = useTranslations("logoutConfirm");
+
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Keluar dari akun?</AlertDialogTitle>
+          <AlertDialogTitle>{t("title")}</AlertDialogTitle>
           <AlertDialogDescription>
-            Anda akan keluar dari akun KSM Katering. Keranjang untuk sesi ini
-            akan dikosongkan dan halaman yang membutuhkan login tidak dapat
-            diakses sampai masuk kembali.
+            {t("description")}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={isLoading}>Batal</AlertDialogCancel>
+          <AlertDialogCancel disabled={isLoading}>{t("cancel")}</AlertDialogCancel>
           <AlertDialogAction
             disabled={isLoading}
             onClick={(event) => {
@@ -45,7 +46,7 @@ export default function LogoutConfirmDialog({
             }}
             className="bg-[#8D0000] text-white hover:bg-[#6f0000]"
           >
-            {isLoading ? "Keluar..." : "Ya, Keluar"}
+            {isLoading ? t("loading") : t("confirm")}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

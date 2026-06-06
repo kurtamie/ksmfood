@@ -1,7 +1,8 @@
 import React from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { LuDot } from "react-icons/lu";
 import { GiBread, GiCupcake, GiJelly, GiSausage } from "react-icons/gi";
+import { localizePriceUnit } from "@/lib/price-unit";
 
 type DishGroup = {
   subName: string;
@@ -128,6 +129,7 @@ function renderDishList(items: DishItem[]) {
 
 function MenuServices() {
   const t = useTranslations("snackBoxMenuServices");
+  const locale = useLocale();
 
   return (
     <div className="mt-16 flex w-full flex-col items-center justify-center gap-6 text-center sm:mt-24">
@@ -151,7 +153,7 @@ function MenuServices() {
                   </h2>
                   {card.subName && (
                     <p className="text-sm italic text-red-800">
-                      {card.subName}
+                      {localizePriceUnit(card.subName, locale)}
                     </p>
                   )}
                 </div>

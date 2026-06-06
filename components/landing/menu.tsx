@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import prasnikah from "@/public/images/menu/prasmanan-nikah.webp";
 import prasmanan from "@/public/images/menu/prasmanan.webp";
 import nasi from "@/public/images/menu/nasi-kotak.webp";
@@ -10,6 +10,7 @@ import snackbox from "@/public/images/menu/snack-kotak.webp";
 import aqiqah from "@/public/images/services/aqiqah/aqiq.webp";
 import tumpeng from "@/public/images/menu/tumpeng.webp";
 import korporat from "@/public/images/menu/korporat.webp";
+import { localizePriceUnit } from "@/lib/price-unit";
 
 const packageCards = [
   {
@@ -86,6 +87,7 @@ const packageCards = [
 
 function Menu() {
   const t = useTranslations("homeMenu");
+  const locale = useLocale();
   const cards = t.raw("cards") as Array<{
     id: number;
     title: string;
@@ -117,7 +119,7 @@ function Menu() {
                 {translatedCard?.title ?? card.title}
               </h3>
               <p className="mt-2 text-sm text-gray-600">
-                {translatedCard?.price ?? card.price}
+                {localizePriceUnit(translatedCard?.price ?? card.price, locale)}
               </p>
             </div>
             <div className="mt-2 flex w-full flex-col gap-2 sm:flex-row">

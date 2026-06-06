@@ -2,13 +2,13 @@ import type { Invoice, InvoiceStatus } from "@/types/invoices";
 import type { Order } from "@/types/orders";
 import { unwrapStrapiList } from "@/lib/strapi-response";
 
-export type PaymentStatusLabel = "Belum Dibayar" | "Dibayar" | "Jatuh Tempo";
+export type PaymentStatusLabel = InvoiceStatus;
 
 const STATUS_LABEL: Record<InvoiceStatus, PaymentStatusLabel> = {
-  paid: "Dibayar",
-  unpaid: "Belum Dibayar",
-  overdue: "Jatuh Tempo",
-  expired: "Jatuh Tempo",
+  paid: "paid",
+  unpaid: "unpaid",
+  overdue: "overdue",
+  expired: "expired",
 };
 
 export function normalizeInvoices(
@@ -21,14 +21,14 @@ export function getOrderPaymentStatusLabel(
   invoices: Order["invoices"] | undefined,
 ): PaymentStatusLabel {
   const list = normalizeInvoices(invoices);
-  if (!list.length) return "Belum Dibayar";
+  if (!list.length) return "unpaid";
 
   const primary = list[0]?.payment_status;
   if (primary && primary in STATUS_LABEL) {
     return STATUS_LABEL[primary];
   }
 
-  return "Belum Dibayar";
+  return "unpaid";
 }
 
 export function getPrimaryInvoice(
@@ -39,5 +39,5 @@ export function getPrimaryInvoice(
 }
 
 export function isPaidStatus(label: PaymentStatusLabel): boolean {
-  return label === "Dibayar";
+  return label === "paid";
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { BiSolidDish } from "react-icons/bi";
 import { BsPlusCircleFill } from "react-icons/bs";
 import { FaCarrot } from "react-icons/fa";
@@ -9,6 +9,7 @@ import { GiChicken, GiChiliPepper, GiShrimp } from "react-icons/gi";
 import { IoFish } from "react-icons/io5";
 import { LuDot } from "react-icons/lu";
 import { PiCowBold } from "react-icons/pi";
+import { localizePriceUnit } from "@/lib/price-unit";
 
 type DishGroup = {
   subName: string;
@@ -178,7 +179,7 @@ function isDishGroup(item: MenuItem): item is DishGroup {
   return typeof item !== "string";
 }
 
-function MenuCard({ card }: { card: MenuCard }) {
+function MenuCard({ card, locale }: { card: MenuCard; locale: string }) {
   return (
     <article className="flex h-full flex-col rounded-2xl border border-[#332929]/12 bg-white px-6 py-6 shadow-[0_18px_50px_-32px_rgba(51,41,41,0.3)]">
       <div className="flex items-start gap-3">
@@ -187,7 +188,7 @@ function MenuCard({ card }: { card: MenuCard }) {
           <h3 className="text-2xl font-bold text-[#332929]">{card.name}</h3>
           {card.accent && (
             <p className="text-xl font-bold leading-tight text-[#8D0000]">
-              {card.accent}
+              {localizePriceUnit(card.accent, locale)}
             </p>
           )}
         </div>
@@ -230,6 +231,7 @@ function MenuCard({ card }: { card: MenuCard }) {
 
 export default function MenuServices() {
   const t = useTranslations("prasmananMenuServices");
+  const locale = useLocale();
 
   return (
     <div className="mt-14 flex w-full flex-col items-center">
@@ -238,7 +240,7 @@ export default function MenuServices() {
       </h3>
       <div className="mt-10 grid w-full max-w-7xl grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
         {mainDishCards.map((card) => (
-          <MenuCard key={card.id} card={card} />
+          <MenuCard key={card.id} card={card} locale={locale} />
         ))}
       </div>
 
@@ -247,7 +249,7 @@ export default function MenuServices() {
       </h3>
       <div className="mt-10 grid w-full max-w-7xl grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-5">
         {companionCards.map((card) => (
-          <MenuCard key={card.id} card={card} />
+          <MenuCard key={card.id} card={card} locale={locale} />
         ))}
       </div>
     </div>

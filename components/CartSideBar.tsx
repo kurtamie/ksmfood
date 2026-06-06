@@ -14,6 +14,8 @@ import { useAuth } from "@/context/authContext";
 import AuthModal from "@/components/auth/AuthModal";
 import { useState } from "react";
 import { createCheckoutOrder } from "@/lib/client-checkout";
+import { getMinimumOrderQuantity } from "@/lib/order-minimums";
+import { useTranslations } from "next-intl";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -29,8 +31,10 @@ function formatRupiah(amount: number): string {
 
 function CartItemRow({ item }: { item: CartItem }) {
   const { removeItem, updateQuantity } = useCart();
+  const t = useTranslations("cart");
   const total = getItemTotalPrice(item);
   const addOnLabels = item.addOns.map((a) => a.label).join(", ");
+  const minimumQuantity = getMinimumOrderQuantity(item);
 
   return (
     <div className="flex gap-3 py-4 border-b border-secondary-300 last:border-0">
@@ -54,7 +58,7 @@ function CartItemRow({ item }: { item: CartItem }) {
         {/* Hapus */}
         <button
           onClick={() => removeItem(item.id)}
-          aria-label="Hapus item"
+          aria-label={t("removeItem")}
           className="text-secondary-500 hover:text-primary-500 transition-colors"
         >
           <RxCross1 size={15} />
@@ -64,7 +68,8 @@ function CartItemRow({ item }: { item: CartItem }) {
         <div className="flex items-center gap-1.5 rounded-lg border border-secondary-400 px-1.5 py-0.5">
           <button
             onClick={() => updateQuantity(item.id, item.quantity - 1)}
-            aria-label="Kurangi"
+            aria-label={t("decrease")}
+            disabled={item.quantity <= minimumQuantity}
             className="w-5 h-5 flex items-center justify-center text-tertiary-700 hover:text-primary-500 transition-colors font-bold text-base leading-none"
           >
             −
@@ -88,6 +93,7 @@ function CartItemRow({ item }: { item: CartItem }) {
 // ─── Cart Sidebar ──────────────────────────────────────────────────────────────
 
 export default function CartSidebar() {
+  const t = useTranslations("cart");
   const { state, closeCart, totalPrice, isEmpty, clearCart } = useCart();
   const { isLoggedIn, user } = useAuth();
   const [isAuthOpen, setIsAuthOpen] = useState(false);
@@ -133,7 +139,7 @@ export default function CartSidebar() {
       setCheckoutError(
         error instanceof Error
           ? error.message
-          : "Gagal membuat pesanan. Coba lagi.",
+          : t("checkoutError"),
       );
     } finally {
       setIsCheckingOut(false);
@@ -160,13 +166,13 @@ export default function CartSidebar() {
         }`}
         role="dialog"
         aria-modal="true"
-        aria-label="Keranjang belanja"
+        aria-label={t("ariaLabel")}
       >
         {/* ── Header sidebar ── */}
         <div className="flex items-center justify-between border-b border-secondary-300 px-5 py-4">
           <div className="flex items-center gap-2">
             <GrCart size={21} className="text-red-900" />
-            <h2 className="text-base font-bold text-tertiary-800">Keranjang</h2>
+            <h2 className="text-base font-bold text-tertiary-800">{t("title")}</h2>
             {state.items.length > 0 && (
               <span className="rounded-full bg-primary-500 px-2 py-0.5 text-xs font-bold text-white">
                 {state.items.length}
@@ -181,12 +187,12 @@ export default function CartSidebar() {
                 onClick={clearCart}
                 className="text-xs text-secondary-600 hover:text-primary-500 transition-colors underline underline-offset-2"
               >
-                Kosongkan
+                {t("clear")}
               </button>
             )}
             <button
               onClick={closeCart}
-              aria-label="Tutup keranjang"
+              aria-label={t("close")}
               className="rounded-lg p-1.5 text-secondary-600 hover:bg-secondary-300 hover:text-secondary-900 transition-colors"
             >
               <RxCross1 size={18} />
@@ -200,10 +206,10 @@ export default function CartSidebar() {
             <div className="flex h-full flex-col items-center justify-center gap-3 text-center">
               <div className="text-5xl">🛒</div>
               <p className="font-semibold text-tertiary-700">
-                Keranjang masih kosong
+                {t("emptyTitle")}
               </p>
               <p className="text-sm text-secondary-600">
-                Tambahkan pesanan dari halaman layanan kami
+                {t("emptyDescription")}
               </p>
             </div>
           ) : (
@@ -220,7 +226,7 @@ export default function CartSidebar() {
           <div className="border-t border-secondary-300 px-5 py-4 flex flex-col gap-3">
             {/* Total */}
             <div className="flex items-center justify-between">
-              <span className="text-sm text-tertiary-600">Total Pesanan</span>
+              <span className="text-sm text-tertiary-600">{t("total")}</span>
               <span className="text-lg font-bold text-tertiary-800">
                 {formatRupiah(totalPrice)}
               </span>
@@ -232,7 +238,7 @@ export default function CartSidebar() {
               disabled={isCheckingOut}
               className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary-500 py-3 text-sm font-bold text-white transition-colors hover:bg-primary-600 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {isCheckingOut ? "Memproses..." : "Lanjut ke Checkout"}
+              {isCheckingOut ? t("processing") : t("checkout")}
               <FaArrowRight size={15} />
             </button>
             {checkoutError ? (

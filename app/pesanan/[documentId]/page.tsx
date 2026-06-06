@@ -4,12 +4,12 @@ import Link from "next/link";
 import Script from "next/script";
 import { useCallback, useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { isPaidStatus } from "@/lib/order-status";
-import type { PaymentStatusLabel } from "@/lib/order-status";
+import { useLocale, useTranslations } from "next-intl";
 import type { OrderDetailView } from "@/lib/order-queries";
 import { parseAmount } from "@/lib/order-totals";
-import type { OrderDisplayStep, OrderStep } from "@/types/orders";
+import type { OrderDisplayStep } from "@/types/orders";
 import { OrderStepper } from "@/components/OrderStepper";
+import type { InvoiceStatus } from "@/types/invoices";
 
 const SNAP_SCRIPT_URL =
   process.env.NEXT_PUBLIC_MIDTRANS_IS_PRODUCTION === "true"
@@ -24,11 +24,11 @@ function formatRupiah(amount: number) {
   }).format(amount);
 }
 
-function formatOrderDate(value: string | null, withTime = false) {
+function formatOrderDate(value: string | null, locale: string, withTime = false) {
   if (!value) return "-";
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return value;
-  return date.toLocaleDateString("id-ID", {
+  return date.toLocaleDateString(locale === "en" ? "en-US" : "id-ID", {
     day: "numeric",
     month: "long",
     year: "numeric",
@@ -61,22 +61,6 @@ type StoredOrderSummaryPayment = {
   snapRedirectUrl?: string | null;
   midtransOrderId?: string | null;
 };
-
-const ORDER_STEP_LABEL: Record<OrderStep, string> = {
-  packing: "Pesanan sedang di packing",
-  send: "Dalam pengiriman",
-  success: "Pesanan Diterima",
-};
-
-const DISPLAY_ORDER_STEP_LABEL: Record<OrderDisplayStep, string> = {
-  waiting_payment: "Menunggu Pembayaran",
-  ...ORDER_STEP_LABEL,
-};
-
-function getOrderStepLabel(step: OrderDisplayStep | null): string | null {
-  if (!step) return null;
-  return DISPLAY_ORDER_STEP_LABEL[step] ?? null;
-}
 
 function buildMenuLabels(menu: OrderMenuRow): string {
   return [
@@ -233,6 +217,20 @@ function isUnpaidPaymentStatus(status: string | null | undefined): boolean {
   return !status || status === "unpaid";
 }
 
+function getPaymentStatusKey(
+  paymentStatus: string | null | undefined,
+): InvoiceStatus {
+  if (
+    paymentStatus === "paid" ||
+    paymentStatus === "unpaid" ||
+    paymentStatus === "overdue" ||
+    paymentStatus === "expired"
+  ) {
+    return paymentStatus;
+  }
+  return "unpaid";
+}
+
 function getDisplayOrderStep(
   step: OrderDetailView["step"],
   paymentStatus: string | null | undefined,
@@ -251,6 +249,8 @@ function getDisplayOrderStep(
 }
 
 export default function OrderDetailPage() {
+  const t = useTranslations("orderDetail");
+  const locale = useLocale();
   const params = useParams();
   const router = useRouter();
   const documentId = params?.documentId as string | undefined;
@@ -535,7 +535,7 @@ export default function OrderDetailPage() {
   if (isLoading) {
     return (
       <div className="mx-auto max-w-5xl px-6 py-10">
-        <p className="text-sm text-secondary-600">Memuat detail pesanan...</p>
+        <p className="text-sm text-secondary-600">{t("loading")}</p>
       </div>
     );
   }
@@ -544,13 +544,13 @@ export default function OrderDetailPage() {
     return (
       <div className="mx-auto max-w-5xl px-6 py-10">
         <p className="text-sm text-red-600">
-          {error ?? "Pesanan tidak ditemukan."}
+          {error ?? t("notFound")}
         </p>
         <Link
           href="/pesanan"
           className="mt-4 inline-flex text-sm font-semibold text-primary-600 hover:underline"
         >
-          Kembali ke Riwayat
+          {t("actions.backToHistory")}
         </Link>
       </div>
     );
@@ -558,11 +558,11 @@ export default function OrderDetailPage() {
 
   // ── Derived values ────────────────────────────────────────────────────────
 
-  const status = order.paymentStatusLabel as PaymentStatusLabel;
   const primaryInvoice = getPrimaryInvoiceFromArray(order.invoices);
   const invoicePaymentStatus =
     primaryInvoice?.payment_status ?? order.paymentStatus;
-  const paid = invoicePaymentStatus === "paid" || isPaidStatus(status);
+  const paymentStatusKey = getPaymentStatusKey(invoicePaymentStatus);
+  const paid = paymentStatusKey === "paid";
   const paymentOverdue = isOverduePaymentStatus(invoicePaymentStatus);
 
   const subTotal = order.orderDetails.reduce(
@@ -578,7 +578,9 @@ export default function OrderDetailPage() {
     order.step,
     invoicePaymentStatus,
   );
-  const orderStepLabel = getOrderStepLabel(displayOrderStep);
+  const orderStepLabel = displayOrderStep
+    ? t(`steps.${displayOrderStep}`)
+    : null;
 
   // ── Render ────────────────────────────────────────────────────────────────
 
@@ -601,7 +603,7 @@ export default function OrderDetailPage() {
         {/* Header */}
 
         <h1 className="mb-5 text-2xl font-semibold text-tertiary-900">
-          Detail Pesanan
+          {t("title")}
         </h1>
 
         {/* Notifikasi pembayaran */}
@@ -620,18 +622,16 @@ export default function OrderDetailPage() {
         {paymentOverdue && !paid ? (
           <div className="mb-4 overflow-hidden rounded-2xl border border-red-200 bg-red-50 px-5 py-4">
             <p className="text-sm font-semibold text-red-700">
-              Pesanan ini tidak dapat diproses
+              {t("expiredBanner.title")}
             </p>
             <p className="mt-1 text-sm text-red-600">
-              Pembayaran untuk pesanan ini sudah jatuh tempo sehingga pesanan
-              tidak dapat dilanjutkan. Silakan buat pesanan baru untuk melakukan
-              pemesanan ulang.
+              {t("expiredBanner.description")}
             </p>
             <Link
               href="/#layanan"
               className="mt-3 inline-flex items-center gap-1 rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700"
             >
-              Buat Pesanan Baru
+              {t("actions.createNewOrder")}
             </Link>
           </div>
         ) : null}
@@ -642,7 +642,7 @@ export default function OrderDetailPage() {
           <div className="flex flex-col gap-3 border-b border-gray-100 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
               <span className="text-sm text-secondary-500">
-                Status Pembayaran
+                {t("paymentStatus")}
               </span>
               <span
                 className={`w-fit rounded-full px-3 py-1 text-xs font-semibold ${
@@ -653,7 +653,7 @@ export default function OrderDetailPage() {
                       : "bg-amber-100 text-amber-700"
                 }`}
               >
-                {status}
+                {t(`paymentStatuses.${paymentStatusKey}`)}
               </span>
             </div>
 
@@ -664,7 +664,7 @@ export default function OrderDetailPage() {
                 disabled={isPaying}
                 className="inline-flex items-center justify-center rounded-lg bg-primary-600 px-5 py-2 text-sm font-semibold text-white hover:bg-primary-700 disabled:cursor-not-allowed disabled:opacity-60"
               >
-                {isPaying ? "Membuka pembayaran..." : "Lanjutkan Pembayaran"}
+                {isPaying ? t("actions.openingPayment") : t("actions.resumePayment")}
               </button>
             ) : null}
           </div>
@@ -673,7 +673,7 @@ export default function OrderDetailPage() {
           {displayOrderStep ? (
             <div className="border-b border-gray-100 px-4 py-5 sm:px-6">
               <p className="mb-4 text-sm font-semibold text-tertiary-900">
-                Status Pesanan: {orderStepLabel}
+                {t("orderStatus")}: {orderStepLabel}
               </p>
               <OrderStepper
                 currentStep={displayOrderStep}
@@ -685,13 +685,13 @@ export default function OrderDetailPage() {
           {/* Tanggal pemesanan & no. invoice */}
           <div className="grid grid-cols-1 divide-y divide-gray-100 border-b border-gray-100 sm:grid-cols-2 sm:divide-x sm:divide-y-0">
             <div className="flex items-center justify-between px-6 py-3 text-sm">
-              <span className="text-secondary-500">Tanggal Pemesanan</span>
+              <span className="text-secondary-500">{t("orderedAt")}</span>
               <span className="font-medium text-tertiary-900">
-                {formatOrderDate(order.createdAt, true)}
+                {formatOrderDate(order.createdAt, locale, true)}
               </span>
             </div>
             <div className="flex items-center justify-between px-6 py-3 text-sm">
-              <span className="text-secondary-500">No. Invoice</span>
+              <span className="text-secondary-500">{t("invoiceNo")}</span>
               <span className="font-medium text-tertiary-900">
                 {order.invoiceNo ??
                   primaryInvoice?.invoice_no ??
@@ -705,14 +705,14 @@ export default function OrderDetailPage() {
           {/* Informasi pengiriman */}
           <div className="border-b border-gray-100 px-6 py-4">
             <p className="mb-3 text-sm font-semibold text-tertiary-900">
-              Informasi Pengiriman
+              {t("deliveryInfo")}
             </p>
             <div className="space-y-2 text-sm">
               {/* Nama penerima */}
               {order.recipientName ? (
                 <div className="flex gap-4">
                   <span className="w-36 shrink-0 text-secondary-500">
-                    Nama Penerima
+                    {t("recipientName")}
                   </span>
                   <span className="text-tertiary-900">
                     : {order.recipientName}
@@ -724,7 +724,7 @@ export default function OrderDetailPage() {
               {order.recipientPhone ? (
                 <div className="flex gap-4">
                   <span className="w-36 shrink-0 text-secondary-500">
-                    No. Telepon
+                    {t("phoneNo")}
                   </span>
                   <span className="text-tertiary-900">
                     : {order.recipientPhone}
@@ -734,25 +734,25 @@ export default function OrderDetailPage() {
 
               <div className="flex gap-4">
                 <span className="w-36 shrink-0 text-secondary-500">
-                  Metode Pengiriman
+                  {t("deliveryMethod")}
                 </span>
                 <span className="text-tertiary-900">
-                  : Pengantaran oleh KSM Katering
+                  : {t("deliveryByKsm")}
                 </span>
               </div>
               <div className="flex gap-4">
                 <span className="w-36 shrink-0 text-secondary-500">
-                  Tanggal Kirim
+                  {t("deliveryDate")}
                 </span>
                 <span className="text-tertiary-900">
                   :{" "}
                   {order.deliveryDate
-                    ? `${formatOrderDate(order.deliveryDate)}${order.arriveTime ? " " + order.arriveTime : ""}`
+                    ? `${formatOrderDate(order.deliveryDate, locale)}${order.arriveTime ? " " + order.arriveTime : ""}`
                     : "-"}
                 </span>
               </div>
               <div className="flex gap-4">
-                <span className="w-36 shrink-0 text-secondary-500">Alamat</span>
+                <span className="w-36 shrink-0 text-secondary-500">{t("address")}</span>
                 <div className="text-tertiary-900">
                   <p className="whitespace-pre-line">
                     : {order.deliveryAddress || "-"}
@@ -762,7 +762,7 @@ export default function OrderDetailPage() {
               {order.recipientPhone ? (
                 <div className="flex gap-4">
                   <span className="w-36 shrink-0 text-secondary-500">
-                    No. Telepon
+                    {t("phoneNo")}
                   </span>
                   <span className="text-tertiary-900">
                     : {order.recipientPhone}
@@ -772,7 +772,7 @@ export default function OrderDetailPage() {
               {order.deliveryNote ? (
                 <div className="flex gap-4">
                   <span className="w-36 shrink-0 text-secondary-500">
-                    Catatan
+                    {t("notes")}
                   </span>
                   <span className="text-tertiary-900">
                     : {order.deliveryNote}
@@ -785,7 +785,7 @@ export default function OrderDetailPage() {
           {/* Detail item pesanan */}
           <div className="border-b border-gray-100 px-6 py-4">
             <p className="mb-3 text-sm font-semibold text-tertiary-900">
-              Detail Pesanan
+              {t("orderItems")}
             </p>
             <div className="space-y-3">
               {orderItems.length > 0 ? (
@@ -806,12 +806,12 @@ export default function OrderDetailPage() {
                         ) : null}
                       </div>
                       <p className="shrink-0 text-right text-sm text-secondary-500">
-                        {formatRupiah(item.unitPrice)} / kotak
+                        {formatRupiah(item.unitPrice)} / {t("unit")}
                       </p>
                     </div>
                     <div className="mt-3 flex items-center justify-between border-t border-gray-100 pt-2 text-sm">
                       <span className="text-secondary-500">
-                        Qty: {item.quantity} kotak
+                        {t("qty")}: {item.quantity} {t("unit")}
                       </span>
                       <span className="font-semibold text-tertiary-900">
                         {formatRupiah(item.total)}
@@ -821,7 +821,7 @@ export default function OrderDetailPage() {
                 ))
               ) : (
                 <p className="text-sm text-secondary-500">
-                  Detail item belum tersedia.
+                  {t("emptyItems")}
                 </p>
               )}
             </div>
@@ -833,15 +833,15 @@ export default function OrderDetailPage() {
               {/* Rincian biaya */}
               <div className="flex-1">
                 <p className="mb-3 text-sm font-semibold text-tertiary-900">
-                  Rincian Pembayaran
+                  {t("paymentDetails")}
                 </p>
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between text-secondary-600">
-                    <span>Subtotal</span>
+                    <span>{t("subtotal")}</span>
                     <span>{formatRupiah(subTotal || order.total)}</span>
                   </div>
                   <div className="flex justify-between border-t border-gray-100 pt-2 font-semibold text-tertiary-900">
-                    <span>Total Pesanan</span>
+                    <span>{t("total")}</span>
                     <span>{formatRupiah(order.total)}</span>
                   </div>
                 </div>

@@ -19,6 +19,7 @@ import {
 import { Calendar } from "@/components/ui/calendar";
 import { Input } from "@/components/ui/input";
 import { getLeaveTime } from "@/lib/cart-order-payload";
+import { getMinimumOrderQuantity } from "@/lib/order-minimums";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -114,6 +115,9 @@ type SessionItem = {
   basePrice: number;
   addOns: SessionAddOn[];
   quantity: number;
+  slug?: string;
+  category?: string;
+  unitLabel?: string;
 };
 
 function getAddOnTotal(addOns: SessionAddOn[] | undefined): number {
@@ -181,7 +185,7 @@ function toOrderDisplayItems(
   menus: OrderMenuRow[],
   details: OrderDetailRow[],
 ): OrderDisplayItem[] {
-  if (details.length === 1) {
+  if (details.length === 1 && menus.length <= 1) {
     const detail = details[0];
     const quantity = parseAmount(detail.qty) || 1;
     const unitPrice = parseAmount(detail.selling_price);
@@ -203,14 +207,29 @@ function toOrderDisplayItems(
   }
 
   const rowCount = Math.max(menus.length, details.length);
+  const aggregateDetail = details.length === 1 ? details[0] : null;
+  const aggregateQuantity = aggregateDetail ? parseAmount(aggregateDetail.qty) : 0;
+  const aggregateUnitPrice = aggregateDetail
+    ? parseAmount(aggregateDetail.selling_price)
+    : 0;
+  const splitQuantity =
+    aggregateDetail && rowCount > 0
+      ? Math.max(1, Math.floor(aggregateQuantity / rowCount))
+      : 1;
 
   return Array.from({ length: rowCount }, (_, index) => {
     const menu = menus[index] ?? {};
-    const detail = details[index] ?? {};
-    const quantity = parseAmount(detail.qty) || 1;
-    const unitPrice = parseAmount(detail.selling_price);
+    const detail = details[index] ?? aggregateDetail ?? {};
+    const quantity =
+      details.length === 1 && menus.length > 1
+        ? splitQuantity
+        : parseAmount(detail.qty) || 1;
+    const unitPrice = parseAmount(detail.selling_price) || aggregateUnitPrice;
     const total =
-      parseAmount(detail.total_amount ?? detail.amount) || quantity * unitPrice;
+      details.length === 1 && menus.length > 1
+        ? quantity * unitPrice
+        : parseAmount(detail.total_amount ?? detail.amount) ||
+          quantity * unitPrice;
 
     return {
       id: String(
@@ -669,6 +688,9 @@ export default function OrderInfoPage() {
       return;
     }
 
+    const currentHref = window.location.href;
+    window.history.pushState({ ksmOrderGuard: true }, "", currentHref);
+
     const handleDocumentClick = (event: MouseEvent) => {
       if (
         event.defaultPrevented ||
@@ -715,12 +737,22 @@ export default function OrderInfoPage() {
       event.returnValue = "";
     };
 
+    const handlePopState = () => {
+      if (allowNavigationRef.current) return;
+      const nextHref = window.location.href;
+      window.history.pushState({ ksmOrderGuard: true }, "", currentHref);
+      setPendingNavigationHref(nextHref);
+      setLeaveDialogOpen(true);
+    };
+
     document.addEventListener("click", handleDocumentClick, true);
     window.addEventListener("beforeunload", handleBeforeUnload);
+    window.addEventListener("popstate", handlePopState);
 
     return () => {
       document.removeEventListener("click", handleDocumentClick, true);
       window.removeEventListener("beforeunload", handleBeforeUnload);
+      window.removeEventListener("popstate", handlePopState);
     };
   }, [documentId, shouldConfirmBeforeLeaving]);
 
@@ -1081,7 +1113,19 @@ export default function OrderInfoPage() {
   }
 
   function updateOrderQuantity(index: number, quantity: number) {
-    if (quantity <= 0) return;
+    const sourceItem = sessionItems[index];
+    const minimumQuantity = sourceItem
+      ? getMinimumOrderQuantity({
+          slug: sourceItem.slug ?? "",
+          category: sourceItem.category ?? "",
+          name: sourceItem.name,
+        })
+      : 1;
+    if (quantity < minimumQuantity) {
+      setSubmitError(t("errors.minimumQuantity", { count: minimumQuantity }));
+      return;
+    }
+    setSubmitError(null);
     // Update via sessionItems kalau ada
     if (sessionItems.length > index) {
       const session = sessionItems[index];
@@ -1517,6 +1561,13 @@ export default function OrderInfoPage() {
               ) : (
                 <div className="space-y-4">
                   {orderItems.map((item, index) => {
+                    const minimumQuantity = sessionItems[index]
+                      ? getMinimumOrderQuantity({
+                          slug: sessionItems[index].slug ?? "",
+                          category: sessionItems[index].category ?? "",
+                          name: sessionItems[index].name,
+                        })
+                      : 1;
                     return (
                       <div
                         key={item.id}
@@ -1546,6 +1597,7 @@ export default function OrderInfoPage() {
                               onClick={() =>
                                 updateOrderQuantity(index, item.quantity - 1)
                               }
+                              disabled={item.quantity <= minimumQuantity}
                               className="h-8 w-8 rounded-full text-sm font-bold text-tertiary-900 transition hover:bg-secondary-100"
                             >
                               −
@@ -1624,15 +1676,14 @@ export default function OrderInfoPage() {
       <AlertDialog open={leaveDialogOpen} onOpenChange={setLeaveDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Tinggalkan halaman pesanan?</AlertDialogTitle>
+            <AlertDialogTitle>{t("leaveConfirm.title")}</AlertDialogTitle>
             <AlertDialogDescription>
-              Pesanan ini belum dilanjutkan ke ringkasan. Jika keluar dari
-              halaman ini, pesanan akan dibatalkan dan dihapus dari database.
+              {t("leaveConfirm.description")}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel disabled={isDeletingDraftOrder}>
-              Batal
+              {t("leaveConfirm.cancel")}
             </AlertDialogCancel>
             <AlertDialogAction
               disabled={isDeletingDraftOrder}
@@ -1642,7 +1693,9 @@ export default function OrderInfoPage() {
               }}
               className="bg-[#8D0000] text-white hover:bg-[#6f0000]"
             >
-              {isDeletingDraftOrder ? "Menghapus..." : "Ya, Setuju"}
+              {isDeletingDraftOrder
+                ? t("leaveConfirm.deleting")
+                : t("leaveConfirm.confirm")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

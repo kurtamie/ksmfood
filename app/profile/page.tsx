@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useAuth } from "@/context/authContext";
 import type { User } from "@/types/users";
+import { useTranslations } from "next-intl";
 
 const kelurahanOptions = [
   { label: "Nagoya", value: "Nagoya, Batam" },
@@ -32,6 +33,7 @@ function toCoordinate(value: unknown): number | null {
 }
 
 export default function AccountPage() {
+  const t = useTranslations("profile");
   const { user } = useAuth();
   const currentUser = user as User | null;
 
@@ -175,7 +177,7 @@ export default function AccountPage() {
   async function persistProfile(successMessage: string) {
     const payload = buildProfilePayload();
     if (Object.keys(payload).length === 0) {
-      showToast("Tidak ada perubahan");
+      showToast(t("messages.noChanges"));
       return true;
     }
 
@@ -198,7 +200,7 @@ export default function AccountPage() {
       if (!response.ok) {
         const errorText = await response.text();
         console.error("Profile update error:", errorText);
-        showToast("Gagal menyimpan profil");
+        showToast(t("messages.saveProfileFailed"));
         return false;
       }
 
@@ -212,7 +214,7 @@ export default function AccountPage() {
       return true;
     } catch (error) {
       console.error(error);
-      showToast("Gagal menyimpan profil");
+      showToast(t("messages.saveProfileFailed"));
       return false;
     } finally {
       setIsSaving(false);
@@ -220,7 +222,7 @@ export default function AccountPage() {
   }
 
   async function saveProfile() {
-    await persistProfile("Profil berhasil diperbarui");
+    await persistProfile(t("messages.profileUpdated"));
   }
 
   function openAddressModal() {
@@ -232,15 +234,15 @@ export default function AccountPage() {
 
   async function saveAddress() {
     if (!addressLine.trim()) {
-      showToast("Alamat lengkap wajib diisi");
+      showToast(t("messages.addressRequired"));
       return;
     }
     if (latitude === null || longitude === null) {
-      showToast("Pinpoint lokasi wajib dipilih");
+      showToast(t("messages.pinpointRequired"));
       return;
     }
 
-    const saved = await persistProfile("Alamat berhasil disimpan");
+    const saved = await persistProfile(t("messages.addressSaved"));
     if (saved) setShowModal(false);
   }
 
@@ -416,12 +418,12 @@ export default function AccountPage() {
       )}
 
       <h1 className="mb-6 text-2xl font-semibold text-tertiary-900">
-        Pengaturan dan Alamat
+        {t("title")}
       </h1>
 
       <div className="grid grid-cols-1 gap-6">
         <div>
-          <label className="mb-1 block text-sm">Nama Customer</label>
+          <label className="mb-1 block text-sm">{t("fields.customerName")}</label>
           <input
             value={customerName}
             onChange={(event) => setCustomerName(event.target.value)}
@@ -430,7 +432,7 @@ export default function AccountPage() {
         </div>
 
         <div>
-          <label className="mb-1 block text-sm">Nomor Handphone</label>
+          <label className="mb-1 block text-sm">{t("fields.phone")}</label>
           <input
             value={phone}
             onChange={(event) => setPhone(event.target.value)}
@@ -444,18 +446,18 @@ export default function AccountPage() {
             disabled={!hasChanges || isSaving}
             className="rounded-md bg-red-600 px-4 py-2 text-white disabled:opacity-50"
           >
-            {isSaving ? "Menyimpan..." : "Simpan"}
+            {isSaving ? t("actions.saving") : t("actions.save")}
           </button>
         </div>
 
         <div className="mt-6 flex items-center justify-between gap-4">
-          <h2 className="text-xl font-semibold">Alamat Pengiriman</h2>
+          <h2 className="text-xl font-semibold">{t("address.title")}</h2>
           <button
             type="button"
             onClick={openAddressModal}
             className="rounded-md bg-red-600 px-4 py-2 text-white"
           >
-            {hasSavedAddress ? "Ubah Alamat" : "Tambah Alamat Baru"}
+            {hasSavedAddress ? t("actions.editAddress") : t("actions.addAddress")}
           </button>
         </div>
 
@@ -463,17 +465,17 @@ export default function AccountPage() {
           <div className="rounded-md border bg-white p-4">
             <p className="text-sm text-secondary-600">{addressLine}</p>
             <p className="mt-1 text-sm text-secondary-600">
-              Kelurahan: {subdistrict}
+              {t("fields.subdistrict")}: {subdistrict}
             </p>
             {latitude !== null && longitude !== null && (
               <p className="mt-2 text-sm text-secondary-700">
-                Koordinat: {latitude.toFixed(6)}, {longitude.toFixed(6)}
+                {t("fields.coordinates")}: {latitude.toFixed(6)}, {longitude.toFixed(6)}
               </p>
             )}
           </div>
         ) : (
           <p className="text-sm text-secondary-600">
-            Belum ada alamat tersimpan.
+            {t("address.empty")}
           </p>
         )}
       </div>
@@ -482,12 +484,12 @@ export default function AccountPage() {
         <div className="fixed inset-0 z-70 flex items-start justify-center overflow-auto bg-black/40 p-4">
           <div className="max-h-[90vh] w-full max-w-2xl overflow-auto rounded-md bg-white p-6">
             <h3 className="mb-4 text-lg font-semibold">
-              {hasSavedAddress ? "UBAH ALAMAT" : "TAMBAH ALAMAT"}
+              {hasSavedAddress ? t("address.editTitle") : t("address.addTitle")}
             </h3>
 
             <div className="grid grid-cols-1 gap-4">
               <div>
-                <label className="mb-1 block text-sm">Alamat Lengkap *</label>
+                <label className="mb-1 block text-sm">{t("fields.fullAddress")} *</label>
                 <textarea
                   value={addressLine}
                   onChange={(event) => setAddressLine(event.target.value)}
@@ -497,13 +499,13 @@ export default function AccountPage() {
               </div>
 
               <div>
-                <label className="mb-1 block text-sm">Kelurahan *</label>
+                <label className="mb-1 block text-sm">{t("fields.subdistrict")} *</label>
                 <select
                   value={subdistrict}
                   onChange={(event) => setSubdistrict(event.target.value)}
                   className="w-full rounded-md border px-3 py-2"
                 >
-                  <option value="">Pilih Kelurahan</option>
+                  <option value="">{t("placeholders.subdistrict")}</option>
                   {kelurahanOptions.map((option) => (
                     <option key={option.value} value={option.value}>
                       {option.label}
@@ -513,14 +515,14 @@ export default function AccountPage() {
               </div>
 
               <div>
-                <label className="mb-1 block text-sm">Pinpoint Lokasi *</label>
+                <label className="mb-1 block text-sm">{t("fields.pinpoint")} *</label>
                 <div className="rounded-md border bg-white p-3">
                   <div className="mb-3 rounded-md border bg-gray-50 px-3 py-2">
                     <input
                       type="text"
                       value={pinpoint}
                       onChange={(event) => setPinpoint(event.target.value)}
-                      placeholder="Cari lokasi / ketik nama tempat"
+                      placeholder={t("placeholders.pinpoint")}
                       className="w-full bg-transparent text-sm outline-none"
                     />
                   </div>
@@ -528,16 +530,15 @@ export default function AccountPage() {
                     <div
                       ref={mapRef}
                       className="h-72 w-full"
-                      aria-label="Peta alamat customer"
+                      aria-label={t("mapAriaLabel")}
                     />
                   </div>
                   <p className="mt-2 text-xs text-secondary-500">
-                    Klik peta untuk menandai lokasi dan simpan
-                    latitude/longitude.
+                    {t("mapHelp")}
                   </p>
                   {latitude !== null && longitude !== null && (
                     <p className="mt-2 text-sm text-secondary-700">
-                      Koordinat: {latitude.toFixed(6)}, {longitude.toFixed(6)}
+                      {t("fields.coordinates")}: {latitude.toFixed(6)}, {longitude.toFixed(6)}
                     </p>
                   )}
                 </div>
@@ -549,7 +550,7 @@ export default function AccountPage() {
                   onClick={() => setShowModal(false)}
                   className="rounded-md border px-4 py-2"
                 >
-                  Batal
+                  {t("actions.cancel")}
                 </button>
                 <button
                   type="button"
@@ -557,7 +558,7 @@ export default function AccountPage() {
                   disabled={isSaving}
                   className="rounded-md bg-red-600 px-4 py-2 text-white disabled:opacity-50"
                 >
-                  {isSaving ? "Menyimpan..." : "Simpan"}
+                  {isSaving ? t("actions.saving") : t("actions.save")}
                 </button>
               </div>
             </div>

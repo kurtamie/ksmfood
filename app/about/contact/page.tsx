@@ -80,8 +80,8 @@ export default async function ContactPage() {
           <div className="mx-auto flex w-full max-w-6xl flex-col gap-12 lg:gap-16">
             <div className="flex flex-col gap-6 items-center justify-center">
               <h2 className="text-center text-4xl font-bold text-[#1A1A1A] sm:text-5xl lg:text-[4rem]">
-                Tim Kami Siap{" "}
-                <span className="text-[#8D0000]">Membantu Anda</span>
+                {t("team.titleLead")}{" "}
+                <span className="text-[#8D0000]">{t("team.titleAccent")}</span>
               </h2>
 
               <div className="grid gap-4 sm:grid-cols-2 sm:gap-8 max-w-5xl mt-14">
@@ -143,7 +143,8 @@ export default async function ContactPage() {
 
             <div className="flex flex-col gap-6">
               <h2 className="text-center text-4xl font-bold text-[#1A1A1A] sm:text-5xl lg:text-[4rem]">
-                Lokasi <span className="text-[#8D0000]">Kami</span>
+                {t("location.titleLead")}{" "}
+                <span className="text-[#8D0000]">{t("location.titleAccent")}</span>
               </h2>
 
               <div className="grid items-stretch gap-4 lg:grid-cols-[1.1fr_0.9fr] lg:gap-5 mt-14">
@@ -156,7 +157,7 @@ export default async function ContactPage() {
                     allowFullScreen={true}
                     loading="lazy"
                     referrerPolicy="no-referrer-when-downgrade"
-                    title="Lokasi KSM Katering"
+                    title={t("location.mapTitle")}
                     className="min-h-80 w-full"
                   />
                 </div>
@@ -187,10 +188,10 @@ export default async function ContactPage() {
                       />
                       <p className="leading-relaxed text-[#8D0000]">
                         <span className="font-bold text-[#1A1A1A]">
-                          Jam Operasional:
+                          {t("location.hoursLabel")}:
                         </span>
                         <br />
-                        Senin - Minggu, 08.00 - 17.00
+                        {t("location.hoursValue")}
                       </p>
                     </div>
                   </div>

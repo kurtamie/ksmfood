@@ -3,9 +3,9 @@
 import type { CartItem } from "@/components/CartContext";
 import { getItemTotalPrice } from "@/components/CartContext";
 import {
-  buildAggregateOrderDetail,
   hasOrderMenuValues,
   mergeCartItems,
+  parseCartItemToOrderDetail,
   parseCartItemToOrderMenu,
 } from "@/lib/cart-order-payload";
 
@@ -46,7 +46,7 @@ export async function createCheckoutOrder(
       package_name: packageName,
       product: productName,
       order_menus: orderMenus,
-      order_details: [buildAggregateOrderDetail(checkoutItems)],
+      order_details: checkoutItems.map(parseCartItemToOrderDetail),
     }),
   });
 

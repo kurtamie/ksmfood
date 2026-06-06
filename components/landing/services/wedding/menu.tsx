@@ -1,6 +1,6 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { LuAward, LuCheck, LuPackageOpen } from "react-icons/lu";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
@@ -8,6 +8,7 @@ import {
   OrderModalPrasmanan as OrderModal,
   type PackageCard,
 } from "./OrderModal";
+import { localizePriceUnit } from "@/lib/price-unit";
 
 const packageCards: PackageCard[] = [
   {
@@ -184,6 +185,7 @@ const packageCards: PackageCard[] = [
 export default function Menu() {
   const t = useTranslations("weddingMenu");
   const commonT = useTranslations("common");
+  const locale = useLocale();
   const serviceName = "Prasmanan Pernikahan";
   const [selectedCard, setSelectedCard] = useState<
     (typeof packageCards)[0] | null
@@ -226,7 +228,7 @@ export default function Menu() {
               </div>
 
               <p className="mt-6 text-center text-2xl font-bold text-[#8D0000]">
-                {card.price}
+                {localizePriceUnit(card.price, locale)}
               </p>
 
               <Button
