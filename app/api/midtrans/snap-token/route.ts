@@ -165,7 +165,7 @@ export async function POST(request: NextRequest) {
           error:
             error instanceof Error
               ? error.message
-              : "Gagal menyimpan data pembayaran Midtrans ke invoice.",
+              : "Gagal menyimpan data pembayaran ke invoice.",
         },
         { status: 500 },
       );

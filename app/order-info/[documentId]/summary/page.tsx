@@ -167,7 +167,7 @@ export default function OrderSummaryPage() {
     }
 
     if (!snapReady || !window.snap?.pay) {
-      setPayError("Midtrans Snap belum siap. Coba lagi sebentar.");
+      setPayError("Halaman pembayaran gagal dimuat. Silakan muat ulang halaman untuk melanjutkan pembayaran.");
       return;
     }
 

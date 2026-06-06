@@ -385,7 +385,7 @@ export default function OrderDetailPage() {
         return;
       }
       if (!snapReady || !window.snap?.pay) {
-        setPayError("Midtrans Snap belum siap. Coba lagi sebentar.");
+        setPayError("Halaman pembayaran gagal dimuat. Silakan muat ulang halaman untuk melanjutkan pembayaran.");
         return;
       }
 
@@ -434,7 +434,7 @@ export default function OrderDetailPage() {
       return;
     }
     if (snapToken && (!snapReady || !snapPay)) {
-      setPayError("Midtrans Snap belum siap. Coba lagi sebentar.");
+      setPayError("Halaman pembayaran gagal dimuat. Silakan muat ulang halaman untuk melanjutkan pembayaran.");
       return;
     }
 
@@ -455,7 +455,7 @@ export default function OrderDetailPage() {
         return;
       }
       if (!snapPay) {
-        throw new Error("Midtrans Snap belum siap. Coba lagi sebentar.");
+        throw new Error("Halaman pembayaran gagal dimuat. Silakan muat ulang halaman untuk melanjutkan pembayaran.");
       }
       if (!snapToken) {
         throw new Error(
@@ -592,7 +592,7 @@ export default function OrderDetailPage() {
           data-client-key={clientKey}
           onLoad={() => setSnapReady(true)}
           onError={() =>
-            setPayError("Midtrans Snap gagal dimuat. Coba refresh halaman.")
+            setPayError("Halaman pembayaran gagal dimuat. Silakan muat ulang halaman untuk melanjutkan pembayaran.")
           }
         />
       ) : null}
