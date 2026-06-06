@@ -62,11 +62,15 @@ function isDishType(value: unknown): value is DishType {
 }
 
 function isServiceType(value: unknown): value is ServiceType {
-  return typeof value === "string" && serviceTypes.includes(value as ServiceType);
+  return (
+    typeof value === "string" && serviceTypes.includes(value as ServiceType)
+  );
 }
 
 function isCategoryType(value: unknown): value is CategoryType {
-  return typeof value === "string" && categoryTypes.includes(value as CategoryType);
+  return (
+    typeof value === "string" && categoryTypes.includes(value as CategoryType)
+  );
 }
 
 function normalizeDish(entry: unknown): Dish | null {
@@ -132,9 +136,11 @@ function normalizeDishes(payload: unknown): Dish[] {
 function getPageCount(payload: unknown): number {
   if (!payload || typeof payload !== "object") return 1;
 
-  const pageCount = (payload as {
-    meta?: { pagination?: { pageCount?: unknown } };
-  }).meta?.pagination?.pageCount;
+  const pageCount = (
+    payload as {
+      meta?: { pagination?: { pageCount?: unknown } };
+    }
+  ).meta?.pagination?.pageCount;
 
   return typeof pageCount === "number" && pageCount > 0 ? pageCount : 1;
 }

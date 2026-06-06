@@ -36,13 +36,7 @@ export interface PackageCard {
   items: string[];
   price: string;
   badge?: boolean;
-  packageType:
-    | "A"
-    | "B"
-    | "C"
-    | "A+"
-    | "B+"
-    | "C+";
+  packageType: "A" | "B" | "C" | "A+" | "B+" | "C+";
 }
 
 interface OrderModalProps {
@@ -51,7 +45,11 @@ interface OrderModalProps {
   onClose: () => void;
 }
 
-export function OrderModalPrasmanan({ card, serviceName, onClose }: OrderModalProps) {
+export function OrderModalPrasmanan({
+  card,
+  serviceName,
+  onClose,
+}: OrderModalProps) {
   const t = useTranslations("riceboxMenu");
   const { addItem, state, clearCart } = useCart();
   const { user } = useAuth();
@@ -386,7 +384,11 @@ export function OrderModalPrasmanan({ card, serviceName, onClose }: OrderModalPr
             {/* Minuman */}
             <div className={fieldClass}>
               <label className={labelClass}>Minuman</label>
-              <input readOnly value="Air Mineral Gelas" className={readonlyClass} />
+              <input
+                readOnly
+                value="Air Mineral Gelas"
+                className={readonlyClass}
+              />
             </div>
 
             {/* Puding */}

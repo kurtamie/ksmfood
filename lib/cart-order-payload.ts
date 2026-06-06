@@ -33,7 +33,9 @@ export function parseCartItemToOrderMenu(item: CartItem): CreateOrderMenuInput {
             .replace(/\s*\(\+Rp\s*2\.000\)\s*$/i, ""),
         };
       })
-      .filter((addOn): addOn is { index: number; label: string } => addOn != null)
+      .filter(
+        (addOn): addOn is { index: number; label: string } => addOn != null,
+      )
       .sort((a, b) => a.index - b.index);
     const mineralWaterAddon = item.addOns.find((a) =>
       /^minuman_/i.test(a.value),
@@ -65,9 +67,7 @@ export function parseCartItemToOrderMenu(item: CartItem): CreateOrderMenuInput {
   );
   const vegetableAddon = item.addOns.find((a) => /^sayur_/i.test(a.value));
   const sauceAddon = item.addOns.find((a) => /^sambal_/i.test(a.value));
-  const mineralWaterAddon = item.addOns.find((a) =>
-    /^minuman_/i.test(a.value),
-  );
+  const mineralWaterAddon = item.addOns.find((a) => /^minuman_/i.test(a.value));
   const boxAddon = item.addOns.find((a) => /^box_/i.test(a.value));
   const fruitAddon = item.addOns.find((a) => /(Pisang|Jeruk)/i.test(a.label));
   const chipAddon = item.addOns.find((a) => /kerupuk/i.test(a.label));
@@ -93,7 +93,9 @@ export function parseCartItemToOrderDetail(
   item: CartItem,
 ): CreateOrderDetailInput {
   const qty = item.quantity;
-  const sellingPrice = item.basePrice;
+  // Fix: ikut sertakan add-on price dalam selling_price
+  const addOnTotal = item.addOns.reduce((sum, a) => sum + a.price, 0);
+  const sellingPrice = item.basePrice + addOnTotal;
   const amount = qty * sellingPrice;
   const amountString = String(amount);
 

@@ -42,7 +42,9 @@ const createEmptyOptions = () =>
     {} as Record<DishType, string[]>,
   );
 
-const createEmptyGroups = (categories: readonly string[]): Record<string, string[]> =>
+const createEmptyGroups = (
+  categories: readonly string[],
+): Record<string, string[]> =>
   categories.reduce(
     (acc, category) => {
       acc[category] = [];
@@ -71,7 +73,11 @@ const inferMainDishGroup = (name: string) => {
 
   if (value.includes("ayam")) return "ayam";
   if (value.includes("ikan")) return "ikan";
-  if (value.includes("udang") || value.includes("cumi") || value.includes("seafood")) {
+  if (
+    value.includes("udang") ||
+    value.includes("cumi") ||
+    value.includes("seafood")
+  ) {
     return "seafood";
   }
   if (value.includes("daging") || value.includes("sapi")) return "daging";
@@ -109,7 +115,9 @@ export function useServiceDishes(service: ServiceType) {
       } catch (err) {
         if (isMounted) {
           setDishes([]);
-          setError(err instanceof Error ? err : new Error("Failed to fetch dishes"));
+          setError(
+            err instanceof Error ? err : new Error("Failed to fetch dishes"),
+          );
         }
       } finally {
         if (isMounted) {
@@ -126,7 +134,10 @@ export function useServiceDishes(service: ServiceType) {
   }, []);
 
   const serviceDishes = useMemo(
-    () => dishes.filter((dish) => dish.service === service || dish.service === null),
+    () =>
+      dishes.filter(
+        (dish) => dish.service === service || dish.service === null,
+      ),
     [dishes, service],
   );
 
@@ -148,7 +159,8 @@ export function useServiceDishes(service: ServiceType) {
     serviceDishes
       .filter((dish) => dish.type === "main_dish")
       .forEach((dish) => {
-        const group = normalizeCategory(dish.category) ?? inferMainDishGroup(dish.name);
+        const group =
+          normalizeCategory(dish.category) ?? inferMainDishGroup(dish.name);
 
         if (group && group in groups && !groups[group].includes(dish.name)) {
           groups[group].push(dish.name);

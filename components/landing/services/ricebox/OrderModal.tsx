@@ -177,26 +177,26 @@ export function OrderModal({ card, serviceName, onClose }: OrderModalProps) {
   const handleCheckoutAll = async () => {
     if (!pendingItem) return;
 
-      if (typeof window !== "undefined") {
-    const allItems = [...state.items, pendingItem];
-    window.sessionStorage.setItem(
-      "ksm_order_summary",
-      JSON.stringify({
-        items: allItems.map((item) => ({
-          id: item.id,
-          productId: item.productId,
-          name: item.name,
-          image: item.image,
-          basePrice: item.basePrice,
-          addOns: item.addOns,       // lengkap dengan price per addon
-          quantity: item.quantity,
-          slug: item.slug,
-          category: item.category,
-        })),
-      }),
-    );
-  }
-  
+    if (typeof window !== "undefined") {
+      const allItems = [...state.items, pendingItem];
+      window.sessionStorage.setItem(
+        "ksm_order_summary",
+        JSON.stringify({
+          items: allItems.map((item) => ({
+            id: item.id,
+            productId: item.productId,
+            name: item.name,
+            image: item.image,
+            basePrice: item.basePrice,
+            addOns: item.addOns, // lengkap dengan price per addon
+            quantity: item.quantity,
+            slug: item.slug,
+            category: item.category,
+          })),
+        }),
+      );
+    }
+
     const checkout = await createCheckoutOrder([...state.items, pendingItem], {
       id: user?.customer?.id,
       documentId: user?.customer?.documentId,

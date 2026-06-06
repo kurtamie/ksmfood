@@ -462,7 +462,9 @@ export default function AccountPage() {
         {hasSavedAddress ? (
           <div className="rounded-md border bg-white p-4">
             <p className="text-sm text-secondary-600">{addressLine}</p>
-            <p className="mt-1 text-sm text-secondary-600">Kelurahan: {subdistrict}</p>
+            <p className="mt-1 text-sm text-secondary-600">
+              Kelurahan: {subdistrict}
+            </p>
             {latitude !== null && longitude !== null && (
               <p className="mt-2 text-sm text-secondary-700">
                 Koordinat: {latitude.toFixed(6)}, {longitude.toFixed(6)}

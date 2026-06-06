@@ -179,8 +179,7 @@ function getStoredOrderSummaryPayment(
     const sameOrderId =
       parsed.orderId != null && String(parsed.orderId) === String(order.id);
     const sameDocumentId =
-      parsed.documentId != null &&
-      parsed.documentId === order.documentId;
+      parsed.documentId != null && parsed.documentId === order.documentId;
 
     if (!sameOrderId && !sameDocumentId) return null;
     return parsed;
@@ -239,7 +238,13 @@ function getDisplayOrderStep(
   paymentStatus: string | null | undefined,
 ): OrderDisplayStep | null {
   if (!step) return null;
-  if (step === "packing" && isUnpaidPaymentStatus(paymentStatus)) {
+  // Jika pembayaran belum lunas (unpaid) atau sudah jatuh tempo (overdue/expired),
+  // tampilkan step "menunggu pembayaran" bukan packing
+  if (
+    step === "packing" &&
+    (isUnpaidPaymentStatus(paymentStatus) ||
+      isOverduePaymentStatus(paymentStatus))
+  ) {
     return "waiting_payment";
   }
   return step;
@@ -350,7 +355,10 @@ export default function OrderDetailPage() {
         });
         const syncJson = await syncRes.json().catch(() => null);
 
-        if (syncJson?.paymentStatus === "overdue") {
+        if (
+          syncJson?.paymentStatus === "overdue" ||
+          syncJson?.paymentStatus === "expired"
+        ) {
           const updatedOrder = await fetchOrderData().catch(() => null);
           if (updatedOrder) setOrder(updatedOrder);
           setPayError(
@@ -434,6 +442,15 @@ export default function OrderDetailPage() {
 
     try {
       if (!snapToken && snapRedirectUrl) {
+        // Jangan redirect kalau belum ada midtransOrderId yang valid
+        // (artinya URL lama bisa saja sudah expired dan tidak di-sync)
+        if (!midtransOrderId) {
+          setPayError(
+            "URL pembayaran sudah tidak valid. Coba refresh halaman untuk mendapatkan token baru.",
+          );
+          setIsPaying(false);
+          return;
+        }
         window.location.href = snapRedirectUrl;
         return;
       }
@@ -599,6 +616,26 @@ export default function OrderDetailPage() {
           </p>
         ) : null}
 
+        {/* Banner pesanan tidak valid karena jatuh tempo */}
+        {paymentOverdue && !paid ? (
+          <div className="mb-4 overflow-hidden rounded-2xl border border-red-200 bg-red-50 px-5 py-4">
+            <p className="text-sm font-semibold text-red-700">
+              Pesanan ini tidak dapat diproses
+            </p>
+            <p className="mt-1 text-sm text-red-600">
+              Pembayaran untuk pesanan ini sudah jatuh tempo sehingga pesanan
+              tidak dapat dilanjutkan. Silakan buat pesanan baru untuk melakukan
+              pemesanan ulang.
+            </p>
+            <Link
+              href="/#layanan"
+              className="mt-3 inline-flex items-center gap-1 rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700"
+            >
+              Buat Pesanan Baru
+            </Link>
+          </div>
+        ) : null}
+
         {/* Card utama */}
         <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
           {/* Baris status + tombol lanjutkan pembayaran */}
@@ -611,25 +648,23 @@ export default function OrderDetailPage() {
                 className={`w-fit rounded-full px-3 py-1 text-xs font-semibold ${
                   paid
                     ? "bg-emerald-100 text-emerald-700"
-                    : "bg-amber-100 text-amber-700"
+                    : paymentOverdue
+                      ? "bg-red-100 text-red-700"
+                      : "bg-amber-100 text-amber-700"
                 }`}
               >
                 {status}
               </span>
             </div>
 
-            {!paid ? (
+            {!paid && !paymentOverdue ? (
               <button
                 type="button"
                 onClick={() => void handleResumePayment()}
-                disabled={isPaying || paymentOverdue}
+                disabled={isPaying}
                 className="inline-flex items-center justify-center rounded-lg bg-primary-600 px-5 py-2 text-sm font-semibold text-white hover:bg-primary-700 disabled:cursor-not-allowed disabled:opacity-60"
               >
-                {paymentOverdue
-                  ? "Pembayaran Jatuh Tempo"
-                  : isPaying
-                    ? "Membuka pembayaran..."
-                    : "Lanjutkan Pembayaran"}
+                {isPaying ? "Membuka pembayaran..." : "Lanjutkan Pembayaran"}
               </button>
             ) : null}
           </div>
@@ -640,7 +675,10 @@ export default function OrderDetailPage() {
               <p className="mb-4 text-sm font-semibold text-tertiary-900">
                 Status Pesanan: {orderStepLabel}
               </p>
-              <OrderStepper currentStep={displayOrderStep} />
+              <OrderStepper
+                currentStep={displayOrderStep}
+                isExpired={paymentOverdue}
+              />
             </div>
           ) : null}
 

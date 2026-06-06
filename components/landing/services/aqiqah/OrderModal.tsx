@@ -14,11 +14,11 @@ import { createCheckoutOrder } from "@/lib/client-checkout";
 
 export interface AqiqahPackageCard {
   id: string;
-  title: string;       // e.g. "BETINA 20KG" / "JANTAN 30KG"
-  subTitle?: string;   // e.g. "Prasmanan" / "Nasi Kotak (80 Kotak)"
-  items: string[];     // read-only list of what's included
-  price: string;       // e.g. "Rp 3.400.000"
-  badge?: boolean;     // "Paling Populer"
+  title: string; // e.g. "BETINA 20KG" / "JANTAN 30KG"
+  subTitle?: string; // e.g. "Prasmanan" / "Nasi Kotak (80 Kotak)"
+  items: string[]; // read-only list of what's included
+  price: string; // e.g. "Rp 3.400.000"
+  badge?: boolean; // "Paling Populer"
   packageType: string; // e.g. "betina-20kg-prasmanan"
 }
 
@@ -28,7 +28,11 @@ interface AqiqahOrderModalProps {
   onClose: () => void;
 }
 
-export function AqiqahOrderModal({ card, serviceName, onClose }: AqiqahOrderModalProps) {
+export function AqiqahOrderModal({
+  card,
+  serviceName,
+  onClose,
+}: AqiqahOrderModalProps) {
   const t = useTranslations("riceboxMenu");
   const { addItem, state, clearCart } = useCart();
   const { user } = useAuth();
@@ -130,8 +134,12 @@ export function AqiqahOrderModal({ card, serviceName, onClose }: AqiqahOrderModa
 
             {/* Harga satuan */}
             <div className="flex items-center gap-4">
-              <span className="w-36 shrink-0 text-sm font-semibold">Harga / Paket</span>
-              <span className="text-lg font-bold text-red-800">{card.price}</span>
+              <span className="w-36 shrink-0 text-sm font-semibold">
+                Harga / Paket
+              </span>
+              <span className="text-lg font-bold text-red-800">
+                {card.price}
+              </span>
             </div>
 
             {/* Isi Paket (read-only) */}
@@ -179,7 +187,9 @@ export function AqiqahOrderModal({ card, serviceName, onClose }: AqiqahOrderModa
 
             {/* Subtotal */}
             <div className="flex items-center gap-4">
-              <span className="w-36 shrink-0 text-sm font-semibold">Subtotal</span>
+              <span className="w-36 shrink-0 text-sm font-semibold">
+                Subtotal
+              </span>
               <span className="text-2xl font-bold text-gray-900">
                 Rp {subtotal.toLocaleString("id-ID")}
               </span>

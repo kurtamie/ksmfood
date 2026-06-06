@@ -677,13 +677,17 @@ export default function AuthModal({
                     type={showConfirmPassword ? "text" : "password"}
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    onKeyDown={(e) => e.key === "Enter" && handleResetPassword()}
+                    onKeyDown={(e) =>
+                      e.key === "Enter" && handleResetPassword()
+                    }
                     placeholder="Ulangi kata sandi baru"
                     className="w-full rounded-xl border border-secondary-400 px-3 py-2.5 text-sm outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-all text-tertiary-900 placeholder:text-secondary-500"
                   />
                   <button
                     type="button"
-                    onClick={() => setShowConfirmPassword((current) => !current)}
+                    onClick={() =>
+                      setShowConfirmPassword((current) => !current)
+                    }
                     className="absolute inset-y-0 right-3 flex items-center text-secondary-500 hover:text-tertiary-900"
                   >
                     {showConfirmPassword ? <FaEye /> : <FaEyeSlash />}

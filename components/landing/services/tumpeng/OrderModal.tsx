@@ -28,7 +28,11 @@ interface TumpengOrderModalProps {
   onClose: () => void;
 }
 
-export function TumpengOrderModal({ card, serviceName, onClose }: TumpengOrderModalProps) {
+export function TumpengOrderModal({
+  card,
+  serviceName,
+  onClose,
+}: TumpengOrderModalProps) {
   const t = useTranslations("riceboxMenu");
   const { addItem, state, clearCart } = useCart();
   const { user } = useAuth();

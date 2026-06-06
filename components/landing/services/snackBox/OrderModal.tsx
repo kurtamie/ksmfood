@@ -66,7 +66,11 @@ const minumanMap: Record<string, string> = {
 
 type KueSelection = { kategori: string; menu: string };
 
-export function SnackOrderModal({ card, serviceName, onClose }: SnackOrderModalProps) {
+export function SnackOrderModal({
+  card,
+  serviceName,
+  onClose,
+}: SnackOrderModalProps) {
   const t = useTranslations("riceboxMenu");
   const { addItem, state, clearCart } = useCart();
   const { user } = useAuth();
@@ -82,11 +86,11 @@ export function SnackOrderModal({ card, serviceName, onClose }: SnackOrderModalP
   );
 
   const [kueList, setKueList] = useState<KueSelection[]>(
-    Array.from({ length: kueCount }, () => ({ kategori: "", menu: "" }))
+    Array.from({ length: kueCount }, () => ({ kategori: "", menu: "" })),
   );
-  const [jumlahStr, setJumlahStr] = useState("100");
+  const [jumlahStr, setJumlahStr] = useState("1");
   const jumlah = parseInt(jumlahStr) || 0;
-  const jumlahError = jumlah < 100;
+  const jumlahError = jumlah < 1;
 
   const priceNumber = parseInt(card.price.replace(/[^0-9]/g, ""), 10);
 
@@ -208,9 +212,7 @@ export function SnackOrderModal({ card, serviceName, onClose }: SnackOrderModalP
                     value={val.kategori}
                     onValueChange={(newKategori) => {
                       const updated = kueList.map((item, i) =>
-                        i === idx
-                          ? { kategori: newKategori, menu: "" }
-                          : item
+                        i === idx ? { kategori: newKategori, menu: "" } : item,
                       );
                       setKueList(updated);
                     }}
@@ -237,7 +239,7 @@ export function SnackOrderModal({ card, serviceName, onClose }: SnackOrderModalP
                     disabled={!val.kategori}
                     onValueChange={(newMenu) => {
                       const updated = kueList.map((item, i) =>
-                        i === idx ? { ...item, menu: newMenu } : item
+                        i === idx ? { ...item, menu: newMenu } : item,
                       );
                       setKueList(updated);
                     }}

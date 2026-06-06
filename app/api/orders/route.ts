@@ -82,11 +82,14 @@ async function countUnpaidOrdersForCustomer(
   token: string | null,
   customer: ResolvedCustomer,
 ): Promise<number> {
-  const res = await fetch(getOrdersApiUrl(buildUnpaidOrderLimitQuery(customer)), {
-    method: "GET",
-    headers: buildHeaders(token),
-    cache: "no-store",
-  });
+  const res = await fetch(
+    getOrdersApiUrl(buildUnpaidOrderLimitQuery(customer)),
+    {
+      method: "GET",
+      headers: buildHeaders(token),
+      cache: "no-store",
+    },
+  );
 
   if (!res.ok) {
     const body = await res.json().catch(() => null);

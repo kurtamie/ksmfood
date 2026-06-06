@@ -71,9 +71,9 @@ export async function POST(request: NextRequest) {
         cache: "no-store",
       },
     );
-    const statusData = (await statusRes.json().catch(() => null)) as
-      | MidtransStatusResponse
-      | null;
+    const statusData = (await statusRes
+      .json()
+      .catch(() => null)) as MidtransStatusResponse | null;
 
     if (!statusRes.ok) {
       const message =

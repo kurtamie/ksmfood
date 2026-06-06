@@ -36,13 +36,7 @@ export interface PackageCard {
   items: string[];
   price: string;
   badge?: boolean;
-  packageType:
-    | "A"
-    | "B"
-    | "C"
-    | "A+"
-    | "B+"
-    | "C+";
+  packageType: "A" | "B" | "C" | "A+" | "B+" | "C+";
 }
 
 interface OrderModalProps {
@@ -74,7 +68,6 @@ export function OrderModal({ card, serviceName, onClose }: OrderModalProps) {
     : card.packageType.startsWith("B")
       ? 2
       : 3;
-
 
   const allLaukTambahanOptions = optionsByType.additional_dish;
 
@@ -362,7 +355,11 @@ export function OrderModal({ card, serviceName, onClose }: OrderModalProps) {
             {/* Minuman */}
             <div className={fieldClass}>
               <label className={labelClass}>Minuman</label>
-              <input readOnly value="Air Mineral 330ml" className={readonlyClass} />
+              <input
+                readOnly
+                value="Air Mineral 330ml"
+                className={readonlyClass}
+              />
             </div>
 
             {/* Puding */}

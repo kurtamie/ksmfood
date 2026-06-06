@@ -33,9 +33,19 @@ const ORDER_STEP_LABEL: Record<OrderDisplayStep, string> = {
   success: "Diterima",
 };
 
+const OVERDUE_STATUSES = ["overdue", "expired", "jatuh tempo", "kedaluwarsa"];
+
+function isOverdueStatus(paymentStatus: string | null | undefined): boolean {
+  if (!paymentStatus) return false;
+  return OVERDUE_STATUSES.some((s) => paymentStatus.toLowerCase().includes(s));
+}
+
 function getDisplayOrderStep(order: OrderListItem): OrderDisplayStep | null {
   if (!order.step) return null;
-  if (order.step === "packing" && order.paymentStatus !== "paid") {
+  if (
+    order.step === "packing" &&
+    (order.paymentStatus !== "paid" || isOverdueStatus(order.paymentStatus))
+  ) {
     return "waiting_payment";
   }
   return order.step;
@@ -94,7 +104,7 @@ export default function OrderHistoryPage() {
         <h1 className="text-3xl font-semibold text-tertiary-900">
           Riwayat Pemesanan
         </h1>
-        <p className="mt-2 text-sm text-secondary-600 max-w-2xl">
+        <p className="mt-2 max-w-2xl text-sm text-secondary-600">
           Lihat semua pesanan terakhir kamu, status pembayaran, dan detail
           pesanan.
         </p>
@@ -116,6 +126,8 @@ export default function OrderHistoryPage() {
         {orders.map((order) => {
           const status = order.paymentStatusLabel as PaymentStatusLabel;
           const paid = order.paymentStatus === "paid" || isPaidStatus(status);
+          const overdue =
+            isOverdueStatus(order.paymentStatus) || isOverdueStatus(status);
           const displayOrderStep = getDisplayOrderStep(order);
           const stepLabel = displayOrderStep
             ? ORDER_STEP_LABEL[displayOrderStep]
@@ -127,20 +139,25 @@ export default function OrderHistoryPage() {
               className="rounded-3xl border border-secondary-200 bg-white px-5 py-5 shadow-sm"
             >
               <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                <div className="min-w-0 flex flex-col gap-2">
+                <div className="flex min-w-0 flex-col gap-2">
                   <div className="flex flex-wrap items-center gap-3">
                     <span className="text-sm text-secondary-500">
                       {formatOrderDate(order.deliveryDate ?? order.createdAt)}
                     </span>
+
+                    {/* Badge status pembayaran — merah kalau overdue */}
                     <span
                       className={`rounded-full px-3 py-1 text-xs font-semibold ${
                         paid
                           ? "bg-emerald-100 text-emerald-700"
-                          : "bg-amber-100 text-amber-700"
+                          : overdue
+                            ? "bg-red-100 text-red-700"
+                            : "bg-amber-100 text-amber-700"
                       }`}
                     >
                       {status}
                     </span>
+
                     {order.invoiceNo ? (
                       <span className="text-sm text-secondary-500">
                         {order.invoiceNo}
@@ -157,8 +174,17 @@ export default function OrderHistoryPage() {
                       {order.packageName ?? "Paket pesanan"}
                     </p>
                     {stepLabel ? (
-                      <span className="mt-2 inline-flex w-fit rounded-full bg-gray-100 px-3 py-1 text-xs font-semibold text-gray-700">
-                        Status Pesanan: {stepLabel}
+                      <span
+                        className={`mt-2 inline-flex w-fit rounded-full px-3 py-1 text-xs font-semibold ${
+                          overdue
+                            ? "bg-red-50 text-red-700"
+                            : "bg-gray-100 text-gray-700"
+                        }`}
+                      >
+                        Status Pesanan:{" "}
+                        {overdue && displayOrderStep === "waiting_payment"
+                          ? "Pembayaran Kedaluwarsa"
+                          : stepLabel}
                       </span>
                     ) : null}
                   </div>

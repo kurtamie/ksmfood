@@ -9,7 +9,11 @@ import Logo from "@/public/images/chara_bot.png";
 import { whatsappLink } from "@/const/whatsapp";
 import { VscRobot } from "react-icons/vsc";
 import { useLocale } from "next-intl";
-import { detectQuickReplyGroup, getGroups, QuickReplyGroup } from "./Quickreplies";
+import {
+  detectQuickReplyGroup,
+  getGroups,
+  QuickReplyGroup,
+} from "./Quickreplies";
 
 // ── Types ─────────────────────────────────────────────────────
 interface Message {
@@ -21,7 +25,10 @@ interface Message {
 
 // ── Helpers ───────────────────────────────────────────────────
 function formatTime(date: Date): string {
-  return date.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" });
+  return date.toLocaleTimeString("id-ID", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 }
 
 function getInitialMessage(lang: "id" | "en"): Message {
@@ -40,45 +47,64 @@ function getInitialMessage(lang: "id" | "en"): Message {
 // untuk langsung set grup yang relevan setelah user klik tombol
 function detectFlowGroupFromUserMessage(
   userMessage: string,
-  lang: "id" | "en"
+  lang: "id" | "en",
 ): QuickReplyGroup | null {
   const msg = userMessage.toLowerCase();
   const groups = getGroups(lang);
 
   // User memilih jalur FIX → tampilkan pilih layanan
   if (
-    msg.includes("mau memesan paket catering") || msg.includes("want to order a fixed") ||
-    msg.includes("pesan paket fix") || msg.includes("order fixed package")
-  ) return groups.pilihLayanan;
+    msg.includes("mau memesan paket catering") ||
+    msg.includes("want to order a fixed") ||
+    msg.includes("pesan paket fix") ||
+    msg.includes("order fixed package")
+  )
+    return groups.pilihLayanan;
 
   // User memilih CUSTOM → tampilkan opsi custom
   if (
-    msg.includes("kebutuhan custom") || msg.includes("custom or special") ||
-    msg.includes("pesan custom") || msg.includes("custom order")
-  ) return groups.custom;
+    msg.includes("kebutuhan custom") ||
+    msg.includes("custom or special") ||
+    msg.includes("pesan custom") ||
+    msg.includes("custom order")
+  )
+    return groups.custom;
 
   // User memilih jalur DIPILIHKAN → tampilkan pilih layanan dulu
   if (
-    msg.includes("pilihkan paket terbaik") || msg.includes("recommend the best package") ||
-    msg.includes("minta dipilihkan") || msg.includes("let vika choose")
-  ) return groups.pilihLayanan;
+    msg.includes("pilihkan paket terbaik") ||
+    msg.includes("recommend the best package") ||
+    msg.includes("minta dipilihkan") ||
+    msg.includes("let vika choose")
+  )
+    return groups.pilihLayanan;
 
   // User memilih INFO/FAQ → tampilkan grup FAQ
   if (
-    msg.includes("informasi umum dan faq") || msg.includes("general information and faqs") ||
-    msg.includes("info & faq") || msg.includes("info dan faq")
-  ) return groups.infoFaq;
+    msg.includes("informasi umum dan faq") ||
+    msg.includes("general information and faqs") ||
+    msg.includes("info & faq") ||
+    msg.includes("info dan faq")
+  )
+    return groups.infoFaq;
 
   // User memilih nasi kotak → tampilkan paket nasi kotak
-  if (msg.includes("nasi kotak") || msg.includes("rice box") || msg.includes("ricebox")) {
+  if (
+    msg.includes("nasi kotak") ||
+    msg.includes("rice box") ||
+    msg.includes("ricebox")
+  ) {
     return groups.paketNasiKotak;
   }
 
   // User memilih prasmanan pernikahan → tampilkan paket wedding (cek dulu)
   if (
-    msg.includes("pernikahan") || msg.includes("wedding") || msg.includes("resepsi") ||
+    msg.includes("pernikahan") ||
+    msg.includes("wedding") ||
+    msg.includes("resepsi") ||
     msg.includes("reception")
-  ) return groups.paketWedding;
+  )
+    return groups.paketWedding;
 
   // User memilih prasmanan biasa → tampilkan paket prasmanan
   if (msg.includes("prasmanan") || msg.includes("buffet")) {
@@ -95,25 +121,37 @@ function detectFlowGroupFromUserMessage(
 
   // User minta estimasi harga → tampilkan opsi harga
   if (
-    msg.includes("estimasi total harga") || msg.includes("estimate the total price") ||
-    msg.includes("estimasi harga") || msg.includes("estimate price")
-  ) return groups.tanyaHarga;
+    msg.includes("estimasi total harga") ||
+    msg.includes("estimate the total price") ||
+    msg.includes("estimasi harga") ||
+    msg.includes("estimate price")
+  )
+    return groups.tanyaHarga;
 
   // User minta info menu → tampilkan opsi menu
   if (
-    msg.includes("rekomendasikan kombinasi menu") || msg.includes("recommend the best menu") ||
-    (msg.includes("pilihan lauk") || msg.includes("dish options") ||
-     msg.includes("pilihan sayur") || msg.includes("vegetable") ||
-     msg.includes("pilihan sambal") || msg.includes("sambal options"))
-  ) return groups.tanyaMenu;
+    msg.includes("rekomendasikan kombinasi menu") ||
+    msg.includes("recommend the best menu") ||
+    msg.includes("pilihan lauk") ||
+    msg.includes("dish options") ||
+    msg.includes("pilihan sayur") ||
+    msg.includes("vegetable") ||
+    msg.includes("pilihan sambal") ||
+    msg.includes("sambal options")
+  )
+    return groups.tanyaMenu;
 
   // User minta kembali ke menu utama
   if (
-    msg.includes("menu utama") || msg.includes("main menu") ||
-    msg.includes("dari awal") || msg.includes("start from the beginning") ||
-    msg.includes("mulai percakapan dari awal") || msg.includes("start over") ||
+    msg.includes("menu utama") ||
+    msg.includes("main menu") ||
+    msg.includes("dari awal") ||
+    msg.includes("start from the beginning") ||
+    msg.includes("mulai percakapan dari awal") ||
+    msg.includes("start over") ||
     msg.includes("new order")
-  ) return groups.welcome;
+  )
+    return groups.welcome;
 
   return null;
 }
@@ -121,10 +159,13 @@ function detectFlowGroupFromUserMessage(
 // ── Quick Reply Pills ─────────────────────────────────────────
 const variantClass: Record<string, string> = {
   default: "border-red-800 text-red-800 hover:bg-red-800 hover:text-white",
-  green:   "border-emerald-600 text-emerald-600 hover:bg-emerald-600 hover:text-white",
-  orange:  "border-orange-500 text-orange-500 hover:bg-orange-500 hover:text-white",
-  blue:    "border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white",
-  purple:  "border-purple-600 text-purple-600 hover:bg-purple-600 hover:text-white",
+  green:
+    "border-emerald-600 text-emerald-600 hover:bg-emerald-600 hover:text-white",
+  orange:
+    "border-orange-500 text-orange-500 hover:bg-orange-500 hover:text-white",
+  blue: "border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white",
+  purple:
+    "border-purple-600 text-purple-600 hover:bg-purple-600 hover:text-white",
 };
 
 function QuickReplyPills({
@@ -163,7 +204,13 @@ function TypingIndicator() {
   return (
     <div className="flex items-end gap-2 mb-3">
       <div className="w-7 h-7 rounded-full overflow-hidden flex items-center justify-center flex-shrink-0">
-        <Image src="/images/chara_bot.png" alt="KSM Bot" className="w-full h-full object-cover" width={28} height={28} />
+        <Image
+          src="/images/chara_bot.png"
+          alt="KSM Bot"
+          className="w-full h-full object-cover"
+          width={28}
+          height={28}
+        />
       </div>
       <div className="bg-gray-100 rounded-2xl rounded-bl-sm px-3 py-2.5">
         <div className="flex gap-1 items-center h-4">
@@ -192,19 +239,31 @@ function MessageBubble({
 }) {
   const isUser = role === "user";
   return (
-    <div className={`flex flex-col mb-3 ${isUser ? "items-end" : "items-start"}`}>
+    <div
+      className={`flex flex-col mb-3 ${isUser ? "items-end" : "items-start"}`}
+    >
       {/* Bubble row */}
-      <div className={`flex items-end gap-2 w-full ${isUser ? "flex-row-reverse" : ""}`}>
+      <div
+        className={`flex items-end gap-2 w-full ${isUser ? "flex-row-reverse" : ""}`}
+      >
         {isUser ? (
           <div className="w-7 h-7 rounded-full bg-black flex items-center justify-center text-white text-[10px] font-bold flex-shrink-0">
             You
           </div>
         ) : (
           <div className="w-7 h-7 rounded-full overflow-hidden flex items-center justify-center flex-shrink-0">
-            <Image src="/images/chara_bot.png" alt="KSM Bot" className="w-full h-full object-cover" width={28} height={28} />
+            <Image
+              src="/images/chara_bot.png"
+              alt="KSM Bot"
+              className="w-full h-full object-cover"
+              width={28}
+              height={28}
+            />
           </div>
         )}
-        <div className={`max-w-[78%] group flex flex-col gap-0.5 ${isUser ? "items-end" : "items-start"}`}>
+        <div
+          className={`max-w-[78%] group flex flex-col gap-0.5 ${isUser ? "items-end" : "items-start"}`}
+        >
           <div
             className={`px-3 py-2 rounded-2xl text-xs leading-relaxed whitespace-pre-wrap ${
               isUser
@@ -238,7 +297,9 @@ export default function WhatsappFloat() {
   const lang = locale === "en" ? "en" : "id";
 
   const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([getInitialMessage(lang)]);
+  const [messages, setMessages] = useState<Message[]>([
+    getInitialMessage(lang),
+  ]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -299,7 +360,10 @@ export default function WhatsappFloat() {
     const optimisticGroup = detectFlowGroupFromUserMessage(trimmed, lang);
 
     try {
-      const apiMessages = updated.map(({ role, content }) => ({ role, content }));
+      const apiMessages = updated.map(({ role, content }) => ({
+        role,
+        content,
+      }));
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -356,7 +420,12 @@ export default function WhatsappFloat() {
             {/* Header */}
             <div className="flex items-center gap-3 border-b border-black/5 px-4 py-3 flex-shrink-0">
               <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-[#a90000]">
-                <Image src={Logo} alt="KSM" className="object-cover rounded-full" width={46} />
+                <Image
+                  src={Logo}
+                  alt="KSM"
+                  className="object-cover rounded-full"
+                  width={46}
+                />
               </div>
               <div className="min-w-0 flex-1">
                 <p className="text-sm font-semibold text-[#2f3443]">Vika</p>
@@ -413,7 +482,9 @@ export default function WhatsappFloat() {
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     onKeyDown={handleKeyDown}
-                    placeholder={lang === "en" ? "Type a message..." : "Ketik pesan..."}
+                    placeholder={
+                      lang === "en" ? "Type a message..." : "Ketik pesan..."
+                    }
                     rows={1}
                     disabled={isLoading}
                     className="flex-1 bg-transparent text-xs text-gray-800 placeholder-gray-400 resize-none outline-none min-h-[20px] max-h-[100px] py-1 disabled:opacity-50"
@@ -439,8 +510,12 @@ export default function WhatsappFloat() {
           aria-expanded={isOpen}
           aria-label={
             isOpen
-              ? lang === "en" ? "Close chat" : "Tutup chat"
-              : lang === "en" ? "Open chat" : "Buka chat"
+              ? lang === "en"
+                ? "Close chat"
+                : "Tutup chat"
+              : lang === "en"
+                ? "Open chat"
+                : "Buka chat"
           }
         >
           {isOpen ? <X className="size-7" /> : <VscRobot className="size-9" />}

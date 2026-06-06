@@ -216,7 +216,9 @@ function PackageSection({
 }
 
 export default function Menu() {
-  const [selectedCard, setSelectedCard] = useState<AqiqahPackageCard | null>(null);
+  const [selectedCard, setSelectedCard] = useState<AqiqahPackageCard | null>(
+    null,
+  );
   const [selectedService, setSelectedService] = useState<string>("");
 
   const handleOrder = (card: AqiqahPackageCard, serviceName: string) => {

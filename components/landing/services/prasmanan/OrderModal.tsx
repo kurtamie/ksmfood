@@ -36,13 +36,7 @@ export interface PackageCard {
   items: string[];
   price: string;
   badge?: boolean;
-  packageType:
-    | "A"
-    | "B"
-    | "C"
-    | "A+"
-    | "B+"
-    | "C+";
+  packageType: "A" | "B" | "C" | "A+" | "B+" | "C+";
 }
 
 interface OrderModalProps {

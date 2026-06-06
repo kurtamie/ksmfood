@@ -169,6 +169,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     if (authLoading) return;
 
     const key = getCartStorageKey(isLoggedIn ? user?.id : null);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setStorageKey(key);
 
     let items = readCartFromStorage(key);

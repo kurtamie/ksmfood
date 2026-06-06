@@ -44,9 +44,7 @@ type OrderSummary = {
   totals?: {
     subtotal?: number;
   };
-  /** ID invoice (numeric) yang dibuat saat order — untuk update status setelah bayar */
   invoiceId?: number | null;
-  /** documentId invoice (Strapi v5) — lebih diutamakan untuk update */
   invoiceDocumentId?: string | null;
   snapToken?: string | null;
   snapRedirectUrl?: string | null;
@@ -55,6 +53,16 @@ type OrderSummary = {
 
 function saveOrderSummary(summary: OrderSummary) {
   window.sessionStorage.setItem("ksm_order_summary", JSON.stringify(summary));
+}
+
+/** Hitung total dari items termasuk add-on, bukan dari subtotal field */
+function calculateTotal(items: OrderItem[] | undefined): number {
+  if (!items || items.length === 0) return 0;
+  return items.reduce((sum, item) => {
+    const addOnTotal = item.addOns.reduce((s, a) => s + a.price, 0);
+    const unitPrice = item.basePrice + addOnTotal;
+    return sum + unitPrice * item.quantity;
+  }, 0);
 }
 
 export default function OrderSummaryPage() {
@@ -85,7 +93,8 @@ export default function OrderSummaryPage() {
     }
   }, [router, summary]);
 
-  const total = useMemo(() => summary?.totals?.subtotal ?? 0, [summary]);
+  // Hitung total dari items (termasuk extra charge add-on), bukan dari totals.subtotal
+  const total = useMemo(() => calculateTotal(summary?.items), [summary]);
 
   const numericOrderId = useMemo(() => {
     const fromSummary = Number(summary?.orderId);
@@ -95,31 +104,21 @@ export default function OrderSummaryPage() {
     return null;
   }, [documentId, summary?.orderId]);
 
-  /**
-   * Update invoice yang sudah ada (dibuat saat order) menjadi "paid".
-   * Menggunakan invoiceDocumentId (Strapi v5) atau invoiceId (Strapi v4).
-   */
   const markInvoicePaid = useCallback(
-    async (result: MidtransSnapResult) => {
+    async (_result: MidtransSnapResult) => {
       const invoiceDocId = summary?.invoiceDocumentId;
       const invoiceNumId = summary?.invoiceId;
 
       if (!invoiceDocId && !invoiceNumId && !numericOrderId) {
-        console.warn(
-          "[markInvoicePaid] Tidak ada invoice/order id di summary. Skip update.",
-        );
+        console.warn("[markInvoicePaid] Tidak ada invoice/order id. Skip.");
         return;
       }
-
-      const updatePayload = {
-        payment_status: "paid",
-      };
 
       const res = invoiceDocId
         ? await fetch(`/api/invoices/${invoiceDocId}`, {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(updatePayload),
+            body: JSON.stringify({ payment_status: "paid" }),
           })
         : await fetch("/api/invoices", {
             method: "PATCH",
@@ -144,13 +143,8 @@ export default function OrderSummaryPage() {
         );
       }
     },
-    [
-      documentId,
-      numericOrderId,
-      summary?.documentId,
-      summary?.invoiceDocumentId,
-      summary?.invoiceId,
-    ],
+    // Pakai summary sebagai satu objek — fix React Compiler warning
+    [documentId, numericOrderId, summary],
   );
 
   const handlePayNow = useCallback(async () => {
@@ -227,15 +221,12 @@ export default function OrderSummaryPage() {
       window.snap.pay(snapToken, {
         onSuccess: async (result) => {
           try {
-            // Update invoice yang sudah ada menjadi "paid"
             await markInvoicePaid(result);
             setPaymentMessage(
               "Pembayaran berhasil. Status invoice telah diperbarui.",
             );
             router.push("/pesanan");
           } catch (err) {
-            // Pembayaran tetap sukses meski update invoice gagal
-            // Midtrans webhook akan menangani sebagai fallback
             console.error("[onSuccess] Gagal update invoice:", err);
             setPaymentMessage(
               "Pembayaran berhasil. Status invoice akan diperbarui via notifikasi Midtrans.",
@@ -267,17 +258,14 @@ export default function OrderSummaryPage() {
       );
       setIsPaying(false);
     }
+    // Pakai summary sebagai satu objek — fix React Compiler warning
   }, [
     clientKey,
     numericOrderId,
     router,
     markInvoicePaid,
     snapReady,
-    summary?.invoiceDocumentId,
-    summary?.invoiceId,
-    summary?.snapToken,
-    summary?.recipientName,
-    summary?.recipientPhone,
+    summary,
     total,
   ]);
 
@@ -306,11 +294,8 @@ export default function OrderSummaryPage() {
         {/* Stepper */}
         <div className="mb-8">
           <div className="relative flex items-start justify-center">
-            {/* Garis penghubung antar step */}
             <div className="absolute left-1/4 right-1/4 top-[18px] h-px bg-gray-200" />
-
             <div className="grid w-full max-w-sm grid-cols-2">
-              {/* Step 1 — selesai */}
               <div className="relative flex flex-col items-center gap-2 text-center">
                 <div className="flex h-9 w-9 items-center justify-center rounded-full border border-gray-300 bg-white text-sm font-medium text-secondary-500">
                   1
@@ -319,8 +304,6 @@ export default function OrderSummaryPage() {
                   Informasi Pesanan & Pengiriman
                 </p>
               </div>
-
-              {/* Step 2 — aktif */}
               <div className="relative flex flex-col items-center gap-2 text-center">
                 <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary-600 text-sm font-medium text-white">
                   2
@@ -333,7 +316,6 @@ export default function OrderSummaryPage() {
           </div>
         </div>
 
-        {/* Judul & Order ID */}
         <h1 className="mb-1 text-center text-xl font-semibold text-tertiary-900">
           Ringkasan Pesanan
         </h1>
@@ -341,7 +323,6 @@ export default function OrderSummaryPage() {
           Order ID: {documentId ?? summary.documentId ?? summary.orderId ?? "-"}
         </p>
 
-        {/* Pesan sukses / error */}
         {paymentMessage ? (
           <p className="mb-4 text-center text-sm text-green-700">
             {paymentMessage}
@@ -351,20 +332,23 @@ export default function OrderSummaryPage() {
           <p className="mb-4 text-center text-sm text-red-600">{payError}</p>
         ) : null}
 
-        {/* Layout utama */}
         <div className="grid grid-cols-1 gap-5 xl:grid-cols-[1.6fr_1fr]">
           {/* Kolom kiri — detail pesanan */}
           <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-            <h2 className="mb-4 text-sm font-semibold text-tertiary-900">
+            <h2 className="mb-1 text-sm font-semibold text-tertiary-900">
               Detail Pesanan
             </h2>
+            <p className="mb-4 text-xs text-secondary-500">
+              {summary.items?.length ?? 0} kotak dari{" "}
+              {new Set(summary.items?.map((i) => i.id)).size} item
+            </p>
 
             <div className="space-y-3">
               {summary.items?.map((item) => {
                 const addOnLabels = item.addOns.map((a) => a.label).join(", ");
                 const unitPrice =
                   item.basePrice +
-                  item.addOns.reduce((sum, addOn) => sum + addOn.price, 0);
+                  item.addOns.reduce((sum, a) => sum + a.price, 0);
                 const itemTotal = unitPrice * item.quantity;
                 return (
                   <div
@@ -394,28 +378,15 @@ export default function OrderSummaryPage() {
               })}
             </div>
 
-            {/* Rincian biaya */}
-            <div className="mt-4 space-y-2 rounded-xl border border-gray-100 bg-gray-50 px-4 py-3 text-sm">
-              <div className="flex justify-between text-secondary-600">
-                <span>Sub total pesanan</span>
-                <span>{formatRupiah(total)}</span>
-              </div>
-              <div className="flex justify-between text-secondary-600">
-                <span>Biaya layanan</span>
-                <span>Rp 0</span>
-              </div>
-            </div>
-
-            {/* Grand total */}
+            {/* Total — langsung tanpa subtotal */}
             <div className="mt-4 flex items-center justify-between border-t border-gray-200 pt-4 text-base font-semibold text-tertiary-900">
               <span>Total yang harus dibayar</span>
               <span>{formatRupiah(total)}</span>
             </div>
           </div>
 
-          {/* Kolom kanan — info pengiriman + tombol */}
+          {/* Kolom kanan */}
           <div className="flex flex-col gap-4">
-            {/* Alamat pengiriman */}
             <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
               <h2 className="mb-3 text-sm font-semibold text-tertiary-900">
                 Alamat Pengiriman
@@ -433,7 +404,6 @@ export default function OrderSummaryPage() {
               </div>
             </div>
 
-            {/* Jadwal pengiriman */}
             <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
               <h2 className="mb-3 text-sm font-semibold text-tertiary-900">
                 Jadwal Pengiriman
@@ -453,7 +423,6 @@ export default function OrderSummaryPage() {
               </div>
             </div>
 
-            {/* Tombol bayar */}
             <button
               type="button"
               onClick={() => void handlePayNow()}
