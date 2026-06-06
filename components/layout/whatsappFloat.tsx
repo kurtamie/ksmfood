@@ -418,7 +418,7 @@ export default function WhatsappFloat() {
             style={{ height: "min(560px, calc(100vh - 7rem))" }}
           >
             {/* Header */}
-            <div className="flex items-center gap-3 border-b border-black/5 px-4 py-3 flex-shrink-0">
+            <div className="flex items-center gap-3 border-b border-black/5 px-4 py-3 shrink-0">
               <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-[#a90000]">
                 <Image
                   src={Logo}
