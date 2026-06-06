@@ -34,7 +34,7 @@ const packageCards = [
     title: "Nasi Kotak",
     price: "Mulai dari Rp 27.000/kotak",
     // catalog: "/images/pdf/naskot.pdf",
-    url: "/services/riceBox",
+    url: "/services/ricebox",
   },
   {
     id: 4,

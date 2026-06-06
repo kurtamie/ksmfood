@@ -2,6 +2,7 @@
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import { useLocale, useTranslations } from "next-intl";
 import { useAuth } from "@/context/authContext";
 import {
   Popover,
@@ -18,6 +19,16 @@ import {
 import { Calendar } from "@/components/ui/calendar";
 import { Input } from "@/components/ui/input";
 import { getLeaveTime } from "@/lib/cart-order-payload";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 function formatRupiah(amount: number) {
   return new Intl.NumberFormat("id-ID", {
@@ -43,6 +54,14 @@ function parseAmount(value: string | number | null | undefined): number {
   if (typeof value === "number") return Number.isFinite(value) ? value : 0;
   const parsed = Number(String(value).replace(/[^\d.-]/g, ""));
   return Number.isFinite(parsed) ? parsed : 0;
+}
+
+function normalizePhoneInput(value: string): string {
+  return value.replace(/\D/g, "").slice(0, 15);
+}
+
+function isValidRecipientPhone(value: string): boolean {
+  return /^(62|08)\d{8,13}$/.test(value);
 }
 
 type OrderMenuRow = {
@@ -96,6 +115,14 @@ type SessionItem = {
   addOns: SessionAddOn[];
   quantity: number;
 };
+
+function getAddOnTotal(addOns: SessionAddOn[] | undefined): number {
+  return (addOns ?? []).reduce((sum, addOn) => sum + addOn.price, 0);
+}
+
+function getSessionUnitPrice(item: SessionItem): number {
+  return item.basePrice + getAddOnTotal(item.addOns);
+}
 
 function unwrapEntity<T extends object>(row: unknown): T | null {
   if (!row || typeof row !== "object") return null;
@@ -331,6 +358,8 @@ function parseSavedAddresses(
 }
 
 export default function OrderInfoPage() {
+  const t = useTranslations("orderInfo");
+  const locale = useLocale();
   const router = useRouter();
   const params = useParams<{ documentId?: string }>();
   const documentId = params?.documentId;
@@ -363,6 +392,15 @@ export default function OrderInfoPage() {
   const [orderDetails, setOrderDetails] = useState<OrderDetailRow[]>([]);
   const [isOrderLoading, setIsOrderLoading] = useState(true);
   const [sessionItems, setSessionItems] = useState<SessionItem[]>([]);
+  const [draftOrderDocumentId, setDraftOrderDocumentId] = useState<
+    string | null
+  >(null);
+  const [leaveDialogOpen, setLeaveDialogOpen] = useState(false);
+  const [pendingNavigationHref, setPendingNavigationHref] = useState<
+    string | null
+  >(null);
+  const [isDeletingDraftOrder, setIsDeletingDraftOrder] = useState(false);
+  const allowNavigationRef = useRef(false);
 
   const savedAddresses = useMemo(
     () =>
@@ -435,10 +473,21 @@ export default function OrderInfoPage() {
       return apiItems.map((item, index) => {
         const session = sessionItems[index];
         const addOns = session?.addOns ?? [];
-        const unitPrice = session?.basePrice ?? item.unitPrice;
+        const basePrice = session?.basePrice ?? item.unitPrice;
+        const unitPrice = session
+          ? getSessionUnitPrice(session)
+          : item.unitPrice;
+        const fallbackName =
+          item.name === "Menu Pesanan"
+            ? t("fallbackMenuName")
+            : item.name.replace(
+                /^Menu Pesanan\s+/,
+                `${t("fallbackMenuName")} `,
+              );
         return {
           ...item,
-          name: session?.name ?? item.name,
+          name: session?.name ?? fallbackName,
+          basePrice,
           addOns,
           addOnLabels: addOns.map((a: SessionAddOn) => a.label).join(", "),
           unitPrice,
@@ -450,15 +499,16 @@ export default function OrderInfoPage() {
     return sessionItems.map((item) => ({
       id: item.id,
       name: item.name,
+      basePrice: item.basePrice,
       addOns: item.addOns,
       addOnLabels: item.addOns.map((a) => a.label).join(", "),
       quantity: item.quantity,
-      unitPrice: item.basePrice,
-      total: item.basePrice * item.quantity,
+      unitPrice: getSessionUnitPrice(item),
+      total: getSessionUnitPrice(item) * item.quantity,
       menu: {} as OrderMenuRow,
       detail: {} as OrderDetailRow,
     }));
-  }, [orderDetails, orderMenus, sessionItems]);
+  }, [orderDetails, orderMenus, sessionItems, t]);
 
   const itemCount = useMemo(
     () => orderItems.reduce((sum, item) => sum + item.quantity, 0),
@@ -466,6 +516,21 @@ export default function OrderInfoPage() {
   );
   const orderTotal = useMemo(
     () => orderItems.reduce((sum, item) => sum + item.total, 0),
+    [orderItems],
+  );
+  const extraChargeRows = useMemo(
+    () =>
+      orderItems.flatMap((item) =>
+        item.addOns
+          .filter((addOn) => addOn.price > 0)
+          .map((addOn) => ({
+            key: `${item.id}-${addOn.value}`,
+            label: addOn.label,
+            quantity: item.quantity,
+            unitPrice: addOn.price,
+            total: addOn.price * item.quantity,
+          })),
+      ),
     [orderItems],
   );
 
@@ -500,7 +565,7 @@ export default function OrderInfoPage() {
           throw new Error(
             typeof json?.error === "string"
               ? json.error
-              : "Gagal memuat detail pesanan.",
+              : t("errors.loadOrderDetailsFailed"),
           );
         }
 
@@ -560,7 +625,7 @@ export default function OrderInfoPage() {
           setSubmitError(
             error instanceof Error
               ? error.message
-              : "Gagal memuat detail pesanan.",
+              : t("errors.loadOrderDetailsFailed"),
           );
         }
       } finally {
@@ -573,20 +638,91 @@ export default function OrderInfoPage() {
     return () => {
       cancelled = true;
     };
-  }, [documentId]);
+  }, [documentId, t]);
 
   useEffect(() => {
     try {
       const raw = window.sessionStorage.getItem("ksm_order_summary");
       if (!raw) return;
       const parsed = JSON.parse(raw);
+      if (
+        typeof parsed?.documentId === "string" &&
+        parsed.documentId === documentId
+      ) {
+        setDraftOrderDocumentId(parsed.documentId);
+      }
       if (Array.isArray(parsed?.items)) {
         setSessionItems(parsed.items);
       }
     } catch {
       // ignore
     }
-  }, []);
+  }, [documentId]);
+
+  const shouldConfirmBeforeLeaving =
+    !!documentId &&
+    draftOrderDocumentId === documentId &&
+    !allowNavigationRef.current;
+
+  useEffect(() => {
+    if (!shouldConfirmBeforeLeaving || typeof window === "undefined") {
+      return;
+    }
+
+    const handleDocumentClick = (event: MouseEvent) => {
+      if (
+        event.defaultPrevented ||
+        event.button !== 0 ||
+        event.metaKey ||
+        event.ctrlKey ||
+        event.shiftKey ||
+        event.altKey
+      ) {
+        return;
+      }
+
+      const target = event.target;
+      if (!(target instanceof Element)) return;
+
+      const anchor = target.closest("a[href]");
+      if (!(anchor instanceof HTMLAnchorElement)) return;
+      if (anchor.target && anchor.target !== "_self") return;
+      if (anchor.hasAttribute("download")) return;
+
+      const nextUrl = new URL(anchor.href, window.location.href);
+      const currentUrl = new URL(window.location.href);
+      const summaryPath = `/order-info/${encodeURIComponent(documentId)}/summary`;
+      const isSamePageHashNavigation =
+        nextUrl.pathname === currentUrl.pathname &&
+        nextUrl.search === currentUrl.search &&
+        nextUrl.hash !== currentUrl.hash;
+
+      if (
+        isSamePageHashNavigation ||
+        nextUrl.pathname === currentUrl.pathname ||
+        nextUrl.pathname === summaryPath
+      ) {
+        return;
+      }
+
+      event.preventDefault();
+      setPendingNavigationHref(nextUrl.href);
+      setLeaveDialogOpen(true);
+    };
+
+    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+      event.preventDefault();
+      event.returnValue = "";
+    };
+
+    document.addEventListener("click", handleDocumentClick, true);
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    return () => {
+      document.removeEventListener("click", handleDocumentClick, true);
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [documentId, shouldConfirmBeforeLeaving]);
 
   useEffect(() => {
     if (
@@ -791,25 +927,33 @@ export default function OrderInfoPage() {
 
     // Validasi field wajib
     if (!addressLine.trim()) {
-      setSubmitError("Alamat lengkap wajib diisi.");
+      setSubmitError(t("errors.addressRequired"));
       return;
     }
     if (!subdistrict) {
-      setSubmitError("Kelurahan wajib dipilih.");
+      setSubmitError(t("errors.subdistrictRequired"));
       return;
     }
     if (!recipientName.trim()) {
-      setSubmitError("Nama penerima wajib diisi.");
+      setSubmitError(t("errors.recipientNameRequired"));
       return;
     }
-    if (!recipientPhone.trim()) {
-      setSubmitError("Telepon penerima wajib diisi.");
+    const normalizedRecipientPhone = normalizePhoneInput(recipientPhone);
+    if (!normalizedRecipientPhone) {
+      setSubmitError(t("errors.recipientPhoneRequired"));
       return;
+    }
+    if (!isValidRecipientPhone(normalizedRecipientPhone)) {
+      setSubmitError(t("errors.recipientPhoneInvalid"));
+      return;
+    }
+    if (recipientPhone !== normalizedRecipientPhone) {
+      setRecipientPhone(normalizedRecipientPhone);
     }
 
     // Validasi tanggal minimal H+2
     if (!date) {
-      setSubmitError("Tanggal pengiriman wajib diisi.");
+      setSubmitError(t("errors.deliveryDateRequired"));
       return;
     }
     const today = new Date();
@@ -820,11 +964,13 @@ export default function OrderInfoPage() {
     selectedDate.setHours(0, 0, 0, 0);
     if (selectedDate < minDate) {
       setSubmitError(
-        `Tanggal pengiriman minimal ${minDate.toLocaleDateString("id-ID", {
-          day: "2-digit",
-          month: "long",
-          year: "numeric",
-        })}.`,
+        t("errors.deliveryDateMin", {
+          date: minDate.toLocaleDateString(locale, {
+            day: "2-digit",
+            month: "long",
+            year: "numeric",
+          }),
+        }),
       );
       return;
     }
@@ -833,11 +979,11 @@ export default function OrderInfoPage() {
 
     try {
       if (!documentId) {
-        throw new Error("ID pesanan tidak valid.");
+        throw new Error(t("errors.invalidOrderId"));
       }
 
       if (!orderItems.length) {
-        throw new Error("Detail pesanan belum tersedia.");
+        throw new Error(t("errors.orderDetailUnavailable"));
       }
 
       const response = await fetch(`/api/orders/${documentId}`, {
@@ -845,7 +991,10 @@ export default function OrderInfoPage() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(orderPayload),
+        body: JSON.stringify({
+          ...orderPayload,
+          recipient_phone_no: normalizedRecipientPhone,
+        }),
       });
 
       const result = await response.json();
@@ -854,7 +1003,7 @@ export default function OrderInfoPage() {
         const message =
           typeof result?.error === "string"
             ? result.error
-            : "Gagal menyimpan pesanan. Coba lagi.";
+            : t("errors.saveOrderFailed");
         throw new Error(message);
       }
 
@@ -892,21 +1041,16 @@ export default function OrderInfoPage() {
         latitude,
         longitude,
         recipientName,
-        recipientPhone,
+        recipientPhone: normalizedRecipientPhone,
         notes,
         items: orderItems.map((item) => ({
           id: item.id,
           productId: item.id,
           name: item.name,
           image: "",
-          basePrice: item.unitPrice,
-          addOns: item.addOnLabels
-            ? item.addOnLabels.split(", ").map((label) => ({
-                label,
-                value: label,
-                price: 0,
-              }))
-            : [],
+          basePrice:
+            item.basePrice ?? item.unitPrice - getAddOnTotal(item.addOns),
+          addOns: item.addOns,
           quantity: item.quantity,
           slug: "",
           category: "Pesanan",
@@ -922,15 +1066,14 @@ export default function OrderInfoPage() {
       }
 
       if (!orderDocumentId) {
-        throw new Error("Gagal mendapatkan ID pesanan dari server.");
+        throw new Error(t("errors.orderIdUnavailable"));
       }
 
+      allowNavigationRef.current = true;
       router.push(`/order-info/${orderDocumentId}/summary`);
     } catch (error) {
       setSubmitError(
-        error instanceof Error
-          ? error.message
-          : "Gagal menyimpan pesanan. Coba lagi.",
+        error instanceof Error ? error.message : t("errors.saveOrderFailed"),
       );
     } finally {
       setIsSubmitting(false);
@@ -942,7 +1085,7 @@ export default function OrderInfoPage() {
     // Update via sessionItems kalau ada
     if (sessionItems.length > index) {
       const session = sessionItems[index];
-      const unitPrice = session.basePrice;
+      const unitPrice = getSessionUnitPrice(session);
       setSessionItems((current) =>
         current.map((item, i) => (i === index ? { ...item, quantity } : item)),
       );
@@ -977,417 +1120,533 @@ export default function OrderInfoPage() {
     );
   }
 
+  async function handleConfirmLeavePage() {
+    if (!documentId || !pendingNavigationHref) return;
+
+    setIsDeletingDraftOrder(true);
+    setSubmitError(null);
+
+    try {
+      const response = await fetch(`/api/orders/${documentId}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+      const result = await response.json().catch(() => null);
+
+      if (!response.ok || !result?.success) {
+        throw new Error(
+          typeof result?.error === "string"
+            ? result.error
+            : "Gagal menghapus pesanan. Coba lagi.",
+        );
+      }
+
+      window.sessionStorage.removeItem("ksm_order_summary");
+      allowNavigationRef.current = true;
+      setLeaveDialogOpen(false);
+
+      const nextUrl = new URL(pendingNavigationHref);
+      if (nextUrl.origin === window.location.origin) {
+        router.push(`${nextUrl.pathname}${nextUrl.search}${nextUrl.hash}`);
+      } else {
+        window.location.assign(nextUrl.href);
+      }
+    } catch (error) {
+      setSubmitError(
+        error instanceof Error
+          ? error.message
+          : "Gagal menghapus pesanan. Coba lagi.",
+      );
+    } finally {
+      setIsDeletingDraftOrder(false);
+    }
+  }
+
   return (
-    <div className="mx-auto max-w-6xl px-6 py-10">
-      <h1 className="text-2xl font-bold text-tertiary-900 mb-6 text-center">
-        Informasi Pesanan <span className="text-red-800">& Pengiriman</span>
-      </h1>
+    <>
+      <div className="mx-auto max-w-6xl px-6 py-10">
+        <h1 className="text-2xl font-bold text-tertiary-900 mb-6 text-center">
+          {t("title")} <span className="text-red-800">{t("titleAccent")}</span>
+        </h1>
 
-      <div className="mb-8">
-        <div className="relative">
-          <div className="absolute inset-x-6 top-1/2 h-px bg-gray-200" />
-          <div className="grid grid-cols-2 gap-4">
-            <div className="relative flex flex-col items-center gap-3 text-center">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full border border-primary-500 bg-primary-500 text-white text-sm font-bold">
-                1
+        <div className="mb-8">
+          <div className="relative">
+            <div className="absolute inset-x-6 top-1/2 h-px bg-gray-200" />
+            <div className="grid grid-cols-2 gap-4">
+              <div className="relative flex flex-col items-center gap-3 text-center">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full border border-primary-500 bg-primary-500 text-white text-sm font-bold">
+                  1
+                </div>
+                <p className="text-sm font-semibold text-tertiary-900">
+                  {t("steps.info")}
+                </p>
               </div>
-              <p className="text-sm font-semibold text-tertiary-900">
-                Informasi Pesanan & Pengiriman
-              </p>
-            </div>
 
-            <div className="relative flex flex-col items-center gap-3 text-center">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full border border-gray-300 bg-white text-secondary-500 text-sm font-bold">
-                2
+              <div className="relative flex flex-col items-center gap-3 text-center">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full border border-gray-300 bg-white text-secondary-500 text-sm font-bold">
+                  2
+                </div>
+                <p className="text-sm text-secondary-500">
+                  {t("steps.summary")}
+                </p>
               </div>
-              <p className="text-sm text-secondary-500">Ringkasan Pesanan</p>
             </div>
           </div>
         </div>
-      </div>
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        {/* Left column - form */}
-        <div className="col-span-2">
-          <div className="rounded-lg border border-secondary-300 bg-white p-5">
-            <h2 className="mb-4 text-lg font-semibold">Informasi Pengiriman</h2>
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+          {/* Left column - form */}
+          <div className="col-span-2">
+            <div className="rounded-lg border border-secondary-300 bg-white p-5">
+              <h2 className="mb-4 text-lg font-semibold">
+                {t("deliveryInfo")}
+              </h2>
 
-            <div className="flex flex-col gap-2">
-              <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">
-                  Tanggal
-                </label>
-                <InputGroup>
-                  <InputGroupInput
-                    id="date-required"
-                    value={value}
-                    placeholder="June 01, 2025"
-                    onChange={(e) => {
-                      const date = new Date(e.target.value);
-                      setValue(e.target.value);
-                      if (isValidDate(date)) {
-                        setDate(date);
-                        setMonth(date);
-                      }
-                    }}
-                    onKeyDown={(e) => {
-                      if (e.key === "ArrowDown") {
-                        e.preventDefault();
-                        setOpen(true);
-                      }
-                    }}
-                  />
-                  <InputGroupAddon align="inline-end">
-                    <Popover open={open} onOpenChange={setOpen}>
-                      <PopoverTrigger asChild>
-                        <InputGroupButton
-                          id="date-picker"
-                          variant="ghost"
-                          size="icon-xs"
-                          aria-label="Select date"
+              <div className="flex flex-col gap-2">
+                <div>
+                  <label className="mb-1 block text-sm font-medium text-gray-700">
+                    {t("fields.date")}
+                  </label>
+                  <InputGroup>
+                    <InputGroupInput
+                      id="date-required"
+                      value={value}
+                      placeholder={t("placeholders.date")}
+                      onChange={(e) => {
+                        const date = new Date(e.target.value);
+                        setValue(e.target.value);
+                        if (isValidDate(date)) {
+                          setDate(date);
+                          setMonth(date);
+                        }
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === "ArrowDown") {
+                          e.preventDefault();
+                          setOpen(true);
+                        }
+                      }}
+                    />
+                    <InputGroupAddon align="inline-end">
+                      <Popover open={open} onOpenChange={setOpen}>
+                        <PopoverTrigger asChild>
+                          <InputGroupButton
+                            id="date-picker"
+                            variant="ghost"
+                            size="icon-xs"
+                            aria-label={t("actions.selectDate")}
+                          >
+                            <CalendarIcon />
+                            <span className="sr-only">
+                              {t("actions.selectDate")}
+                            </span>
+                          </InputGroupButton>
+                        </PopoverTrigger>
+                        <PopoverContent
+                          className="w-auto overflow-hidden p-0"
+                          align="end"
+                          alignOffset={-8}
+                          sideOffset={10}
                         >
-                          <CalendarIcon />
-                          <span className="sr-only">Select date</span>
-                        </InputGroupButton>
-                      </PopoverTrigger>
-                      <PopoverContent
-                        className="w-auto overflow-hidden p-0"
-                        align="end"
-                        alignOffset={-8}
-                        sideOffset={10}
-                      >
-                        <Calendar
-                          mode="single"
-                          selected={date}
-                          month={month}
-                          onMonthChange={setMonth}
-                          onSelect={(date) => {
-                            setDate(date);
-                            setValue(formatDate(date));
-                            setOpen(false);
-                          }}
-                        />
-                      </PopoverContent>
-                    </Popover>
-                  </InputGroupAddon>
-                </InputGroup>
-              </div>
+                          <Calendar
+                            mode="single"
+                            selected={date}
+                            month={month}
+                            onMonthChange={setMonth}
+                            onSelect={(date) => {
+                              setDate(date);
+                              setValue(formatDate(date));
+                              setOpen(false);
+                            }}
+                          />
+                        </PopoverContent>
+                      </Popover>
+                    </InputGroupAddon>
+                  </InputGroup>
+                </div>
 
-              <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">
-                  Jam Sampai
-                </label>
-                <Input
-                  type="time"
-                  id="time-picker-optional"
-                  step="1"
-                  value={deliveryTime}
-                  onChange={(e) => setDeliveryTime(e.target.value)}
-                  className="appearance-none bg-background [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
-                />
-              </div>
+                <div>
+                  <label className="mb-1 block text-sm font-medium text-gray-700">
+                    {t("fields.arrivalTime")}
+                  </label>
+                  <Input
+                    type="time"
+                    id="time-picker-optional"
+                    step="1"
+                    value={deliveryTime}
+                    onChange={(e) => setDeliveryTime(e.target.value)}
+                    className="appearance-none bg-background [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
+                  />
+                </div>
 
-              <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">
-                  Alamat Lengkap <span className="text-red-600">*</span>
-                </label>
-                <textarea
-                  value={addressLine}
-                  onChange={(e) => setAddressLine(e.target.value)}
-                  placeholder="Peumahan GMP Blok N"
-                  rows={3}
-                  className="w-full rounded-lg border px-3 py-2 text-sm"
-                />
-              </div>
+                <div>
+                  <label className="mb-1 block text-sm font-medium text-gray-700">
+                    {t("fields.fullAddress")}{" "}
+                    <span className="text-red-600">*</span>
+                  </label>
+                  <textarea
+                    value={addressLine}
+                    onChange={(e) => setAddressLine(e.target.value)}
+                    placeholder={t("placeholders.fullAddress")}
+                    rows={3}
+                    className="w-full rounded-lg border px-3 py-2 text-sm"
+                  />
+                </div>
 
-              <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">
-                  Kelurahan <span className="text-red-600">*</span>
-                </label>
-                <select
-                  value={subdistrict}
-                  onChange={(e) => setSubdistrict(e.target.value)}
-                  className="w-full rounded-lg border px-3 py-2"
-                >
-                  <option value="">Pilih Kelurahan</option>
-                  {subdistrict &&
-                    !kelurahanOptions.some(
-                      (option) => option.value === subdistrict,
-                    ) && <option value={subdistrict}>{subdistrict}</option>}
-                  {kelurahanOptions.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
+                <div>
+                  <label className="mb-1 block text-sm font-medium text-gray-700">
+                    {t("fields.subdistrict")}{" "}
+                    <span className="text-red-600">*</span>
+                  </label>
+                  <select
+                    value={subdistrict}
+                    onChange={(e) => setSubdistrict(e.target.value)}
+                    className="w-full rounded-lg border px-3 py-2"
+                  >
+                    <option value="">{t("placeholders.subdistrict")}</option>
+                    {subdistrict &&
+                      !kelurahanOptions.some(
+                        (option) => option.value === subdistrict,
+                      ) && <option value={subdistrict}>{subdistrict}</option>}
+                    {kelurahanOptions.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
 
-              <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">
-                  Pinpoint Lokasi <span className="text-red-600">*</span>
-                </label>
-                <div className="rounded-2xl border border-secondary-300 bg-white p-3">
-                  <div className="mb-3 rounded-lg border border-secondary-200 bg-gray-50 px-3 py-2">
-                    <input
-                      type="text"
-                      value={pinpoint}
-                      onChange={(e) => setPinpoint(e.target.value)}
-                      placeholder="Cari lokasi / ketik nama tempat"
-                      className="w-full bg-transparent text-sm outline-none"
-                    />
-                  </div>
-                  <div className="overflow-hidden rounded-xl border border-secondary-300 bg-gray-100">
-                    <div
-                      ref={mapRef}
-                      className="h-72 w-full"
-                      aria-label="Peta lokasi pengiriman"
-                    />
-                  </div>
-                  <p className="mt-2 text-sm text-secondary-600">
-                    Klik peta untuk menandai lokasi dan simpan
-                    latitude/longitude.
-                  </p>
-                  {latitude !== null && longitude !== null && (
-                    <p className="mt-2 text-sm text-secondary-700">
-                      Koordinat: {latitude.toFixed(6)}, {longitude.toFixed(6)}
+                <div>
+                  <label className="mb-1 block text-sm font-medium text-gray-700">
+                    {t("fields.pinpoint")}{" "}
+                    <span className="text-red-600">*</span>
+                  </label>
+                  <div className="rounded-2xl border border-secondary-300 bg-white p-3">
+                    <div className="mb-3 rounded-lg border border-secondary-200 bg-gray-50 px-3 py-2">
+                      <input
+                        type="text"
+                        value={pinpoint}
+                        onChange={(e) => setPinpoint(e.target.value)}
+                        placeholder={t("placeholders.pinpoint")}
+                        className="w-full bg-transparent text-sm outline-none"
+                      />
+                    </div>
+                    <div className="overflow-hidden rounded-xl border border-secondary-300 bg-gray-100">
+                      <div
+                        ref={mapRef}
+                        className="h-72 w-full"
+                        aria-label={t("mapAriaLabel")}
+                      />
+                    </div>
+                    <p className="mt-2 text-sm text-secondary-600">
+                      {t("mapHelp")}
                     </p>
-                  )}
+                    {latitude !== null && longitude !== null && (
+                      <p className="mt-2 text-sm text-secondary-700">
+                        {t("coordinates")}: {latitude.toFixed(6)},{" "}
+                        {longitude.toFixed(6)}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="mb-1 block text-sm font-medium text-gray-700">
+                    {t("fields.recipientName")}{" "}
+                    <span className="text-red-600">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={recipientName}
+                    onChange={(e) => setRecipientName(e.target.value)}
+                    placeholder={t("placeholders.recipientName")}
+                    className="w-full rounded-lg border px-3 py-2"
+                  />
+                </div>
+
+                <div>
+                  <label className="mb-1 block text-sm font-medium text-gray-700">
+                    {t("fields.recipientPhone")}{" "}
+                    <span className="text-red-600">*</span>
+                  </label>
+                  <input
+                    type="tel"
+                    value={recipientPhone}
+                    onChange={(e) =>
+                      setRecipientPhone(normalizePhoneInput(e.target.value))
+                    }
+                    placeholder="081234567890"
+                    inputMode="numeric"
+                    pattern="(62|08)[0-9]{8,13}"
+                    minLength={10}
+                    maxLength={15}
+                    aria-describedby="recipient-phone-help"
+                    className="w-full rounded-lg border px-3 py-2"
+                  />
+                  <p
+                    id="recipient-phone-help"
+                    className="mt-1 text-xs text-secondary-500"
+                  >
+                    {t("phoneHelp")}
+                  </p>
+                </div>
+
+                <div className="mt-6 flex items-center justify-between gap-4">
+                  <p className="text-sm text-secondary-600">
+                    {t("savedAddressHelp")}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setAddressPickerOpen(true)}
+                    className="rounded-full border border-primary-500 bg-primary-50 px-4 py-2 text-sm font-semibold text-primary-700 transition hover:bg-primary-100"
+                  >
+                    {t("actions.chooseAddress")}
+                  </button>
+                </div>
+
+                {addressPickerOpen && (
+                  <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 px-4 py-6">
+                    <div className="w-full max-w-lg rounded-3xl bg-white p-6 shadow-xl">
+                      <div className="flex items-center justify-between">
+                        <h3 className="text-lg font-semibold">
+                          {t("addressPicker.title")}
+                        </h3>
+                        <button
+                          type="button"
+                          onClick={() => setAddressPickerOpen(false)}
+                          className="text-secondary-600 hover:text-tertiary-900"
+                        >
+                          ✕
+                        </button>
+                      </div>
+
+                      <div className="mt-5 space-y-4">
+                        <select
+                          value={selectedAddressId ?? ""}
+                          onChange={(e) => setSelectedAddressId(e.target.value)}
+                          className="w-full rounded-lg border px-3 py-2"
+                        >
+                          <option value="">
+                            {t("addressPicker.placeholder")}
+                          </option>
+                          {savedAddresses.map((address) => (
+                            <option key={address.id} value={address.id}>
+                              {address.label}
+                            </option>
+                          ))}
+                        </select>
+
+                        <button
+                          type="button"
+                          disabled={!selectedAddressId}
+                          onClick={() => {
+                            const address = savedAddresses.find(
+                              (item) => item.id === selectedAddressId,
+                            );
+                            if (address) {
+                              setAddressName(address.addressName);
+                              setAddressLine(address.addressLine);
+                              setSubdistrict(address.subdistrict);
+                              setPinpoint(address.pinpoint);
+                              setRecipientName(address.recipientName);
+                              setRecipientPhone(address.recipientPhone);
+                              setLatitude(address.latitude ?? null);
+                              setLongitude(address.longitude ?? null);
+                            }
+                            setAddressPickerOpen(false);
+                          }}
+                          className="w-full rounded-xl bg-primary-500 py-3 text-sm font-bold text-white hover:bg-primary-600 disabled:opacity-40 disabled:cursor-not-allowed"
+                        >
+                          {t("actions.confirmChoice")}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                <div className="mt-6">
+                  <label className="mb-2 block font-semibold">
+                    {t("fields.notes")}
+                  </label>
+                  <textarea
+                    value={notes}
+                    onChange={(e) => setNotes(e.target.value)}
+                    placeholder={t("placeholders.notes")}
+                    className="w-full rounded-lg border px-3 py-2 text-sm"
+                    rows={3}
+                  />
+                </div>
+
+                <div className="mt-6 rounded-2xl border border-secondary-200 bg-gray-50 p-4">
+                  <p className="text-sm font-semibold text-tertiary-900">
+                    {t("deliveryMethod.title")}
+                  </p>
+                  <p className="mt-2 text-sm text-secondary-700">
+                    {t("deliveryMethod.description")}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Right column - summary */}
+          <aside className="sticky top-24">
+            <div className="rounded-lg border border-secondary-300 bg-white p-5">
+              <div className="mb-5">
+                <div>
+                  <h3 className="text-lg font-semibold">
+                    {t("orderInfoTitle")}
+                  </h3>
+                  <p className="text-sm text-secondary-600">
+                    {t("itemCount", {
+                      count: itemCount,
+                      items: orderItems.length,
+                    })}
+                  </p>
                 </div>
               </div>
 
-              <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">
-                  Nama Penerima <span className="text-red-600">*</span>
-                </label>
-                <input
-                  type="text"
-                  value={recipientName}
-                  onChange={(e) => setRecipientName(e.target.value)}
-                  placeholder="Nama penerima"
-                  className="w-full rounded-lg border px-3 py-2"
-                />
-              </div>
-
-              <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">
-                  Telepon Penerima <span className="text-red-600">*</span>
-                </label>
-                <input
-                  type="tel"
-                  value={recipientPhone}
-                  onChange={(e) => setRecipientPhone(e.target.value)}
-                  placeholder="081234567890"
-                  className="w-full rounded-lg border px-3 py-2"
-                />
-              </div>
-
-              <div className="mt-6 flex items-center justify-between gap-4">
-                <p className="text-sm text-secondary-600">
-                  Jika sudah pernah menyimpan alamat di akun, alamat akan
-                  terpilih otomatis.
-                </p>
-                <button
-                  type="button"
-                  onClick={() => setAddressPickerOpen(true)}
-                  className="rounded-full border border-primary-500 bg-primary-50 px-4 py-2 text-sm font-semibold text-primary-700 transition hover:bg-primary-100"
-                >
-                  Pilih Alamat
-                </button>
-              </div>
-
-              {addressPickerOpen && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 px-4 py-6">
-                  <div className="w-full max-w-lg rounded-3xl bg-white p-6 shadow-xl">
-                    <div className="flex items-center justify-between">
-                      <h3 className="text-lg font-semibold">
-                        Lokasi Pengiriman
-                      </h3>
-                      <button
-                        type="button"
-                        onClick={() => setAddressPickerOpen(false)}
-                        className="text-secondary-600 hover:text-tertiary-900"
+              {isOrderLoading ? (
+                <div className="rounded-xl border border-dashed border-secondary-300 bg-gray-50 p-4 text-sm text-secondary-600">
+                  {t("loadingOrderDetails")}
+                </div>
+              ) : orderItems.length === 0 ? (
+                <div className="rounded-xl border border-dashed border-secondary-300 bg-gray-50 p-4 text-sm text-secondary-600">
+                  {t("emptyOrderDetails")}
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {orderItems.map((item, index) => {
+                    return (
+                      <div
+                        key={item.id}
+                        className="rounded-2xl border border-secondary-200 bg-gray-50 p-4"
                       >
-                        ✕
-                      </button>
-                    </div>
-
-                    <div className="mt-5 space-y-4">
-                      <select
-                        value={selectedAddressId ?? ""}
-                        onChange={(e) => setSelectedAddressId(e.target.value)}
-                        className="w-full rounded-lg border px-3 py-2"
-                      >
-                        <option value="">-- Pilih Alamat --</option>
-                        {savedAddresses.map((address) => (
-                          <option key={address.id} value={address.id}>
-                            {address.label}
-                          </option>
-                        ))}
-                      </select>
-
-                      <button
-                        type="button"
-                        disabled={!selectedAddressId}
-                        onClick={() => {
-                          const address = savedAddresses.find(
-                            (item) => item.id === selectedAddressId,
-                          );
-                          if (address) {
-                            setAddressName(address.addressName);
-                            setAddressLine(address.addressLine);
-                            setSubdistrict(address.subdistrict);
-                            setPinpoint(address.pinpoint);
-                            setRecipientName(address.recipientName);
-                            setRecipientPhone(address.recipientPhone);
-                            setLatitude(address.latitude ?? null);
-                            setLongitude(address.longitude ?? null);
-                          }
-                          setAddressPickerOpen(false);
-                        }}
-                        className="w-full rounded-xl bg-primary-500 py-3 text-sm font-bold text-white hover:bg-primary-600 disabled:opacity-40 disabled:cursor-not-allowed"
-                      >
-                        Konfirmasi Pilihan
-                      </button>
-                    </div>
-                  </div>
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="min-w-0">
+                            <p className="text-sm font-semibold text-tertiary-900 line-clamp-2">
+                              {item.name}
+                            </p>
+                            {item.addOnLabels && (
+                              <p className="mt-2 text-xs text-secondary-600 leading-relaxed">
+                                {item.addOnLabels}
+                              </p>
+                            )}
+                          </div>
+                          <div className="text-right">
+                            <p className="text-sm text-secondary-600">
+                              {formatRupiah(item.unitPrice)} / {t("unit")}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="mt-4 flex items-center justify-between gap-3">
+                          <div className="flex items-center gap-2 rounded-full border border-secondary-300 bg-white px-2 py-1">
+                            <button
+                              type="button"
+                              onClick={() =>
+                                updateOrderQuantity(index, item.quantity - 1)
+                              }
+                              className="h-8 w-8 rounded-full text-sm font-bold text-tertiary-900 transition hover:bg-secondary-100"
+                            >
+                              −
+                            </button>
+                            <span className="min-w-[2rem] text-center text-sm font-semibold text-tertiary-900">
+                              {item.quantity}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() =>
+                                updateOrderQuantity(index, item.quantity + 1)
+                              }
+                              className="h-8 w-8 rounded-full text-sm font-bold text-tertiary-900 transition hover:bg-secondary-100"
+                            >
+                              +
+                            </button>
+                          </div>
+                          <div className="text-right text-sm font-semibold text-tertiary-900">
+                            <div>{t("total")}</div>
+                            <div>{formatRupiah(item.total)}</div>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               )}
 
-              <div className="mt-6">
-                <label className="mb-2 block font-semibold">
-                  Catatan Pengiriman (Opsional)
-                </label>
-                <textarea
-                  value={notes}
-                  onChange={(e) => setNotes(e.target.value)}
-                  placeholder="Silahkan isi catatan untuk kurir, jika ada"
-                  className="w-full rounded-lg border px-3 py-2 text-sm"
-                  rows={3}
-                />
+              <div className="mt-5 border-t border-secondary-200 pt-4 space-y-3 text-sm text-secondary-700">
+                {extraChargeRows.map((row) => (
+                  <div
+                    key={row.key}
+                    className="flex items-start justify-between gap-3 text-xs text-secondary-600"
+                  >
+                    <span className="min-w-0">
+                      {t("extraCharge")}: {row.label}
+                      <span className="block text-secondary-500">
+                        {row.quantity} x {formatRupiah(row.unitPrice)}
+                      </span>
+                    </span>
+                    <span className="shrink-0">{formatRupiah(row.total)}</span>
+                  </div>
+                ))}
+                <div className="flex items-center justify-between">
+                  <span>{t("subtotal")}</span>
+                  <span>{formatRupiah(orderTotal)}</span>
+                </div>
               </div>
 
-              <div className="mt-6 rounded-2xl border border-secondary-200 bg-gray-50 p-4">
-                <p className="text-sm font-semibold text-tertiary-900">
-                  Metode Pengiriman
-                </p>
-                <p className="mt-2 text-sm text-secondary-700">
-                  Pesanan akan diantar oleh KSM dengan gratis ongkir.
-                </p>
+              <div className="mt-4 flex items-center justify-between border-t border-secondary-200 pt-4">
+                <span className="text-lg font-bold">{t("total")}</span>
+                <span className="text-xl font-bold">
+                  {formatRupiah(orderTotal)}
+                </span>
               </div>
+
+              {submitError && (
+                <p className="mt-3 text-sm text-red-600">{submitError}</p>
+              )}
+
+              <button
+                onClick={handleSaveAndContinue}
+                disabled={
+                  orderItems.length === 0 || isOrderLoading || isSubmitting
+                }
+                className="mt-5 w-full rounded-lg bg-primary-500 py-3 text-sm font-bold text-white transition hover:bg-primary-600 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {isSubmitting
+                  ? t("actions.saving")
+                  : t("actions.continueSummary")}
+              </button>
             </div>
-          </div>
+          </aside>
         </div>
-
-        {/* Right column - summary */}
-        <aside className="sticky top-24">
-          <div className="rounded-lg border border-secondary-300 bg-white p-5">
-            <div className="mb-5">
-              <div>
-                <h3 className="text-lg font-semibold">Detail Pesanan</h3>
-                <p className="text-sm text-secondary-600">
-                  {itemCount} kotak dari {orderItems.length} item
-                </p>
-              </div>
-            </div>
-
-            {isOrderLoading ? (
-              <div className="rounded-xl border border-dashed border-secondary-300 bg-gray-50 p-4 text-sm text-secondary-600">
-                Memuat detail pesanan...
-              </div>
-            ) : orderItems.length === 0 ? (
-              <div className="rounded-xl border border-dashed border-secondary-300 bg-gray-50 p-4 text-sm text-secondary-600">
-                Detail pesanan belum tersedia.
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {orderItems.map((item, index) => {
-                  return (
-                    <div
-                      key={item.id}
-                      className="rounded-2xl border border-secondary-200 bg-gray-50 p-4"
-                    >
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="min-w-0">
-                          <p className="text-sm font-semibold text-tertiary-900 line-clamp-2">
-                            {item.name}
-                          </p>
-                          {item.addOnLabels && (
-                            <p className="mt-2 text-xs text-secondary-600 leading-relaxed">
-                              {item.addOnLabels}
-                            </p>
-                          )}
-                        </div>
-                        <div className="text-right">
-                          <p className="text-sm text-secondary-600">
-                            {formatRupiah(item.unitPrice)} / kotak
-                          </p>
-                        </div>
-                      </div>
-                      <div className="mt-4 flex items-center justify-between gap-3">
-                        <div className="flex items-center gap-2 rounded-full border border-secondary-300 bg-white px-2 py-1">
-                          <button
-                            type="button"
-                            onClick={() =>
-                              updateOrderQuantity(index, item.quantity - 1)
-                            }
-                            className="h-8 w-8 rounded-full text-sm font-bold text-tertiary-900 transition hover:bg-secondary-100"
-                          >
-                            −
-                          </button>
-                          <span className="min-w-[2rem] text-center text-sm font-semibold text-tertiary-900">
-                            {item.quantity}
-                          </span>
-                          <button
-                            type="button"
-                            onClick={() =>
-                              updateOrderQuantity(index, item.quantity + 1)
-                            }
-                            className="h-8 w-8 rounded-full text-sm font-bold text-tertiary-900 transition hover:bg-secondary-100"
-                          >
-                            +
-                          </button>
-                        </div>
-                        <div className="text-right text-sm font-semibold text-tertiary-900">
-                          <div>Total</div>
-                          <div>{formatRupiah(item.total)}</div>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-
-            <div className="mt-5 border-t border-secondary-200 pt-4 space-y-3 text-sm text-secondary-700">
-              <div className="flex items-center justify-between">
-                <span>Sub Total Pesanan</span>
-                <span>{formatRupiah(orderTotal)}</span>
-              </div>
-            </div>
-
-            <div className="mt-4 flex items-center justify-between border-t border-secondary-200 pt-4">
-              <span className="text-lg font-bold">Total</span>
-              <span className="text-xl font-bold">
-                {formatRupiah(orderTotal)}
-              </span>
-            </div>
-
-            {submitError && (
-              <p className="mt-3 text-sm text-red-600">{submitError}</p>
-            )}
-
-            <button
-              onClick={handleSaveAndContinue}
-              disabled={
-                orderItems.length === 0 || isOrderLoading || isSubmitting
-              }
-              className="mt-5 w-full rounded-lg bg-primary-500 py-3 text-sm font-bold text-white transition hover:bg-primary-600 disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              {isSubmitting ? "Menyimpan..." : "Lanjut Ringkasan"}
-            </button>
-          </div>
-        </aside>
       </div>
-    </div>
+      <AlertDialog open={leaveDialogOpen} onOpenChange={setLeaveDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Tinggalkan halaman pesanan?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Pesanan ini belum dilanjutkan ke ringkasan. Jika keluar dari
+              halaman ini, pesanan akan dibatalkan dan dihapus dari database.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeletingDraftOrder}>
+              Batal
+            </AlertDialogCancel>
+            <AlertDialogAction
+              disabled={isDeletingDraftOrder}
+              onClick={(event) => {
+                event.preventDefault();
+                void handleConfirmLeavePage();
+              }}
+              className="bg-[#8D0000] text-white hover:bg-[#6f0000]"
+            >
+              {isDeletingDraftOrder ? "Menghapus..." : "Ya, Setuju"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 }

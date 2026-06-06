@@ -3,7 +3,7 @@
 import Script from "next/script";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import type { MidtransSnapResult } from "@/types/midtrans-snap";
+import { useTranslations } from "next-intl";
 
 const SNAP_SCRIPT_URL =
   process.env.NEXT_PUBLIC_MIDTRANS_IS_PRODUCTION === "true"
@@ -23,7 +23,7 @@ type OrderItem = {
   name: string;
   quantity: number;
   basePrice: number;
-  addOns: Array<{ label: string; price: number }>;
+  addOns: Array<{ label: string; value?: string; price: number }>;
 };
 
 type OrderSummary = {
@@ -55,7 +55,6 @@ function saveOrderSummary(summary: OrderSummary) {
   window.sessionStorage.setItem("ksm_order_summary", JSON.stringify(summary));
 }
 
-/** Hitung total dari items termasuk add-on, bukan dari subtotal field */
 function calculateTotal(items: OrderItem[] | undefined): number {
   if (!items || items.length === 0) return 0;
   return items.reduce((sum, item) => {
@@ -65,7 +64,16 @@ function calculateTotal(items: OrderItem[] | undefined): number {
   }, 0);
 }
 
+function getSummarySubtotal(summary: OrderSummary | null): number {
+  const savedSubtotal = summary?.totals?.subtotal;
+  if (typeof savedSubtotal === "number" && Number.isFinite(savedSubtotal)) {
+    return savedSubtotal;
+  }
+  return calculateTotal(summary?.items);
+}
+
 export default function OrderSummaryPage() {
+  const t = useTranslations("orderInfo");
   const router = useRouter();
   const params = useParams();
   const documentId = params?.documentId;
@@ -93,8 +101,22 @@ export default function OrderSummaryPage() {
     }
   }, [router, summary]);
 
-  // Hitung total dari items (termasuk extra charge add-on), bukan dari totals.subtotal
-  const total = useMemo(() => calculateTotal(summary?.items), [summary]);
+  const total = useMemo(() => getSummarySubtotal(summary), [summary]);
+  const extraChargeRows = useMemo(
+    () =>
+      (summary?.items ?? []).flatMap((item) =>
+        item.addOns
+          .filter((addOn) => addOn.price > 0)
+          .map((addOn) => ({
+            key: `${item.id}-${addOn.value ?? addOn.label}`,
+            label: addOn.label,
+            quantity: item.quantity,
+            unitPrice: addOn.price,
+            total: addOn.price * item.quantity,
+          })),
+      ),
+    [summary?.items],
+  );
 
   const numericOrderId = useMemo(() => {
     const fromSummary = Number(summary?.orderId);
@@ -105,7 +127,7 @@ export default function OrderSummaryPage() {
   }, [documentId, summary?.orderId]);
 
   const markInvoicePaid = useCallback(
-    async (_result: MidtransSnapResult) => {
+    async () => {
       const invoiceDocId = summary?.invoiceDocumentId;
       const invoiceNumId = summary?.invoiceId;
 
@@ -139,12 +161,12 @@ export default function OrderSummaryPage() {
         throw new Error(
           typeof json?.error === "string"
             ? json.error
-            : "Gagal memperbarui status invoice.",
+            : t("errors.updateInvoiceFailed"),
         );
       }
     },
     // Pakai summary sebagai satu objek — fix React Compiler warning
-    [documentId, numericOrderId, summary],
+    [documentId, numericOrderId, summary, t],
   );
 
   const handlePayNow = useCallback(async () => {
@@ -152,22 +174,22 @@ export default function OrderSummaryPage() {
     setPaymentMessage(null);
 
     if (numericOrderId == null) {
-      setPayError("ID pesanan tidak valid.");
+      setPayError(t("errors.invalidOrderId"));
       return;
     }
 
     if (total <= 0) {
-      setPayError("Total pembayaran belum tersedia.");
+      setPayError(t("errors.paymentTotalUnavailable"));
       return;
     }
 
     if (!clientKey) {
-      setPayError("Midtrans client key belum dikonfigurasi.");
+      setPayError(t("errors.midtransClientKeyMissing"));
       return;
     }
 
     if (!snapReady || !window.snap?.pay) {
-      setPayError("Halaman pembayaran gagal dimuat. Silakan muat ulang halaman untuk melanjutkan pembayaran.");
+      setPayError(t("errors.paymentPageUnavailable"));
       return;
     }
 
@@ -195,7 +217,7 @@ export default function OrderSummaryPage() {
           throw new Error(
             typeof json?.error === "string"
               ? json.error
-              : "Gagal membuka pembayaran Midtrans.",
+              : t("errors.openPaymentFailed"),
           );
         }
 
@@ -215,21 +237,21 @@ export default function OrderSummaryPage() {
       }
 
       if (!snapToken) {
-        throw new Error("Data pembayaran Midtrans tidak tersedia.");
+        throw new Error(t("errors.midtransDataUnavailable"));
       }
 
       window.snap.pay(snapToken, {
-        onSuccess: async (result) => {
+        onSuccess: async () => {
           try {
-            await markInvoicePaid(result);
+            await markInvoicePaid();
             setPaymentMessage(
-              "Pembayaran berhasil. Status invoice telah diperbarui.",
+              t("payment.success"),
             );
             router.push("/pesanan");
           } catch (err) {
             console.error("[onSuccess] Gagal update invoice:", err);
             setPaymentMessage(
-              "Pembayaran berhasil. Status invoice akan diperbarui via notifikasi Midtrans.",
+              t("payment.successPendingSync"),
             );
             router.push("/pesanan");
           } finally {
@@ -238,12 +260,12 @@ export default function OrderSummaryPage() {
         },
         onPending: () => {
           setPaymentMessage(
-            "Pembayaran menunggu konfirmasi. Status akan diperbarui setelah selesai.",
+            t("payment.pending"),
           );
           setIsPaying(false);
         },
         onError: () => {
-          setPayError("Pembayaran gagal atau dibatalkan.");
+          setPayError(t("payment.error"));
           setIsPaying(false);
         },
         onClose: () => {
@@ -254,7 +276,7 @@ export default function OrderSummaryPage() {
       setPayError(
         error instanceof Error
           ? error.message
-          : "Gagal memulai pembayaran Midtrans.",
+          : t("errors.startPaymentFailed"),
       );
       setIsPaying(false);
     }
@@ -266,6 +288,7 @@ export default function OrderSummaryPage() {
     markInvoicePaid,
     snapReady,
     summary,
+    t,
     total,
   ]);
 
@@ -273,7 +296,7 @@ export default function OrderSummaryPage() {
     return (
       <div className="mx-auto max-w-6xl px-6 py-10">
         <p className="text-center text-sm text-secondary-600">
-          Memuat ringkasan pesanan...
+          {t("loadingSummary")}
         </p>
       </div>
     );
@@ -301,7 +324,7 @@ export default function OrderSummaryPage() {
                   1
                 </div>
                 <p className="text-xs text-secondary-500">
-                  Informasi Pesanan & Pengiriman
+                  {t("steps.info")}
                 </p>
               </div>
               <div className="relative flex flex-col items-center gap-2 text-center">
@@ -309,7 +332,7 @@ export default function OrderSummaryPage() {
                   2
                 </div>
                 <p className="text-xs font-semibold text-tertiary-900">
-                  Ringkasan Pesanan
+                  {t("steps.summary")}
                 </p>
               </div>
             </div>
@@ -317,7 +340,7 @@ export default function OrderSummaryPage() {
         </div>
 
         <h1 className="mb-1 text-center text-xl font-semibold text-tertiary-900">
-          Ringkasan Pesanan
+          {t("steps.summary")}
         </h1>
         <p className="mb-6 text-center text-xs text-secondary-500">
           Order ID: {documentId ?? summary.documentId ?? summary.orderId ?? "-"}
@@ -336,11 +359,13 @@ export default function OrderSummaryPage() {
           {/* Kolom kiri — detail pesanan */}
           <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
             <h2 className="mb-1 text-sm font-semibold text-tertiary-900">
-              Detail Pesanan
+              {t("orderDetails")}
             </h2>
             <p className="mb-4 text-xs text-secondary-500">
-              {summary.items?.length ?? 0} kotak dari{" "}
-              {new Set(summary.items?.map((i) => i.id)).size} item
+              {t("itemCount", {
+                count: summary.items?.length ?? 0,
+                items: new Set(summary.items?.map((i) => i.id)).size,
+              })}
             </p>
 
             <div className="space-y-3">
@@ -378,9 +403,29 @@ export default function OrderSummaryPage() {
               })}
             </div>
 
-            {/* Total — langsung tanpa subtotal */}
+            <div className="mt-4 space-y-2 border-t border-gray-200 pt-4">
+              {extraChargeRows.map((row) => (
+                <div
+                  key={row.key}
+                  className="flex items-start justify-between gap-3 text-xs text-secondary-600"
+                >
+                  <span className="min-w-0">
+                    {t("extraCharge")}: {row.label}
+                    <span className="block text-secondary-500">
+                      {row.quantity} x {formatRupiah(row.unitPrice)}
+                    </span>
+                  </span>
+                  <span className="shrink-0">{formatRupiah(row.total)}</span>
+                </div>
+              ))}
+              <div className="flex items-center justify-between text-sm font-semibold text-tertiary-900">
+                <span>{t("subtotal")}</span>
+                <span>{formatRupiah(total)}</span>
+              </div>
+            </div>
+
             <div className="mt-4 flex items-center justify-between border-t border-gray-200 pt-4 text-base font-semibold text-tertiary-900">
-              <span>Total yang harus dibayar</span>
+              <span>{t("payableTotal")}</span>
               <span>{formatRupiah(total)}</span>
             </div>
           </div>
@@ -389,7 +434,7 @@ export default function OrderSummaryPage() {
           <div className="flex flex-col gap-4">
             <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
               <h2 className="mb-3 text-sm font-semibold text-tertiary-900">
-                Alamat Pengiriman
+                {t("shippingAddress")}
               </h2>
               <div className="space-y-1 text-sm text-secondary-600">
                 {summary.addressName && <p>{summary.addressName}</p>}
@@ -406,18 +451,18 @@ export default function OrderSummaryPage() {
 
             <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
               <h2 className="mb-3 text-sm font-semibold text-tertiary-900">
-                Jadwal Pengiriman
+                {t("deliverySchedule")}
               </h2>
               <div className="space-y-1 text-sm text-secondary-600">
                 <p>
-                  Tanggal pengiriman:{" "}
+                  {t("deliveryDateLabel")}:{" "}
                   {summary.deliveryDate
                     ? `${summary.deliveryDate}${summary.deliveryTime ? " " + summary.deliveryTime : ""}`
                     : "-"}
                 </p>
                 {summary.notes && (
                   <p className="pt-1 text-xs text-secondary-500">
-                    Catatan: {summary.notes}
+                    {t("notesLabel")}: {summary.notes}
                   </p>
                 )}
               </div>
@@ -429,7 +474,7 @@ export default function OrderSummaryPage() {
               disabled={isPaying || total <= 0}
               className="w-full rounded-xl bg-primary-600 py-3 text-sm font-semibold text-white transition-colors hover:bg-primary-700 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {isPaying ? "Membuka pembayaran..." : "Bayar Sekarang"}
+              {isPaying ? t("actions.openingPayment") : t("actions.payNow")}
             </button>
           </div>
         </div>

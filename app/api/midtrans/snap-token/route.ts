@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
         {
           success: false,
           error:
-            "Invoice sudah jatuh tempo. Pembayaran tidak dapat dilanjutkan.",
+            "Tagihan sudah jatuh tempo. Pembayaran tidak dapat dilanjutkan.",
         },
         { status: 409 },
       );
@@ -121,7 +121,7 @@ export async function POST(request: NextRequest) {
       const message =
         snapData?.error_messages?.join?.(", ") ??
         snapData?.status_message ??
-        "Gagal membuat token Midtrans Snap.";
+        "Gagal membuat token pembayaran.";
       return NextResponse.json(
         { success: false, error: message },
         { status: snapRes.status },
@@ -153,7 +153,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json(
           {
             success: false,
-            error: "Invoice pembayaran tidak ditemukan untuk menyimpan Snap.",
+            error: "Tagihan pembayaran tidak ditemukan.",
           },
           { status: 404 },
         );
@@ -165,7 +165,7 @@ export async function POST(request: NextRequest) {
           error:
             error instanceof Error
               ? error.message
-              : "Gagal menyimpan data pembayaran ke invoice.",
+              : "Gagal menyimpan data pembayaran.",
         },
         { status: 500 },
       );
@@ -185,7 +185,7 @@ export async function POST(request: NextRequest) {
         error:
           error instanceof Error
             ? error.message
-            : "Terjadi kesalahan saat membuat Snap token.",
+            : "Terjadi kesalahan saat memuat form pembayaran.",
       },
       { status: 500 },
     );

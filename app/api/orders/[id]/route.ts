@@ -13,6 +13,22 @@ function getOrderApiUrl(id: string, search = ""): string {
   return `${getStrapiBaseUrl()}/api/orders/${id}${search}`;
 }
 
+function getOrderDetailApiUrl(id: string): string {
+  const endpoint =
+    process.env.NEXT_PUBLIC_STRAPI_ORDER_DETAIL_ENDPOINT ?? "order-details";
+  return `${getStrapiBaseUrl()}/api/${endpoint}/${id}`;
+}
+
+function getOrderMenuApiUrl(id: string): string {
+  const endpoint =
+    process.env.NEXT_PUBLIC_STRAPI_ORDER_MENU_ENDPOINT ?? "order-menus";
+  return `${getStrapiBaseUrl()}/api/${endpoint}/${id}`;
+}
+
+function getInvoiceApiUrl(id: string): string {
+  return `${getStrapiBaseUrl()}/api/invoices/${id}`;
+}
+
 function buildHeaders(token: string | null): HeadersInit {
   const headers: HeadersInit = {
     "Content-Type": "application/json",
@@ -54,7 +70,28 @@ function pickOrderUpdateFields(payload: Record<string, unknown>) {
   });
 }
 
-function getRelationDocumentIds(value: unknown): string[] {
+type RelationIdentifier = {
+  id?: number | string;
+  documentId?: string;
+};
+
+function formatStrapiError(body: unknown): string {
+  if (typeof body === "string") return body;
+  if (body && typeof body === "object") {
+    const err = body as {
+      error?: {
+        message?: string;
+        details?: { errors?: Array<{ message?: string }> };
+      };
+      message?: string;
+    };
+    const detail = err.error?.details?.errors?.[0]?.message;
+    return detail ?? err.error?.message ?? err.message ?? "Request gagal";
+  }
+  return "Request gagal";
+}
+
+function getRelationIdentifiers(value: unknown): RelationIdentifier[] {
   const rows = Array.isArray(value)
     ? value
     : value &&
@@ -67,14 +104,123 @@ function getRelationDocumentIds(value: unknown): string[] {
     .map((row) => {
       if (!row || typeof row !== "object") return null;
       const record = row as Record<string, unknown>;
-      if (typeof record.documentId === "string") return record.documentId;
-      if (record.attributes && typeof record.attributes === "object") {
-        const attrs = record.attributes as Record<string, unknown>;
-        return typeof attrs.documentId === "string" ? attrs.documentId : null;
+      const attributes =
+        record.attributes && typeof record.attributes === "object"
+          ? (record.attributes as Record<string, unknown>)
+          : {};
+      const documentId =
+        typeof record.documentId === "string"
+          ? record.documentId
+          : typeof attributes.documentId === "string"
+            ? attributes.documentId
+            : undefined;
+      const id =
+        typeof record.id === "number" || typeof record.id === "string"
+          ? record.id
+          : typeof attributes.id === "number" ||
+              typeof attributes.id === "string"
+            ? attributes.id
+            : undefined;
+
+      if (documentId || id) {
+        return {
+          ...(id != null ? { id } : {}),
+          ...(documentId ? { documentId } : {}),
+        };
       }
       return null;
     })
+    .filter((row): row is RelationIdentifier => row != null);
+}
+
+function getRelationDocumentIds(value: unknown): string[] {
+  return getRelationIdentifiers(value)
+    .map((row) => row.documentId)
     .filter((documentId): documentId is string => !!documentId);
+}
+
+function getDeleteIdentifier(row: RelationIdentifier): string | null {
+  if (row.documentId) return row.documentId;
+  if (row.id != null) return String(row.id);
+  return null;
+}
+
+async function readResponseBody(res: Response): Promise<unknown> {
+  const contentType = res.headers.get("content-type") ?? "";
+  return contentType.includes("application/json") ? res.json() : res.text();
+}
+
+async function getOrderForDeletion(token: string | null, id: string) {
+  const res = await fetch(
+    getOrderApiUrl(
+      id,
+      "?populate[order_details][fields][0]=documentId&populate[order_menus][fields][0]=documentId&populate[invoices][fields][0]=documentId&populate[invoices][fields][1]=payment_status",
+    ),
+    {
+      method: "GET",
+      headers: buildHeaders(token),
+      cache: "no-store",
+    },
+  );
+
+  const body = await readResponseBody(res).catch(() => null);
+  if (!res.ok) {
+    throw new Error(`Gagal mengambil order: ${formatStrapiError(body)}`);
+  }
+
+  return body &&
+    typeof body === "object" &&
+    "data" in body &&
+    body.data &&
+    typeof body.data === "object"
+    ? (body.data as Record<string, unknown>)
+    : null;
+}
+
+async function deleteStrapiEntry(
+  token: string | null,
+  url: string,
+  label: string,
+) {
+  const res = await fetch(url, {
+    method: "DELETE",
+    headers: buildHeaders(token),
+  });
+  const body = await readResponseBody(res).catch(() => null);
+
+  if (res.status === 404) {
+    return;
+  }
+
+  if (!res.ok) {
+    throw new Error(`Gagal menghapus ${label}: ${formatStrapiError(body)}`);
+  }
+}
+
+function getInvoiceRows(value: unknown) {
+  const rows = Array.isArray(value)
+    ? value
+    : value &&
+        typeof value === "object" &&
+        Array.isArray((value as { data?: unknown }).data)
+      ? (value as { data: unknown[] }).data
+      : [];
+
+  return rows
+    .map((row) => {
+      if (!row || typeof row !== "object") return null;
+      const record = row as Record<string, unknown>;
+      if (record.attributes && typeof record.attributes === "object") {
+        const attrs = record.attributes as Record<string, unknown>;
+        return {
+          id: record.id,
+          documentId: record.documentId ?? attrs.documentId,
+          payment_status: attrs.payment_status,
+        };
+      }
+      return record;
+    })
+    .filter((row): row is Record<string, unknown> => row != null);
 }
 
 async function getExistingRelationConnects(token: string | null, id: string) {
@@ -110,15 +256,15 @@ async function getExistingRelationConnects(token: string | null, id: string) {
 }
 
 async function toNextResponse(res: Response) {
-  const contentType = res.headers.get("content-type") ?? "";
-  const body = contentType.includes("application/json")
-    ? await res.json()
-    : await res.text();
+  const body = res.status === 204 ? null : await readResponseBody(res);
   if (!res.ok) {
     return NextResponse.json(
-      { success: false, error: body ?? res.statusText },
+      { success: false, error: formatStrapiError(body) },
       { status: res.status },
     );
+  }
+  if (res.status === 204) {
+    return NextResponse.json({ success: true, data: null }, { status: 200 });
   }
   return NextResponse.json(
     { success: true, data: body },
@@ -195,6 +341,58 @@ export async function DELETE(
   try {
     const token = await getToken();
     const { id } = await params;
+    const order = await getOrderForDeletion(token, id);
+
+    if (order) {
+      const invoices = getInvoiceRows(order.invoices);
+      const paidInvoice = invoices.find(
+        (invoice) => invoice.payment_status === "paid",
+      );
+
+      if (paidInvoice) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: "Pesanan yang sudah dibayar tidak dapat dihapus.",
+          },
+          { status: 409 },
+        );
+      }
+
+      for (const invoice of invoices) {
+        const identifier = getDeleteIdentifier(invoice);
+        if (identifier) {
+          await deleteStrapiEntry(
+            token,
+            getInvoiceApiUrl(identifier),
+            "invoice pesanan",
+          );
+        }
+      }
+
+      for (const detail of getRelationIdentifiers(order.order_details)) {
+        const identifier = getDeleteIdentifier(detail);
+        if (identifier) {
+          await deleteStrapiEntry(
+            token,
+            getOrderDetailApiUrl(identifier),
+            "detail pesanan",
+          );
+        }
+      }
+
+      for (const menu of getRelationIdentifiers(order.order_menus)) {
+        const identifier = getDeleteIdentifier(menu);
+        if (identifier) {
+          await deleteStrapiEntry(
+            token,
+            getOrderMenuApiUrl(identifier),
+            "menu pesanan",
+          );
+        }
+      }
+    }
+
     const res = await fetch(getOrderApiUrl(id), {
       method: "DELETE",
       headers: buildHeaders(token),

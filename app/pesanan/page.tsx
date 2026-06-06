@@ -28,7 +28,7 @@ function formatOrderDate(value: string | null) {
 
 const ORDER_STEP_LABEL: Record<OrderDisplayStep, string> = {
   waiting_payment: "Menunggu Pembayaran",
-  packing: "Packing",
+  packing: "Dikemas",
   send: "Pengiriman",
   success: "Diterima",
 };
