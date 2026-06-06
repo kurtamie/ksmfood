@@ -506,7 +506,7 @@ export default function WhatsappFloat() {
         <button
           type="button"
           onClick={() => setIsOpen((v) => !v)}
-          className="flex size-16 items-center justify-center rounded-full bg-red-800 text-white shadow-[0_18px_40px_rgba(37,211,102,0.35)] transition hover:scale-[1.03] hover:bg-red-500"
+          className="flex size-16 items-center justify-center rounded-full bg-red-800 text-white shadow-[0_18px_40px_rgba(255,0,0,0.35)] transition hover:scale-[1.03] hover:bg-red-500"
           aria-expanded={isOpen}
           aria-label={
             isOpen
