@@ -285,8 +285,8 @@ export const LogoLoop = React.memo<LogoLoopProps>(
     const updateDimensions = useCallback(() => {
       const containerWidth = containerRef.current?.clientWidth ?? 0;
       const sequenceRect = seqRef.current?.getBoundingClientRect?.();
-      const sequenceWidth = sequenceRect?.width ?? 0;
-      const sequenceHeight = sequenceRect?.height ?? 0;
+      const sequenceWidth = sequenceRect?.width || seqRef.current?.offsetWidth || 0;
+      const sequenceHeight = sequenceRect?.height || seqRef.current?.offsetHeight || 0;
       if (isVertical) {
         const parentHeight =
           containerRef.current?.parentElement?.clientHeight ?? 0;
@@ -346,7 +346,7 @@ export const LogoLoop = React.memo<LogoLoopProps>(
 
       const observer = new IntersectionObserver(
         ([entry]) => setIsInView(entry.isIntersecting),
-        { threshold: 0.05 },
+        { threshold: 0 },
       );
       observer.observe(element);
 

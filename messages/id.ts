@@ -465,7 +465,7 @@ const messages = {
       paragraph2:
         "Kami terus menerus melakukan penyempurnaan layanan untuk selalu menyajikan sajian berkelas, citarasa istimewa, tampilan elegan dan standar higienis yang terjaga untuk menyempurnakan setiap moment acara anda.",
       paragraph3:
-        "Dengan pengalaman lebih dari 19 tahun, kami telah melayani berbagai kebutuhan catering mulai dari Wedding, Event Pemerintah & Kementrian, Bank, Rumah Sakit, dan Perusahaan-Perusahaan besar di Batam.",
+        "Dengan pengalaman lebih dari 19 tahun, kami telah melayani berbagai kebutuhan katering mulai dari Pernikahan, Acara Pemerintah & Kementerian, Bank, Rumah Sakit, dan Perusahaan-Perusahaan besar di Batam.",
       cta: "Lihat Lebih Banyak",
     },
     servicesSection: {
@@ -928,14 +928,14 @@ const messages = {
         id: "service",
         question: "Apakah KSM menyediakan layanan full service untuk wedding?",
         answer:
-          "Ya. KSM menghadirkan layanan full service dengan jumlah tim yang disesuaikan dengan skala acara. Untuk acara dengan jumlah tamu besar, kami menyiapkan tim yang lengkap dan terstruktur guna memastikan seluruh operasional berjalan dengan optimal. Setiap tim terdiri dari petugas stall, penjaga lauk, runner distribusi makanan, petugas buah, hingga tim kebersihan yang bekerja secara terkoordinasi. Dengan sistem ini, seluruh alur catering tertangani dengan baik, sehingga Anda dapat menikmati momen pernikahan tanpa perlu mengkhawatirkan detail di lapangan.",
+          "Ya. KSM menghadirkan layanan full service dengan jumlah tim yang disesuaikan dengan skala acara. Untuk acara dengan jumlah tamu besar, kami menyiapkan tim yang lengkap dan terstruktur guna memastikan seluruh operasional berjalan dengan optimal. Setiap tim terdiri dari petugas stall, penjaga lauk, runner distribusi makanan, petugas buah, hingga tim kebersihan yang bekerja secara terkoordinasi. Dengan sistem ini, seluruh alur katering tertangani dengan baik, sehingga Anda dapat menikmati momen pernikahan tanpa perlu mengkhawatirkan detail di lapangan.",
       },
       {
         id: "family",
         question:
-          "Apakah pihak keluarga perlu terlibat dalam pengelolaan catering saat acara?",
+          "Apakah pihak keluarga perlu terlibat dalam pengelolaan katering saat acara?",
         answer:
-          "Tidak perlu. Seluruh alur catering—mulai dari penyajian, pengisian ulang makanan, hingga kebersihan area—ditangani sepenuhnya oleh tim KSM. Anda dan keluarga bisa fokus menikmati momen tanpa distraksi.",
+          "Tidak perlu. Seluruh alur katering—mulai dari penyajian, pengisian ulang makanan, hingga kebersihan area—ditangani sepenuhnya oleh tim KSM. Anda dan keluarga bisa fokus menikmati momen tanpa distraksi.",
       },
       {
         id: "empty",
@@ -1106,9 +1106,9 @@ const messages = {
     about: {
       titleHighlight: "Solusi Katering Terbaik untuk Perusahaan Anda.",
       paragraph1:
-        "Terlahir dari catering korporat di tahun 2007, KSM Catering menjadi catering terbesar di Batam dengan kapasitas hingga 10.000 porsi setiap hari melayani berbagai Perusahaan besar di Batam.",
+        "Terlahir dari katering korporat di tahun 2007, KSM Katering menjadi katering terbesar di Batam dengan kapasitas hingga 10.000 porsi setiap hari melayani berbagai Perusahaan besar di Batam.",
       paragraph2:
-        "Dengan standar mutu yang tinggi, menerapkan standar CPB (Cara Produksi yang Baik) dengan skala yang besar, menjadikan KSM Catering menjadi catering yang dipercaya!",
+        "Dengan standar mutu yang tinggi, menerapkan standar CPB (Cara Produksi yang Baik) dengan skala yang besar, menjadikan KSM Katering menjadi katering yang dipercaya!",
     },
     clientsSection: {
       title: "Dipercaya Oleh Klien Kami",
