@@ -72,7 +72,7 @@ const imageLogosBottom = [
 
 function Client() {
   return (
-    <div className="relative overflow-x-hidden flex flex-col gap-12 mt-16">
+    <div className="relative flex flex-col gap-12 mt-16" style={{ overflowX: 'clip' }}>
       <LogoLoop
         logos={imageLogosTop}
         speed={50}

@@ -167,7 +167,7 @@ export default async function Page() {
         id="klien"
         className="flex w-full flex-col items-center px-6 py-16 sm:py-20"
       >
-        <h2 className="text-3xl font-bold text-[#332929] sm:text-4xl lg:text-5xl">
+        <h2 className="text-center text-3xl font-bold text-[#332929] sm:text-4xl lg:text-5xl">
           {t("clientsSection.title")}
         </h2>
         <Client />
@@ -176,7 +176,7 @@ export default async function Page() {
       <section className="bg-[url('/images/testi.webp')] bg-cover bg-top shadow-[inset_0_0_0_2000px_rgba(255,255,255,0.72)]">
         <div className="mx-auto flex max-w-7xl flex-col items-center gap-10 px-6 py-16 text-center sm:gap-14 sm:py-24">
           <div className="w-full text-[#332929]">
-            <h2 className="text-3xl font-bold uppercase sm:text-4xl lg:text-5xl">
+            <h2 className="text-center text-3xl font-bold text-[#332929] sm:text-4xl lg:text-5xl">
               {t("testimonialsSection.title")}
             </h2>
             <Testimonial />
