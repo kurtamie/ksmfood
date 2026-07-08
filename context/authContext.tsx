@@ -72,15 +72,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     void refreshSession();
+     const handlePageShow = (event: PageTransitionEvent) => {
+    if (event.persisted) {
+      void refreshSession();
+    }
+  };
+
+  window.addEventListener("pageshow", handlePageShow);
+  return () => window.removeEventListener("pageshow", handlePageShow);
   }, [refreshSession]);
 
-  const login = useCallback(
-    (token: string, user: AuthUser) => {
-      setState({ user, token, isLoading: false });
-      void refreshSession();
-    },
-    [refreshSession],
-  );
+  const login = useCallback((token: string, user: AuthUser) => {
+    setState({ user, token, isLoading: false });
+  }, []);
 
   const logout = useCallback(async () => {
     try {

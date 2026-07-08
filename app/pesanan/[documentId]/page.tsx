@@ -7,6 +7,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import type { OrderDetailView } from "@/lib/order-queries";
 import { parseAmount } from "@/lib/order-totals";
+import { getDishSurcharge } from "@/components/landing/services/dish-surcharge";
 import type { OrderDisplayStep } from "@/types/orders";
 import { OrderStepper } from "@/components/OrderStepper";
 import type { InvoiceStatus } from "@/types/invoices";
@@ -28,14 +29,19 @@ function formatOrderDate(value: string | null, locale: string, withTime = false)
   if (!value) return "-";
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return value;
-  return date.toLocaleDateString(locale === "en" ? "en-US" : "id-ID", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-    ...(withTime
-      ? { hour: "2-digit", minute: "2-digit", timeZoneName: "short" }
-      : {}),
-  });
+
+  const localeKey = locale === "en" ? "en-US" : "id-ID";
+  const day = date.getDate();
+  const month = date.toLocaleDateString(localeKey, { month: "short" });
+  const year = date.getFullYear();
+
+  if (!withTime) {
+    return `${day} ${month} ${year}`;
+  }
+
+  const hours = String(date.getHours()).padStart(2, "0");
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+  return `${day} ${month} ${year}, ${hours}.${minutes} WIB`;
 }
 
 type OrderMenuRow = OrderDetailView["orderMenus"][number];
@@ -52,6 +58,27 @@ type OrderDisplayItem = {
   total: number;
 };
 
+type SessionAddOn = { label: string; value?: string; price: number };
+type SessionSummaryItem = {
+  id?: string | number;
+  basePrice?: number | string;
+  quantity?: number | string;
+  addOns?: SessionAddOn[];
+};
+type SessionSummary = {
+  items?: SessionSummaryItem[];
+  orderId?: string | number | null;
+  documentId?: string | null;
+};
+
+type ExtraChargeRow = {
+  key: string;
+  label: string;
+  quantity: number;
+  unitPrice: number;
+  total: number;
+};
+
 type StoredOrderSummaryPayment = {
   orderId?: string | number | null;
   documentId?: string | null;
@@ -62,7 +89,20 @@ type StoredOrderSummaryPayment = {
   midtransOrderId?: string | null;
 };
 
-function buildMenuLabels(menu: OrderMenuRow): string {
+function isTumpengPackage(
+  packageName: string | null,
+  productName: string | null | undefined,
+): boolean {
+  return /tumpeng/i.test(`${packageName ?? ""} ${productName ?? ""}`);
+}
+
+function buildMenuLabels(
+  menu: OrderMenuRow,
+  packageName: string | null,
+  productName: string | null | undefined,
+): string {
+  if (isTumpengPackage(packageName, productName)) return "";
+
   return [
     menu.rice,
     menu.main_dish,
@@ -77,15 +117,58 @@ function buildMenuLabels(menu: OrderMenuRow): string {
     menu.box,
     menu.pudding,
     menu.snack,
+    menu.snack2,
+    menu.snack3,
+    menu.snack4,
   ]
     .filter(Boolean)
     .join(", ");
+}
+
+function getSnackBoxExtraCharge(label: string | null | undefined): number {
+  if (!label) return 0;
+  // If label explicitly includes surcharge marker, honor it
+  if (/\(\+Rp\s*2\.000\)$/.test(label.trim())) return 2000;
+  // Fallback: detect by dish name using shared surcharge list
+  try {
+    const name = label.replace(/\s*\(\+Rp.*\)$/, "").trim();
+    return getDishSurcharge(name);
+  } catch {
+    return 0;
+  }
+}
+
+function buildExtraChargeRowsFromMenus(
+  menus: OrderMenuRow[],
+  details: OrderDetailRow[],
+): ExtraChargeRow[] {
+  return menus.flatMap((menu, menuIndex) => {
+    const quantity =
+      parseAmount(details[menuIndex]?.qty) || parseAmount(details[0]?.qty) || 1;
+
+    return [menu.snack, menu.snack2, menu.snack3, menu.snack4]
+      .map((label) => ({
+        label,
+        surcharge: getSnackBoxExtraCharge(label),
+      }))
+      .filter((entry) => entry.surcharge > 0)
+      .map((entry, addonIndex) => ({
+        key: `${menu.documentId ?? menu.id ?? menuIndex}-snack-${addonIndex}`,
+        label: entry.label
+          ? entry.label.replace(/\s*\(\+Rp\s*2\.000\)$/, "")
+          : "",
+        quantity,
+        unitPrice: entry.surcharge,
+        total: entry.surcharge * quantity,
+      }));
+  });
 }
 
 function toOrderDisplayItems(
   menus: OrderMenuRow[],
   details: OrderDetailRow[],
   packageName: string | null,
+  productName: string | null | undefined,
 ): OrderDisplayItem[] {
   if (details.length === 1) {
     const detail = details[0];
@@ -93,12 +176,19 @@ function toOrderDisplayItems(
     const unitPrice = parseAmount(detail.selling_price);
     const total =
       parseAmount(detail.total_amount ?? detail.amount) || quantity * unitPrice;
+    const displayName = [productName, packageName]
+      .filter(Boolean)
+      .join(" - ");
+    const fallbackName = displayName || "Menu Pesanan";
     return [
       {
         id: String(detail.documentId ?? detail.id ?? "order-detail"),
-        name: packageName ?? "Menu Pesanan",
+        name: fallbackName,
         packageName,
-        addOnLabels: menus.map(buildMenuLabels).filter(Boolean).join(" | "),
+        addOnLabels: menus
+          .map((menu) => buildMenuLabels(menu, packageName, productName))
+          .filter(Boolean)
+          .join(" | "),
         quantity,
         unitPrice,
         total,
@@ -107,6 +197,7 @@ function toOrderDisplayItems(
   }
 
   const rowCount = Math.max(menus.length, details.length);
+  const baseName = [productName, packageName].filter(Boolean).join(" - ") || "Menu Pesanan";
   return Array.from({ length: rowCount }, (_, index) => {
     const menu = menus[index];
     const detail = details[index];
@@ -123,11 +214,12 @@ function toOrderDisplayItems(
           menu?.id ??
           index,
       ),
-      name: packageName
-        ? `${packageName} ${index + 1}`
-        : `Menu Pesanan ${index + 1}`,
+      name:
+        rowCount > 1
+          ? `${baseName} ${index + 1}`
+          : baseName,
       packageName,
-      addOnLabels: menu ? buildMenuLabels(menu) : "",
+      addOnLabels: menu ? buildMenuLabels(menu, packageName, productName) : "",
       quantity,
       unitPrice,
       total,
@@ -276,6 +368,22 @@ export default function OrderDetailPage() {
       `/api/orders/mine/${encodeURIComponent(documentId)}`,
       { cache: "no-store" },
     );
+
+    const contentType = res.headers.get("content-type") ?? "";
+    if (!contentType.includes("application/json")) {
+      // The server returned something other than JSON (e.g. Next.js's
+      // default HTML 404 page), which means the route itself isn't being
+      // matched rather than the order lookup failing.
+      if (res.status === 404) {
+        throw new Error(
+          "Endpoint pesanan tidak ditemukan (404). Periksa apakah route API /api/orders/mine/[documentId] sudah dibuat dengan benar.",
+        );
+      }
+      throw new Error(
+        `Server mengembalikan respons tidak valid (status ${res.status}).`,
+      );
+    }
+
     const json = await res.json();
     if (!res.ok || !json?.success) {
       throw new Error(
@@ -565,15 +673,75 @@ export default function OrderDetailPage() {
   const paid = paymentStatusKey === "paid";
   const paymentOverdue = isOverduePaymentStatus(invoicePaymentStatus);
 
-  const subTotal = order.orderDetails.reduce(
-    (sum, detail) => sum + parseAmount(detail.total_amount ?? detail.amount),
-    0,
-  );
   const orderItems = toOrderDisplayItems(
     order.orderMenus,
     order.orderDetails,
     order.packageName,
+    order.product,
   );
+  const detailSubtotal = orderItems.reduce((sum, item) => sum + item.total, 0);
+  // If a draft/order summary exists in sessionStorage (created from order-info),
+  // prefer showing subtotal and extra charge breakdown from that summary.
+  const sessionSummary: SessionSummary | null = (() => {
+    try {
+      if (typeof window === "undefined") return null;
+      const raw = window.sessionStorage.getItem("ksm_order_summary");
+      if (!raw) return null;
+      const parsed = JSON.parse(raw) as SessionSummary;
+      // Only use the stored summary when it belongs to the same order/document
+      const sameOrderId = parsed?.orderId != null && String(parsed.orderId) === String(order.id);
+      const sameDocumentId = parsed?.documentId != null && parsed.documentId === order.documentId;
+      if (!sameOrderId && !sameDocumentId) return null;
+      return parsed;
+    } catch {
+      return null;
+    }
+  })();
+
+  const extraChargeRowsFromMenus = buildExtraChargeRowsFromMenus(
+    order.orderMenus,
+    order.orderDetails,
+  );
+
+  const extraChargeRows: ExtraChargeRow[] = sessionSummary?.items
+    ? (sessionSummary.items ?? []).flatMap((item: SessionSummaryItem) =>
+        (item.addOns ?? [])
+          .filter((a: SessionAddOn) => Number(a?.price) > 0)
+          .map((a: SessionAddOn) => ({
+            key: `${item.id}-${a.value ?? a.label}`,
+            label: a.label,
+            quantity: Number(item.quantity) || 1,
+            unitPrice: Number(a.price) || 0,
+            total: (Number(a.price) || 0) * (Number(item.quantity) || 1),
+          })),
+      )
+    : extraChargeRowsFromMenus;
+
+  const extraChargeTotal = extraChargeRows.reduce((s, r) => s + r.total, 0);
+
+  const sessionBaseSubtotal: number | null = sessionSummary?.items
+    ? sessionSummary.items.reduce((sum: number, item: SessionSummaryItem) => {
+        const base = Number(item.basePrice) || 0;
+        const qty = Number(item.quantity) || 1;
+        return sum + base * qty;
+      }, 0)
+    : extraChargeTotal > 0
+    ? order.total - extraChargeTotal
+    : null;
+
+  const itemDisplayTotals = orderItems.map((item, index) => {
+    const sessionItem = sessionSummary?.items?.[index];
+    if (!sessionItem) return item.total;
+
+    const basePrice = Number(sessionItem.basePrice) || 0;
+    const quantity = Number(sessionItem.quantity) || 1;
+    const addOnTotal = (sessionItem.addOns ?? []).reduce(
+      (sum, addOn) => sum + (Number(addOn.price) || 0),
+      0,
+    );
+
+    return basePrice * quantity + addOnTotal * quantity;
+  });
   const displayOrderStep = getDisplayOrderStep(
     order.step,
     invoicePaymentStatus,
@@ -678,107 +846,117 @@ export default function OrderDetailPage() {
               <OrderStepper
                 currentStep={displayOrderStep}
                 isExpired={paymentOverdue}
+                bannerAction={
+                  displayOrderStep === "success" && order.imageReceive?.length ? (
+                    <a
+                      href={
+                        order.imageReceive[0]?.url ?? order.imageReceive[0]?.previewUrl ?? "#"
+                      }
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex text-xs font-semibold text-primary-600 hover:underline"
+                    >
+                      {t("proofLink")}
+                    </a>
+                  ) : null
+                }
               />
             </div>
           ) : null}
 
-          {/* Tanggal pemesanan & no. invoice */}
-          <div className="grid grid-cols-1 divide-y divide-gray-100 border-b border-gray-100 sm:grid-cols-2 sm:divide-x sm:divide-y-0">
-            <div className="flex items-center justify-between px-6 py-3 text-sm">
-              <span className="text-secondary-500">{t("orderedAt")}</span>
-              <span className="font-medium text-tertiary-900">
-                {formatOrderDate(order.createdAt, locale, true)}
-              </span>
-            </div>
-            <div className="flex items-center justify-between px-6 py-3 text-sm">
-              <span className="text-secondary-500">{t("invoiceNo")}</span>
-              <span className="font-medium text-tertiary-900">
-                {order.invoiceNo ??
-                  primaryInvoice?.invoice_no ??
-                  order.orderNo ??
-                  order.documentId ??
-                  "-"}
-              </span>
-            </div>
-          </div>
+          {/* Tanggal pemesanan & nomor tagihan */}
+          <div className="grid gap-4 text-sm md:grid-cols-2 px-6 py-3">
+              <div className="flex gap-4">
+                <span className="w-36 shrink-0 text-[#6B7280]">
+                  {t("orderedAt")}
+                </span>
+                <span className="text-tertiary-900">
+                  : {formatOrderDate(order.createdAt, locale, true)}
+                </span>
+              </div>
+              <div className="flex gap-4">
+                <span className="w-36 shrink-0 text-[#6B7280]">
+                  {t("invoiceNo")}
+                </span>
+                <span className="text-tertiary-900">
+                  : {order.invoiceNo ??
+                    primaryInvoice?.invoice_no ??
+                    order.orderNo ??
+                    order.documentId ??
+                    "-"}
+                </span>
+              </div>
+           </div>
 
           {/* Informasi pengiriman */}
           <div className="border-b border-gray-100 px-6 py-4">
             <p className="mb-3 text-sm font-semibold text-tertiary-900">
               {t("deliveryInfo")}
             </p>
-            <div className="space-y-2 text-sm">
-              {/* Nama penerima */}
-              {order.recipientName ? (
-                <div className="flex gap-4">
-                  <span className="w-36 shrink-0 text-secondary-500">
-                    {t("recipientName")}
-                  </span>
-                  <span className="text-tertiary-900">
-                    : {order.recipientName}
-                  </span>
-                </div>
-              ) : null}
+            <div className="grid gap-4 text-sm md:grid-cols-2">
+              <div className="space-y-2">
+                {order.recipientName ? (
+                  <div className="flex gap-4">
+                    <span className="w-36 shrink-0 text-[#6B7280]">
+                      {t("recipientName")}
+                    </span>
+                    <span className="text-tertiary-900">
+                      : {order.recipientName}
+                    </span>
+                  </div>
+                ) : null}
 
-              {/* No. telepon penerima — sudah ada, pastikan tetap ada */}
-              {order.recipientPhone ? (
                 <div className="flex gap-4">
-                  <span className="w-36 shrink-0 text-secondary-500">
-                    {t("phoneNo")}
+                  <span className="w-36 shrink-0 text-[#6B7280]">
+                    {t("deliveryMethod")}
                   </span>
                   <span className="text-tertiary-900">
-                    : {order.recipientPhone}
+                    : {t("deliveryByKsm")}
                   </span>
                 </div>
-              ) : null}
+                <div className="flex gap-4">
+                  <span className="w-36 shrink-0 text-[#6B7280]">
+                    {t("deliveryDate")}
+                  </span>
+                  <span className="text-tertiary-900">
+                    :{" "}
+                    {order.deliveryDate
+                      ? `${formatOrderDate(order.deliveryDate, locale)}${order.arriveTime ? " " + order.arriveTime : ""}`
+                      : "-"}
+                  </span>
+                </div>
+              </div>
 
-              <div className="flex gap-4">
-                <span className="w-36 shrink-0 text-secondary-500">
-                  {t("deliveryMethod")}
-                </span>
-                <span className="text-tertiary-900">
-                  : {t("deliveryByKsm")}
-                </span>
-              </div>
-              <div className="flex gap-4">
-                <span className="w-36 shrink-0 text-secondary-500">
-                  {t("deliveryDate")}
-                </span>
-                <span className="text-tertiary-900">
-                  :{" "}
-                  {order.deliveryDate
-                    ? `${formatOrderDate(order.deliveryDate, locale)}${order.arriveTime ? " " + order.arriveTime : ""}`
-                    : "-"}
-                </span>
-              </div>
-              <div className="flex gap-4">
-                <span className="w-36 shrink-0 text-secondary-500">{t("address")}</span>
-                <div className="text-tertiary-900">
-                  <p className="whitespace-pre-line">
-                    : {order.deliveryAddress || "-"}
-                  </p>
-                </div>
-              </div>
-              {order.recipientPhone ? (
+              <div className="space-y-2">
                 <div className="flex gap-4">
-                  <span className="w-36 shrink-0 text-secondary-500">
-                    {t("phoneNo")}
-                  </span>
-                  <span className="text-tertiary-900">
-                    : {order.recipientPhone}
-                  </span>
+                  <span className="w-36 shrink-0 text-[#6B7280]">{t("address")}</span>
+                  <div className="min-w-0 flex-1 text-tertiary-900">
+                    <p className="whitespace-pre-line">
+                      : {order.deliveryAddress || "-"}
+                    </p>
+                  </div>
                 </div>
-              ) : null}
-              {order.deliveryNote ? (
-                <div className="flex gap-4">
-                  <span className="w-36 shrink-0 text-secondary-500">
-                    {t("notes")}
-                  </span>
-                  <span className="text-tertiary-900">
-                    : {order.deliveryNote}
-                  </span>
-                </div>
-              ) : null}
+                {order.recipientPhone ? (
+                  <div className="flex gap-4">
+                    <span className="w-36 shrink-0 text-[#6B7280]">
+                      {t("phoneNo")}
+                    </span>
+                    <span className="text-tertiary-900">
+                      : {order.recipientPhone}
+                    </span>
+                  </div>
+                ) : null}
+                {order.deliveryNote ? (
+                  <div className="flex gap-4">
+                    <span className="w-36 shrink-0 text-[#6B7280]">
+                      {t("notes")}
+                    </span>
+                    <span className="text-tertiary-900">
+                      : {order.deliveryNote}
+                    </span>
+                  </div>
+                ) : null}
+              </div>
             </div>
           </div>
 
@@ -789,7 +967,7 @@ export default function OrderDetailPage() {
             </p>
             <div className="space-y-3">
               {orderItems.length > 0 ? (
-                orderItems.map((item) => (
+                orderItems.map((item, index) => (
                   <div
                     key={item.id}
                     className="rounded-xl border border-gray-100 bg-gray-50 px-4 py-3"
@@ -805,16 +983,18 @@ export default function OrderDetailPage() {
                           </p>
                         ) : null}
                       </div>
-                      <p className="shrink-0 text-right text-sm text-secondary-500">
+                      <p className="shrink-0 text-right text-sm text-secondary-700">
                         {formatRupiah(item.unitPrice)} / {t("unit")}
                       </p>
                     </div>
                     <div className="mt-3 flex items-center justify-between border-t border-gray-100 pt-2 text-sm">
-                      <span className="text-secondary-500">
+                      <span className="text-secondary-700">
                         {t("qty")}: {item.quantity} {t("unit")}
                       </span>
                       <span className="font-semibold text-tertiary-900">
-                        {formatRupiah(item.total)}
+                        {sessionSummary != null && extraChargeTotal > 0
+                          ? formatRupiah(itemDisplayTotals[index])
+                          : formatRupiah(item.total)}
                       </span>
                     </div>
                   </div>
@@ -827,36 +1007,54 @@ export default function OrderDetailPage() {
             </div>
           </div>
 
-          {/* Rincian pembayaran + lacak pesanan */}
-          <div className="px-6 py-4">
-            <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
-              {/* Rincian biaya */}
-              <div className="flex-1">
-                <p className="mb-3 text-sm font-semibold text-tertiary-900">
-                  {t("paymentDetails")}
-                </p>
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between text-secondary-600">
+          {/* Payment details */}
+          <div className="border-b border-gray-100 px-6 py-4">
+            <p className="mb-3 text-sm font-semibold text-tertiary-900">
+              {t("paymentDetails")}
+            </p>
+              <div className="space-y-3 text-sm text-secondary-700">
+              {sessionBaseSubtotal != null && extraChargeTotal > 0 ? (
+                <>
+                  <div className="flex justify-between text-sm text-secondary-600">
                     <span>{t("subtotal")}</span>
-                    <span>{formatRupiah(subTotal || order.total)}</span>
+                    <span>{formatRupiah(sessionBaseSubtotal)}</span>
                   </div>
-                  <div className="flex justify-between border-t border-gray-100 pt-2 font-semibold text-tertiary-900">
+                  {extraChargeRows.map((row) => (
+                    <div
+                      key={row.key}
+                      className="flex justify-between text-sm text-secondary-600"
+                    >
+                      <span className="min-w-0">
+                        {t("extraCharge")}: {row.label}
+                        <span className="block text-secondary-500">
+                          {row.quantity} x {formatRupiah(row.unitPrice)}
+                        </span>
+                      </span>
+                      <span className="shrink-0">{formatRupiah(row.total)}</span>
+                    </div>
+                  ))}
+
+                  <div className="border-t border-gray-100 pt-2 text-base font-semibold text-tertiary-900">
+                    <div className="flex justify-between">
+                      <span>{t("total")}</span>
+                      <span>{formatRupiah(order.total)}</span>
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <>
+                  {detailSubtotal === order.total ? (
+                    <div className="flex justify-between">
+                      <span>{t("subtotal")}</span>
+                      <span>{formatRupiah(detailSubtotal)}</span>
+                    </div>
+                  ) : null}
+                  <div className="flex justify-between items-center border-t border-gray-100 pt-3 text-lg font-semibold text-tertiary-900">
                     <span>{t("total")}</span>
                     <span>{formatRupiah(order.total)}</span>
                   </div>
-                </div>
-              </div>
-
-              {/* Status pengiriman + lacak */}
-              <div className="flex flex-col gap-3 sm:items-end">
-                {/* {orderStepLabel ? (
-                  <div className="rounded-xl border border-primary-200 bg-primary-50 px-4 py-3 text-sm">
-                    <p className="font-semibold text-primary-700">
-                      {orderStepLabel}
-                    </p>
-                  </div>
-                ) : null} */}
-              </div>
+                </>
+              )}
             </div>
           </div>
         </div>

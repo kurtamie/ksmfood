@@ -19,10 +19,11 @@ import {
 } from "../ui/dropdown-menu";
 import LanguageSwitcher from "./language-switcher";
 import { useCart } from "@/components/CartContext";
-import CartSidebar from "@/components/CartSideBar";
+// import CartSidebar from "@/components/CartSideBar";
 import AuthModal from "@/components/auth/AuthModal";
 import LogoutConfirmDialog from "@/components/auth/logout-confirm-dialog";
 import { useAuth } from "@/context/authContext";
+import { toastSuccess } from "@/lib/sonnerToast";
 
 const navLinkClassName =
   "text-sm font-bold text-gray-700 transition-colors hover:text-gray-900";
@@ -142,7 +143,7 @@ function Header() {
             {isLoggedIn ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <button className="flex items-center justify-center size-11 rounded-full border border-red-100 bg-red-50 text-[#8D0000] hover:bg-red-100 transition-colors">
+                  <button className="flex items-center h-11 px-4 gap-4 rounded-full border border-red-100 bg-red-50 text-[#8D0000] hover:bg-red-100 transition-colors">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       width="18"
@@ -157,6 +158,10 @@ function Header() {
                       <circle cx="12" cy="8" r="4" />
                       <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
                     </svg>
+                      <span className="text-sm font-semibold max-w-[160px] truncate">
+                      {user?.username}
+                    </span>
+                    <FaChevronDown className="size-3 opacity-60" />
                   </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-56" align="end">
@@ -413,8 +418,9 @@ function Header() {
       <AuthModal
         isOpen={isAuthOpen}
         onClose={() => setIsAuthOpen(false)}
-        onSuccess={() => {
-          void refreshSession();
+        onSuccess={async (username) => {
+          await refreshSession();
+          toastSuccess(`Selamat datang, ${username}! 👋`, { position: "top-right" });
           const redirect = searchParams.get("redirect");
           if (redirect?.startsWith("/")) {
             router.push(redirect);
@@ -432,47 +438,47 @@ function Header() {
   );
 }
 
-// ─── Cart Button ──────────────────────────────────────────────────────────────
+// // ─── Cart Button ──────────────────────────────────────────────────────────────
 
-function CartButton({
-  totalQuantity,
-  onClick,
-}: {
-  totalQuantity: number;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      aria-label={`Buka keranjang, ${totalQuantity} pesanan`}
-      className="relative flex size-11 items-center justify-center rounded-full border border-red-100 bg-red-50 text-[#8D0000] transition hover:bg-red-100"
-    >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="18"
-        height="18"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        aria-hidden="true"
-      >
-        <circle cx="9" cy="21" r="1" />
-        <circle cx="20" cy="21" r="1" />
-        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
-      </svg>
+// function CartButton({
+//   totalQuantity,
+//   onClick,
+// }: {
+//   totalQuantity: number;
+//   onClick: () => void;
+// }) {
+//   return (
+//     <button
+//       type="button"
+//       onClick={onClick}
+//       aria-label={`Buka keranjang, ${totalQuantity} pesanan`}
+//       className="relative flex size-11 items-center justify-center rounded-full border border-red-100 bg-red-50 text-[#8D0000] transition hover:bg-red-100"
+//     >
+//       <svg
+//         xmlns="http://www.w3.org/2000/svg"
+//         width="18"
+//         height="18"
+//         viewBox="0 0 24 24"
+//         fill="none"
+//         stroke="currentColor"
+//         strokeWidth="2"
+//         strokeLinecap="round"
+//         strokeLinejoin="round"
+//         aria-hidden="true"
+//       >
+//         <circle cx="9" cy="21" r="1" />
+//         <circle cx="20" cy="21" r="1" />
+//         <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
+//       </svg>
 
-      {totalQuantity > 0 && (
-        <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-[#8D0000] px-1 text-[10px] font-bold text-white">
-          {totalQuantity > 99 ? "99+" : totalQuantity}
-        </span>
-      )}
-    </button>
-  );
-}
+//       {totalQuantity > 0 && (
+//         <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-[#8D0000] px-1 text-[10px] font-bold text-white">
+//           {totalQuantity > 99 ? "99+" : totalQuantity}
+//         </span>
+//       )}
+//     </button>
+//   );
+// }
 
 // ─── Dropdown Section ─────────────────────────────────────────────────────────
 

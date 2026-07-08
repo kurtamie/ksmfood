@@ -18,6 +18,28 @@ function formatRupiah(amount: number | undefined) {
   }).format(amount ?? 0);
 }
 
+function formatDeliverySchedule(dateStr?: string, timeStr?: string) {
+  if (!dateStr) return "-";
+  const d = new Date(dateStr);
+  if (Number.isNaN(d.getTime())) {
+    return dateStr + (timeStr ? ", " + timeStr : "");
+  }
+  const day = d.getDate();
+  const month = d.toLocaleDateString("id-ID", { month: "short" });
+  const year = d.getFullYear();
+
+  let time = timeStr ?? "";
+  if (time && time.length === 5) time = time + ":00";
+  if (!time) {
+    const hh = String(d.getHours()).padStart(2, "0");
+    const mm = String(d.getMinutes()).padStart(2, "0");
+    const ss = String(d.getSeconds()).padStart(2, "0");
+    time = `${hh}:${mm}:${ss}`;
+  }
+
+  return `${day} ${month} ${year}, ${time}`;
+}
+
 type OrderItem = {
   id: string;
   name: string;
@@ -28,6 +50,7 @@ type OrderItem = {
 
 type OrderSummary = {
   orderId: string | number | null;
+  orderNo?: string;
   documentId?: string | null;
   deliveryDate?: string;
   deliveryTime?: string;
@@ -41,9 +64,6 @@ type OrderSummary = {
   recipientPhone?: string;
   notes?: string;
   items?: OrderItem[];
-  totals?: {
-    subtotal?: number;
-  };
   invoiceId?: number | null;
   invoiceDocumentId?: string | null;
   snapToken?: string | null;
@@ -62,14 +82,6 @@ function calculateTotal(items: OrderItem[] | undefined): number {
     const unitPrice = item.basePrice + addOnTotal;
     return sum + unitPrice * item.quantity;
   }, 0);
-}
-
-function getSummarySubtotal(summary: OrderSummary | null): number {
-  const savedSubtotal = summary?.totals?.subtotal;
-  if (typeof savedSubtotal === "number" && Number.isFinite(savedSubtotal)) {
-    return savedSubtotal;
-  }
-  return calculateTotal(summary?.items);
 }
 
 export default function OrderSummaryPage() {
@@ -101,7 +113,15 @@ export default function OrderSummaryPage() {
     }
   }, [router, summary]);
 
-  const total = useMemo(() => getSummarySubtotal(summary), [summary]);
+  const total = useMemo(() => calculateTotal(summary?.items), [summary?.items]);
+  const baseSubtotal = useMemo(() => {
+    if (!summary?.items || summary.items.length === 0) return 0;
+    return summary.items.reduce(
+      (sum, item) => sum + item.basePrice * item.quantity,
+      0,
+    );
+  }, [summary?.items]);
+
   const extraChargeRows = useMemo(
     () =>
       (summary?.items ?? []).flatMap((item) =>
@@ -116,6 +136,11 @@ export default function OrderSummaryPage() {
           })),
       ),
     [summary?.items],
+  );
+
+  const extraChargeTotal = useMemo(
+    () => extraChargeRows.reduce((sum, row) => sum + row.total, 0),
+    [extraChargeRows],
   );
 
   const numericOrderId = useMemo(() => {
@@ -339,12 +364,12 @@ export default function OrderSummaryPage() {
           </div>
         </div>
 
-        <h1 className="mb-1 text-center text-xl font-semibold text-tertiary-900">
+        <h1 className="mb-6 text-center text-xl font-semibold text-tertiary-900">
           {t("steps.summary")}
         </h1>
-        <p className="mb-6 text-center text-xs text-secondary-500">
-          Order ID: {documentId ?? summary.documentId ?? summary.orderId ?? "-"}
-        </p>
+        {/* <p className="mb-6 text-center text-xs text-secondary-500">
+          Nomor Tagihan: {summary.orderId ?? documentId ?? "-"}
+        </p> */}
 
         {paymentMessage ? (
           <p className="mb-4 text-center text-sm text-green-700">
@@ -355,13 +380,69 @@ export default function OrderSummaryPage() {
           <p className="mb-4 text-center text-sm text-red-600">{payError}</p>
         ) : null}
 
-        <div className="grid grid-cols-1 gap-5 xl:grid-cols-[1.6fr_1fr]">
-          {/* Kolom kiri — detail pesanan */}
-          <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+        <div className="mx-auto max-w-3xl rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+          {/* Section 1 — Informasi Pengiriman (gabungan shippingAddress + deliverySchedule) */}
+          <div>
+            <h2 className="mb-3 text-sm font-semibold text-tertiary-900">
+              {t("shippingAddress")}
+            </h2>
+            <div className="grid grid-cols-1 gap-x-8 gap-y-3 text-sm text-secondary-600 sm:grid-cols-2">
+              <div>
+                <div className="text-xs text-[#6B7280]">Nama Penerima</div>
+                <p className="mt-1 text-sm text-tertiary-900">
+                  {summary.recipientName ?? "-"}
+                </p>
+              </div>
+
+              <div>
+                <div className="text-xs text-[#6B7280]">Alamat Pengiriman</div>
+                <p className="mt-1 text-sm text-tertiary-900">
+                  {summary.addressLine || summary.subdistrict ? (
+                    <>
+                      {summary.addressName ? (
+                        <>
+                          {summary.addressName}
+                          <br />
+                        </>
+                      ) : null}
+                      {summary.addressLine || "-"}
+                      {summary.subdistrict ? ", " + summary.subdistrict : ""}
+                    </>
+                  ) : (
+                    "-"
+                  )}
+                </p>
+              </div>
+
+              <div>
+                <div className="text-xs text-[#6B7280]">{t("deliverySchedule")}</div>
+                <p className="mt-1 text-sm text-tertiary-900">
+                  {formatDeliverySchedule(summary.deliveryDate, summary.deliveryTime)}
+                </p>
+              </div>
+
+              <div>
+                <div className="text-xs text-[#6B7280]">Nomor Telepon</div>
+                <p className="mt-1 text-sm text-tertiary-900">
+                  {summary.recipientPhone ?? "-"}
+                </p>
+              </div>
+
+              {summary.notes ? (
+                <div className="sm:col-span-2">
+                  <div className="text-xs text-[#6B7280]">Catatan Pengiriman</div>
+                  <p className="mt-1 text-sm text-secondary-700">{summary.notes}</p>
+                </div>
+              ) : null}
+            </div>
+          </div>
+
+          {/* Section 2 — Detail Pesanan */}
+          <div className="mt-6 border-t border-gray-200 pt-5">
             <h2 className="mb-1 text-sm font-semibold text-tertiary-900">
               {t("orderDetails")}
             </h2>
-            <p className="mb-4 text-xs text-secondary-500">
+            <p className="mb-4 text-xs text-[#6B7280]">
               {t("itemCount", {
                 count: summary.items?.length ?? 0,
                 items: new Set(summary.items?.map((i) => i.id)).size,
@@ -374,7 +455,6 @@ export default function OrderSummaryPage() {
                 const unitPrice =
                   item.basePrice +
                   item.addOns.reduce((sum, a) => sum + a.price, 0);
-                const itemTotal = unitPrice * item.quantity;
                 return (
                   <div
                     key={item.id}
@@ -385,98 +465,72 @@ export default function OrderSummaryPage() {
                         {item.name}
                       </p>
                       {addOnLabels && (
-                        <p className="mt-0.5 text-xs text-secondary-500">
+                        <p className="mt-0.5 text-xs text-[#6B7280]">
                           + {addOnLabels}
                         </p>
                       )}
                     </div>
                     <div className="shrink-0 text-right">
-                      <p className="text-xs text-secondary-500">
+                      <p className="text-xs text-[#6B7280]">
                         {item.quantity} × {formatRupiah(unitPrice)}
                       </p>
                       <p className="text-sm font-semibold text-tertiary-900">
-                        {formatRupiah(itemTotal)}
+                        {formatRupiah(baseSubtotal)}
                       </p>
                     </div>
                   </div>
                 );
               })}
             </div>
+          </div>
 
-            <div className="mt-4 space-y-2 border-t border-gray-200 pt-4">
-              {extraChargeRows.map((row) => (
-                <div
-                  key={row.key}
-                  className="flex items-start justify-between gap-3 text-xs text-secondary-600"
-                >
-                  <span className="min-w-0">
-                    {t("extraCharge")}: {row.label}
-                    <span className="block text-secondary-500">
-                      {row.quantity} x {formatRupiah(row.unitPrice)}
-                    </span>
-                  </span>
-                  <span className="shrink-0">{formatRupiah(row.total)}</span>
+          {/* Section 3 — Rincian Pembayaran */}
+          <div className="mt-4 space-y-2 border-t border-gray-200 pt-4">
+            {extraChargeTotal > 0 ? (
+              <>
+                <div className="flex justify-between text-sm text-tertiary-900">
+                  <span>{t("subtotal")}</span>
+                  <span>{formatRupiah(baseSubtotal)}</span>
                 </div>
-              ))}
-              <div className="flex items-center justify-between text-sm font-semibold text-tertiary-900">
-                <span>{t("subtotal")}</span>
+                {extraChargeRows.map((row) => (
+                  <div
+                    key={row.key}
+                    className="flex justify-between text-sm text-[#6B7280]"
+                  >
+                    <span className="min-w-0">
+                      {t("extraCharge")}: {row.label}
+                      <span className="block text-[#6B7280]">
+                        {row.quantity} x {formatRupiah(row.unitPrice)}
+                      </span>
+                    </span>
+                    <span className="shrink-0">{formatRupiah(row.total)}</span>
+                  </div>
+                ))}
+                <div className="border-t border-gray-200 pt-2 text-base font-semibold text-tertiary-900">
+                  <div className="flex justify-between">
+                    <span>{t("total")}</span>
+                    <span>{formatRupiah(total)}</span>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <div className="flex justify-between text-base font-semibold text-tertiary-900">
+                <span>{t("total")}</span>
                 <span>{formatRupiah(total)}</span>
               </div>
-            </div>
-
-            <div className="mt-4 flex items-center justify-between border-t border-gray-200 pt-4 text-base font-semibold text-tertiary-900">
-              <span>{t("payableTotal")}</span>
-              <span>{formatRupiah(total)}</span>
-            </div>
+            )}
           </div>
+        </div>
 
-          {/* Kolom kanan */}
-          <div className="flex flex-col gap-4">
-            <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-              <h2 className="mb-3 text-sm font-semibold text-tertiary-900">
-                {t("shippingAddress")}
-              </h2>
-              <div className="space-y-1 text-sm text-secondary-600">
-                {summary.addressName && <p>{summary.addressName}</p>}
-                <p>{summary.addressLine || "-"}</p>
-                <p>{summary.subdistrict || "-"}</p>
-                {(summary.recipientName || summary.recipientPhone) && (
-                  <p className="pt-1 text-xs text-secondary-500">
-                    {summary.recipientName || "-"} •{" "}
-                    {summary.recipientPhone || "-"}
-                  </p>
-                )}
-              </div>
-            </div>
-
-            <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-              <h2 className="mb-3 text-sm font-semibold text-tertiary-900">
-                {t("deliverySchedule")}
-              </h2>
-              <div className="space-y-1 text-sm text-secondary-600">
-                <p>
-                  {t("deliveryDateLabel")}:{" "}
-                  {summary.deliveryDate
-                    ? `${summary.deliveryDate}${summary.deliveryTime ? " " + summary.deliveryTime : ""}`
-                    : "-"}
-                </p>
-                {summary.notes && (
-                  <p className="pt-1 text-xs text-secondary-500">
-                    {t("notesLabel")}: {summary.notes}
-                  </p>
-                )}
-              </div>
-            </div>
-
-            <button
-              type="button"
-              onClick={() => void handlePayNow()}
-              disabled={isPaying || total <= 0}
-              className="w-full rounded-xl bg-primary-600 py-3 text-sm font-semibold text-white transition-colors hover:bg-primary-700 disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              {isPaying ? t("actions.openingPayment") : t("actions.payNow")}
-            </button>
-          </div>
+        <div className="mx-auto mt-5 max-w-3xl">
+          <button
+            type="button"
+            onClick={() => void handlePayNow()}
+            disabled={isPaying || total <= 0}
+            className="w-full rounded-xl bg-primary-600 py-3 text-sm font-semibold text-white transition-colors hover:bg-primary-700 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {isPaying ? t("actions.openingPayment") : t("actions.payNow")}
+          </button>
         </div>
       </div>
     </>

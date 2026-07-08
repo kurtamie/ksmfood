@@ -8,9 +8,9 @@ import {
   resetPasswordWithPhoneService,
   sendOtpService,
   verifyOtpService,
+  verifyPasswordResetOtpService,
   type LoginPayload,
   type RegisterPayload,
-  type ResetPasswordPayload,
   type SendOtpPayload,
   type VerifyOtpPayload,
   type AuthUser,
@@ -20,6 +20,7 @@ import {
   hasAuthFieldErrors,
   validatePassword,
   validatePasswordConfirmation,
+  validatePasswordLogin,
   validatePhoneNo,
   validateUsername,
 } from "@/lib/auth-validation";
@@ -70,7 +71,7 @@ export async function loginAction(
   try {
     const fieldErrors: AuthFieldErrors = {
       phone_no: validatePhoneNo(payload.phone_no),
-      password: validatePassword(payload.password),
+      password: validatePasswordLogin(payload.password),
     };
 
     if (hasAuthFieldErrors(fieldErrors)) {
@@ -87,10 +88,7 @@ export async function loginAction(
   } catch (err) {
     return {
       success: false,
-      error: extractMessage(
-        err,
-        "Login gagal. Periksa nomor dan password Anda.",
-      ),
+      error: extractMessage(err, "Login gagal. Periksa nomor dan password Anda."),
     };
   }
 }
@@ -114,8 +112,8 @@ export async function sendOtpAction(
     if (await isPhoneNoRegisteredService(payload.phone_no)) {
       return {
         success: false,
-        error: "Nomor Hp sudah terdaftar",
-        fieldErrors: { phone_no: ["Nomor Hp sudah terdaftar"] },
+        error: "Nomor whatsapp sudah terdaftar",
+        fieldErrors: { phone_no: ["Nomor whatsapp sudah terdaftar"] },
       };
     }
 
@@ -148,8 +146,8 @@ export async function sendPasswordResetOtpAction(
     if (!(await isPhoneNoRegisteredService(payload.phone_no))) {
       return {
         success: false,
-        error: "Nomor Hp tidak terdaftar",
-        fieldErrors: { phone_no: ["Nomor Hp tidak terdaftar"] },
+        error: "Nomor whatsapp tidak terdaftar",
+        fieldErrors: { phone_no: ["Nomor whatsapp tidak terdaftar"] },
       };
     }
 
@@ -177,9 +175,10 @@ export async function verifyOtpAction(
   }
 }
 
+// Khusus untuk flow lupa password — mengembalikan resetToken sekali pakai
 export async function verifyPasswordResetOtpAction(
   payload: VerifyOtpPayload,
-): Promise<ActionResult> {
+): Promise<ActionResult<{ resetToken: string }>> {
   try {
     const fieldErrors: AuthFieldErrors = {
       phone_no: validatePhoneNo(payload.phone_no),
@@ -193,16 +192,8 @@ export async function verifyPasswordResetOtpAction(
       };
     }
 
-    if (!(await isPhoneNoRegisteredService(payload.phone_no))) {
-      return {
-        success: false,
-        error: "Nomor Hp tidak terdaftar",
-        fieldErrors: { phone_no: ["Nomor Hp tidak terdaftar"] },
-      };
-    }
-
-    await verifyOtpService(payload);
-    return { success: true };
+    const result = await verifyPasswordResetOtpService(payload);
+    return { success: true, data: { resetToken: result.resetToken } };
   } catch (err) {
     return {
       success: false,
@@ -211,12 +202,15 @@ export async function verifyPasswordResetOtpAction(
   }
 }
 
-export async function resetPasswordWithPhoneAction(
-  payload: ResetPasswordPayload,
-): Promise<ActionResult> {
+// Pakai reset_token (bukan otp_code) — OTP sudah diverifikasi di step sebelumnya
+export async function resetPasswordWithPhoneAction(payload: {
+  phone_no: string;
+  reset_token: string;
+  password: string;
+  password_confirmation: string;
+}): Promise<ActionResult> {
   try {
     const fieldErrors: AuthFieldErrors = {
-      phone_no: validatePhoneNo(payload.phone_no),
       password: validatePassword(payload.password),
       password_confirmation: validatePasswordConfirmation(
         payload.password,
@@ -224,27 +218,11 @@ export async function resetPasswordWithPhoneAction(
       ),
     };
 
-    if (payload.otp_code.length < 6) {
-      return {
-        success: false,
-        error: "Masukkan 6 digit kode OTP.",
-        fieldErrors,
-      };
-    }
-
     if (hasAuthFieldErrors(fieldErrors)) {
       return {
         success: false,
         error: "Periksa kembali data yang diisi.",
         fieldErrors,
-      };
-    }
-
-    if (!(await isPhoneNoRegisteredService(payload.phone_no))) {
-      return {
-        success: false,
-        error: "Nomor Hp tidak terdaftar",
-        fieldErrors: { phone_no: ["Nomor Hp tidak terdaftar"] },
       };
     }
 
@@ -273,14 +251,6 @@ export async function registerAction(
         success: false,
         error: "Periksa kembali data yang diisi.",
         fieldErrors,
-      };
-    }
-
-    if (await isPhoneNoRegisteredService(payload.phone_no)) {
-      return {
-        success: false,
-        error: "Nomor Hp sudah terdaftar",
-        fieldErrors: { phone_no: ["Nomor Hp sudah terdaftar"] },
       };
     }
 

@@ -315,7 +315,23 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     const data: OpenAIResponse = await response.json();
     const reply = data.choices[0]?.message?.content ?? "";
 
-    return NextResponse.json({ reply });
+    function sanitizeReply(text: string): string {
+      if (!text) return text;
+      let s = String(text);
+      // Convert lines starting with '*' or '•' to '- '
+      s = s.replace(/^\s*[\*•]\s+/gm, "- ");
+      // Remove bold/italic markers using asterisks or underscores
+      s = s.replace(/\*\*([\s\S]*?)\*\*/g, "$1");
+      s = s.replace(/\*([\s\S]*?)\*/g, "$1");
+      s = s.replace(/_([\s\S]*?)_/g, "$1");
+      // Collapse repeated hyphens from list conversions (optional cleanup)
+      s = s.replace(/^-\s+-\s+/gm, "- ");
+      return s;
+    }
+
+    const sanitized = sanitizeReply(reply);
+
+    return NextResponse.json({ reply: sanitized });
   } catch (error) {
     console.error("Server error:", error);
     return NextResponse.json(

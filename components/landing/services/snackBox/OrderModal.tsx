@@ -47,21 +47,21 @@ interface SnackOrderModalProps {
 // Jumlah kue per paket
 const kueCountMap: Record<string, number> = {
   A: 2,
-  B: 2,
-  C: 3,
-  D: 3,
-  E: 4,
+  B: 3,
+  C: 4,
+  D: 2,
+  E: 3,
   F: 4,
 };
 
 // Minuman per paket (read-only)
 const minumanMap: Record<string, string> = {
   A: "Air Mineral Gelas",
-  B: "Teh Kotak",
+  B: "Air Mineral Gelas",
   C: "Air Mineral Gelas",
   D: "Teh Kotak",
-  E: "Air Mineral Gelas",
   F: "Teh Kotak",
+  E: "Teh Kotak",
 };
 
 type KueSelection = { kategori: string; menu: string };
@@ -89,9 +89,9 @@ export function SnackOrderModal({
   const [kueList, setKueList] = useState<KueSelection[]>(
     Array.from({ length: kueCount }, () => ({ kategori: "", menu: "" })),
   );
-  const [jumlahStr, setJumlahStr] = useState("100");
+  const [jumlahStr, setJumlahStr] = useState("1");
   const jumlah = parseInt(jumlahStr) || 0;
-  const jumlahError = jumlah < 100;
+  const jumlahError = jumlah < 1;
 
   const priceNumber = parseInt(card.price.replace(/[^0-9]/g, ""), 10);
 
@@ -310,9 +310,8 @@ export function SnackOrderModal({
               </p>
             )}
 
-            {/* Subtotal */}
             <div className={fieldClass}>
-              <span className={labelClass}>{modalT("fields.subtotal")}</span>
+              <span className={labelClass}>{modalT("fields.total")}</span>
               <span className="text-2xl font-bold">
                 Rp {subtotal.toLocaleString("id-ID")}
               </span>

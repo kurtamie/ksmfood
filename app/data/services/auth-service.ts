@@ -13,6 +13,8 @@ function normalizePhone(phone: string): string {
 
 export type AuthUser = User;
 
+// ─── Interfaces ───────────────────────────────────────────────────────────────
+
 export interface LoginPayload {
   phone_no: string;
   password: string;
@@ -35,9 +37,15 @@ export interface RegisterPayload {
 
 export interface ResetPasswordPayload {
   phone_no: string;
-  otp_code: string;
+  reset_token: string;
   password: string;
   password_confirmation: string;
+}
+
+export interface VerifyPasswordResetOtpResponse {
+  message: string;
+  verified: boolean;
+  resetToken: string;
 }
 
 export interface AuthResponse {
@@ -49,6 +57,8 @@ export interface ApiError {
   message: string;
   status: number;
 }
+
+// ─── Helper ───────────────────────────────────────────────────────────────────
 
 async function handleResponse<T>(res: Response): Promise<T> {
   const data = await res.json();
@@ -64,6 +74,8 @@ async function handleResponse<T>(res: Response): Promise<T> {
 
   return data as T;
 }
+
+// ─── Services ─────────────────────────────────────────────────────────────────
 
 export async function loginService(
   payload: LoginPayload,
@@ -115,33 +127,68 @@ export async function verifyOtpService(
   return handleResponse<{ message: string; verified: boolean }>(res);
 }
 
+// Khusus forgot password — endpoint berbeda, mengembalikan resetToken
+export async function verifyPasswordResetOtpService(
+  payload: VerifyOtpPayload,
+): Promise<VerifyPasswordResetOtpResponse> {
+  const phone = normalizePhone(payload.phone_no);
+  console.log("[verifyPasswordResetOtpService] phone →", phone);
+
+  const res = await fetch(`${getBaseUrl()}/api/auth/verify-password-reset-otp`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      phone_no: phone,
+      otp_code: payload.otp_code,
+    }),
+  });
+  return handleResponse<VerifyPasswordResetOtpResponse>(res);
+}
+
+// Pakai reset_token (bukan otp_code) — OTP sudah diverifikasi di step sebelumnya
 export async function resetPasswordWithPhoneService(
   payload: ResetPasswordPayload,
 ): Promise<{ message: string }> {
   const phone = normalizePhone(payload.phone_no);
+  console.debug("[auth-service] resetPasswordWithPhone ->", {
+    phone,
+    resetTokenProvided: Boolean(payload.reset_token),
+    passwordProvided: Boolean(payload.password),
+  });
 
   const res = await fetch(`${getBaseUrl()}/api/auth/reset-password-phone`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       phone_no: phone,
-      otp_code: payload.otp_code,
+      reset_token: payload.reset_token,
       password: payload.password,
       password_confirmation: payload.password_confirmation,
     }),
   });
 
-  return handleResponse<{ message: string }>(res);
+  const result = await handleResponse<{ message: string }>(res);
+  console.debug("[auth-service] resetPasswordWithPhone result ->", result);
+  return result;
 }
 
 export async function isPhoneNoRegisteredService(
   phoneNo: string,
 ): Promise<boolean> {
   const phone = normalizePhone(phoneNo);
+
+  const variants = [phone, `+${phone}`];
+  if (phone.startsWith("62")) {
+    variants.push(`0${phone.slice(2)}`);
+  }
+
   const params = new URLSearchParams({
-    "filters[phone_no][$eq]": phone,
     "pagination[pageSize]": "1",
     "fields[0]": "id",
+  });
+
+  variants.forEach((v, i) => {
+    params.append(`filters[$or][${i}][phone_no][$eq]`, v);
   });
 
   const res = await fetch(`${getBaseUrl()}/api/users?${params.toString()}`, {
@@ -150,7 +197,10 @@ export async function isPhoneNoRegisteredService(
     cache: "no-store",
   });
 
+  console.debug("[auth-service] isPhoneNoRegisteredService querying variants ->", variants);
   const data = await handleResponse<unknown>(res);
+  console.debug("[auth-service] isPhoneNoRegisteredService response ->", data);
+
   if (Array.isArray(data)) return data.length > 0;
   if (typeof data === "object" && data !== null && "data" in data) {
     const entries = (data as { data?: unknown }).data;

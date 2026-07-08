@@ -3,6 +3,7 @@ import type { OrderStep } from "@/types/orders";
 import type { OrderDetail } from "@/types/order-details";
 import type { OrderMenu } from "@/types/order-menus";
 import type { Invoice } from "@/types/invoices";
+import type { MediaItem } from "@/types/shared";
 import {
   getOrderPaymentStatusLabel,
   getPrimaryInvoice,
@@ -26,6 +27,7 @@ export type OrderListItem = {
   documentId: string;
   orderNo: string | null;
   packageName: string | null;
+  product: string | null;
   createdAt: string | null;
   deliveryDate: string | null;
   deliveryAddress: string | null;
@@ -43,6 +45,8 @@ export type OrderDetailView = OrderListItem & {
   arriveTime: string | null;
   step: OrderStep | null;
   paymentStatus: string | null;
+  product: string | null;
+  imageReceive: MediaItem[];
   orderDetails: Array<OrderDetail & { id: number; documentId?: string }>;
   orderMenus: Array<OrderMenu & { id: number; documentId?: string }>;
   invoices: Array<Invoice & { id: number; documentId?: string }>;
@@ -80,10 +84,11 @@ export async function fetchOrdersByCustomerId(
     "fields[0]": "step",
     "fields[1]": "order_no",
     "fields[2]": "package_name",
-    "fields[3]": "createdAt",
-    "fields[4]": "delivery_date",
-    "fields[5]": "delivery_address",
-    "fields[6]": "created_date",
+    "fields[3]": "product",
+    "fields[4]": "createdAt",
+    "fields[5]": "delivery_date",
+    "fields[6]": "delivery_address",
+    "fields[7]": "created_date",
     "populate[invoices][fields][0]": "invoice_no",
     "populate[invoices][fields][1]": "payment_status",
     "populate[invoices][fields][2]": "invoice_date",
@@ -152,6 +157,9 @@ export async function fetchOrderMenusForOrder(
     "fields[10]": "box",
     "fields[11]": "pudding",
     "fields[12]": "snack",
+    "fields[13]": "snack2",
+    "fields[14]": "snack3",
+    "fields[15]": "snack4",
   });
 
   const body = await fetchStrapiJson(
@@ -183,7 +191,9 @@ export async function fetchOrderByDocumentId(
     "fields[8]": "delivery_note",
     "fields[9]": "arrive_time",
     "fields[10]": "created_date",
+    "fields[11]": "product",
     "populate[invoices]": "true",
+    "populate[image_receive]": "true",
   });
 
   try {
@@ -200,7 +210,7 @@ export async function fetchOrderByDocumentId(
   if (/^\d+$/.test(documentId)) {
     try {
       const singleBody = await fetchStrapiJson(
-        `${baseUrl}/api/orders/${documentId}`,
+        `${baseUrl}/api/orders/${documentId}?fields[0]=product&populate[image_receive]=true`,
         authToken,
       );
       return unwrapStrapiEntity<Order>(
@@ -237,6 +247,7 @@ export async function mapOrderToListItem(
     documentId: order.documentId ?? String(order.id),
     orderNo: order.order_no ?? null,
     packageName: order.package_name ?? null,
+    product: order.product ?? null,
     createdAt: order.createdAt ?? order.created_date ?? null,
     deliveryDate: order.delivery_date ?? null,
     deliveryAddress: order.delivery_address ?? null,
@@ -265,6 +276,8 @@ export async function mapOrderToDetailView(
     arriveTime: order.arrive_time ?? null,
     step: order.step ?? null,
     paymentStatus: invoices[0]?.payment_status ?? listItem.paymentStatus,
+    product: order.product ?? null,
+    imageReceive: unwrapStrapiList<MediaItem>(order.image_receive ?? []),
     orderDetails,
     orderMenus,
     invoices,

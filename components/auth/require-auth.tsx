@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type ReactNode } from "react";
+import { type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/authContext";
 import AuthModal from "@/components/auth/AuthModal";
@@ -11,22 +11,12 @@ type RequireAuthProps = {
 
 export default function RequireAuth({ children }: RequireAuthProps) {
   const router = useRouter();
-  const { isLoggedIn, isLoading, refreshSession } = useAuth();
-  const [authOpen, setAuthOpen] = useState(false);
-
-  useEffect(() => {
-    if (isLoading) return;
-    if (!isLoggedIn) {
-      setAuthOpen(true);
-    } else {
-      setAuthOpen(false);
-    }
-  }, [isLoading, isLoggedIn]);
+  const { isLoggedIn, isLoading } = useAuth();
 
   if (isLoading) {
     return (
       <div className="mx-auto flex min-h-[40vh] max-w-5xl items-center justify-center px-6">
-        <p className="text-sm text-secondary-600">Memuat sesi...</p>
+        <p className="text-sm text-secondary-600">Memuat halaman...</p>
       </div>
     );
   }
@@ -43,14 +33,9 @@ export default function RequireAuth({ children }: RequireAuthProps) {
           </p>
         </div>
         <AuthModal
-          isOpen={authOpen}
+          isOpen={!isLoading && !isLoggedIn}
           onClose={() => {
-            setAuthOpen(false);
             router.push("/");
-          }}
-          onSuccess={() => {
-            void refreshSession();
-            setAuthOpen(false);
           }}
         />
       </>

@@ -9,11 +9,11 @@ export const galleryNavItems = [
     labelKey: "menu",
     href: "/gallery/menu",
   },
-  {
-    key: "testimonial",
-    labelKey: "testimonial",
-    href: "/gallery/testimonial",
-  },
+  // {
+  //   key: "testimonial",
+  //   labelKey: "testimonial",
+  //   href: "/gallery/testimonial",
+  // },
   {
     key: "video",
     labelKey: "video",

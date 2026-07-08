@@ -111,7 +111,7 @@ export default function OrderHistoryPage() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [t]);
 
   return (
     <div className="mx-auto max-w-5xl px-6 py-10">
@@ -185,7 +185,12 @@ export default function OrderHistoryPage() {
 
                   <div className="min-w-0">
                     <p className="truncate text-base font-semibold text-tertiary-900 sm:text-lg">
-                      {order.packageName ?? "Paket pesanan"}
+                      {[
+                        order.product,
+                        order.packageName,
+                      ]
+                        .filter(Boolean)
+                        .join(" - ") || "Paket pesanan"}
                     </p>
                     {stepLabel ? (
                       <span

@@ -6,7 +6,7 @@ export interface AuthFieldErrors {
 }
 
 export const REQUIRED_MESSAGE = "Kolom ini wajib diisi";
-export const INVALID_PHONE_MESSAGE = "Nomor Hp tidak valid";
+export const INVALID_PHONE_MESSAGE = "Nomor whatsapp tidak valid";
 
 export function normalizeAuthPhoneInput(phone: string): string {
   return phone.trim().replace(/^0+/, "");
@@ -22,7 +22,7 @@ export function validatePhoneNo(phone: string): string[] {
   }
 
   if (!/^\d+$/.test(value)) {
-    errors.push("Nomor Hp hanya boleh angka");
+    errors.push("Nomor whatsapp hanya boleh angka");
     return errors;
   }
 
@@ -66,27 +66,35 @@ export function validatePassword(password: string): string[] {
   }
 
   if (password.length < 8) {
-    errors.push("Password minimal 8 Karakter");
+    errors.push("Kata sandi minimal 8 Karakter");
   }
 
   if (!/[A-Z]/.test(password)) {
-    errors.push("Password harus mengandung huruf besar");
+    errors.push("Kata sandi harus mengandung huruf besar");
   }
 
   if (!/[a-z]/.test(password)) {
-    errors.push("Password harus mengandung huruf kecil");
+    errors.push("Kata sandi harus mengandung huruf kecil");
   }
 
   if (!/\d/.test(password)) {
-    errors.push("Password harus mengandung angka");
+    errors.push("Kata sandi harus mengandung angka");
   }
 
   if (!/[!@#$%^&*(),.?":{}|<>_\-+=\[\]\\;/`~]/.test(password)) {
     errors.push(
-      "Password harus mengandung karakter spesial, contoh: ! @ # $ %",
+      "Kata sandi harus mengandung karakter spesial, contoh: ! @ # $ %",
     );
   }
 
+  return errors;
+}
+
+export function validatePasswordLogin(password: string): string[] {
+  const errors: string[] = [];
+  if (!password) {
+    errors.push(REQUIRED_MESSAGE);
+  }
   return errors;
 }
 

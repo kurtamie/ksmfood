@@ -99,6 +99,7 @@ type OrderDisplayItem = {
   quantity: number;
   unitPrice: number;
   total: number;
+  basePrice?: number;
   menu: OrderMenuRow;
   detail: OrderDetailRow;
 };
@@ -402,10 +403,7 @@ export default function OrderInfoPage() {
   const [notes, setNotes] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
-  const [addressPickerOpen, setAddressPickerOpen] = useState(false);
-  const [selectedAddressId, setSelectedAddressId] = useState<string | null>(
-    null,
-  );
+
   const [orderId, setOrderId] = useState<number | string | null>(null);
   const [orderMenus, setOrderMenus] = useState<OrderMenuRow[]>([]);
   const [orderDetails, setOrderDetails] = useState<OrderDetailRow[]>([]);
@@ -424,10 +422,10 @@ export default function OrderInfoPage() {
   const savedAddresses = useMemo(
     () =>
       parseSavedAddresses(
-        user?.customer?.address,
-        user?.customer?.latitude,
-        user?.customer?.longitude,
-        user?.customer?.subdistrict,
+        user?.customer?.address ?? localStorage.getItem("ksm_customer_address"),
+        user?.customer?.latitude ?? localStorage.getItem("ksm_customer_latitude"),
+        user?.customer?.longitude ?? localStorage.getItem("ksm_customer_longitude"),
+        user?.customer?.subdistrict ?? localStorage.getItem("ksm_customer_subdistrict"),
       ),
     [
       user?.customer?.address,
@@ -531,6 +529,15 @@ export default function OrderInfoPage() {
 
   const itemCount = useMemo(
     () => orderItems.reduce((sum, item) => sum + item.quantity, 0),
+    [orderItems],
+  );
+  const orderSubtotal = useMemo(
+    () =>
+      orderItems.reduce(
+        (sum, item) =>
+          sum + (item.basePrice ?? item.unitPrice) * item.quantity,
+        0,
+      ),
     [orderItems],
   );
   const orderTotal = useMemo(
@@ -935,7 +942,8 @@ export default function OrderInfoPage() {
       delivery_date: deliveryDate || undefined,
       arrive_time: deliveryTime || undefined,
       leave: deliveryTime ? getLeaveTime(deliveryTime) : undefined,
-      delivery_address: addressLine || undefined,
+      delivery_address: [addressLine.trim(), subdistrict].filter(Boolean).join(", ") ||
+      undefined,
       latitude: latitude !== null ? String(latitude) : undefined,
       longitude: longitude !== null ? String(longitude) : undefined,
       recipient_name: recipientName || undefined,
@@ -946,6 +954,7 @@ export default function OrderInfoPage() {
       deliveryDate,
       deliveryTime,
       addressLine,
+      subdistrict,
       latitude,
       longitude,
       recipientName,
@@ -1087,7 +1096,6 @@ export default function OrderInfoPage() {
           slug: "",
           category: "Pesanan",
         })),
-        totals: { subtotal: orderTotal },
       };
 
       if (typeof window !== "undefined") {
@@ -1441,72 +1449,25 @@ export default function OrderInfoPage() {
                   </p>
                   <button
                     type="button"
-                    onClick={() => setAddressPickerOpen(true)}
-                    className="rounded-full border border-primary-500 bg-primary-50 px-4 py-2 text-sm font-semibold text-primary-700 transition hover:bg-primary-100"
+                    disabled={savedAddresses.length === 0}
+                    onClick={() => {
+                      const address = savedAddresses[0];
+                      if (address) {
+                        setAddressName(address.addressName);
+                        setAddressLine(address.addressLine);
+                        setSubdistrict(address.subdistrict);
+                        setPinpoint(address.pinpoint);
+                        setRecipientName(address.recipientName);
+                        setRecipientPhone(address.recipientPhone);
+                        setLatitude(address.latitude ?? null);
+                        setLongitude(address.longitude ?? null);
+                      }
+                    }}
+                    className="rounded-full border border-primary-500 bg-primary-50 px-4 py-2 text-sm font-semibold text-primary-700 transition hover:bg-primary-100 disabled:opacity-40 disabled:cursor-not-allowed"
                   >
                     {t("actions.chooseAddress")}
                   </button>
                 </div>
-
-                {addressPickerOpen && (
-                  <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 px-4 py-6">
-                    <div className="w-full max-w-lg rounded-3xl bg-white p-6 shadow-xl">
-                      <div className="flex items-center justify-between">
-                        <h3 className="text-lg font-semibold">
-                          {t("addressPicker.title")}
-                        </h3>
-                        <button
-                          type="button"
-                          onClick={() => setAddressPickerOpen(false)}
-                          className="text-secondary-600 hover:text-tertiary-900"
-                        >
-                          ✕
-                        </button>
-                      </div>
-
-                      <div className="mt-5 space-y-4">
-                        <select
-                          value={selectedAddressId ?? ""}
-                          onChange={(e) => setSelectedAddressId(e.target.value)}
-                          className="w-full rounded-lg border px-3 py-2"
-                        >
-                          <option value="">
-                            {t("addressPicker.placeholder")}
-                          </option>
-                          {savedAddresses.map((address) => (
-                            <option key={address.id} value={address.id}>
-                              {address.label}
-                            </option>
-                          ))}
-                        </select>
-
-                        <button
-                          type="button"
-                          disabled={!selectedAddressId}
-                          onClick={() => {
-                            const address = savedAddresses.find(
-                              (item) => item.id === selectedAddressId,
-                            );
-                            if (address) {
-                              setAddressName(address.addressName);
-                              setAddressLine(address.addressLine);
-                              setSubdistrict(address.subdistrict);
-                              setPinpoint(address.pinpoint);
-                              setRecipientName(address.recipientName);
-                              setRecipientPhone(address.recipientPhone);
-                              setLatitude(address.latitude ?? null);
-                              setLongitude(address.longitude ?? null);
-                            }
-                            setAddressPickerOpen(false);
-                          }}
-                          className="w-full rounded-xl bg-primary-500 py-3 text-sm font-bold text-white hover:bg-primary-600 disabled:opacity-40 disabled:cursor-not-allowed"
-                        >
-                          {t("actions.confirmChoice")}
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                )}
 
                 <div className="mt-6">
                   <label className="mb-2 block font-semibold">
@@ -1617,7 +1578,7 @@ export default function OrderInfoPage() {
                           </div>
                           <div className="text-right text-sm font-semibold text-tertiary-900">
                             <div>{t("total")}</div>
-                            <div>{formatRupiah(item.total)}</div>
+                            <div>{formatRupiah(orderSubtotal)}</div>
                           </div>
                         </div>
                       </div>
@@ -1626,25 +1587,29 @@ export default function OrderInfoPage() {
                 </div>
               )}
 
-              <div className="mt-5 border-t border-secondary-200 pt-4 space-y-3 text-sm text-secondary-700">
-                {extraChargeRows.map((row) => (
-                  <div
-                    key={row.key}
-                    className="flex items-start justify-between gap-3 text-xs text-secondary-600"
-                  >
-                    <span className="min-w-0">
-                      {t("extraCharge")}: {row.label}
-                      <span className="block text-secondary-500">
-                        {row.quantity} x {formatRupiah(row.unitPrice)}
-                      </span>
-                    </span>
-                    <span className="shrink-0">{formatRupiah(row.total)}</span>
-                  </div>
-                ))}
-                <div className="flex items-center justify-between">
+              <div className="mt-5 border-t border-secondary-200 pt-4 text-sm text-secondary-700">
+                <div className="flex justify-between">
                   <span>{t("subtotal")}</span>
-                  <span>{formatRupiah(orderTotal)}</span>
+                  <span>{formatRupiah(orderSubtotal)}</span>
                 </div>
+                {extraChargeRows.length > 0 && (
+                  <div className="mt-3 space-y-3">
+                    {extraChargeRows.map((row) => (
+                      <div
+                        key={row.key}
+                        className="flex items-start justify-between gap-3 text-xs text-secondary-600"
+                      >
+                        <span className="min-w-0">
+                          {t("extraCharge")}: {row.label}
+                          <span className="block text-secondary-500">
+                            {row.quantity} x {formatRupiah(row.unitPrice)}
+                          </span>
+                        </span>
+                        <span className="shrink-0">{formatRupiah(row.total)}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
               <div className="mt-4 flex items-center justify-between border-t border-secondary-200 pt-4">

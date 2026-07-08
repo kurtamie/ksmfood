@@ -481,9 +481,8 @@ export function OrderModal({ card, serviceName, onClose }: OrderModalProps) {
               </div>
             )}
 
-            {/* Subtotal */}
             <div className={fieldClass}>
-              <span className={labelClass}>{modalT("fields.subtotal")}</span>
+              <span className={labelClass}>{modalT("fields.total")}</span>
               <span className="text-2xl font-bold">
                 Rp {subtotal.toLocaleString("id-ID")}
               </span>

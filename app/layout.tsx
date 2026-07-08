@@ -7,6 +7,7 @@ import { defaultLocale, hasLocale, localeCookieName } from "@/i18n/routing";
 import { CartProvider } from "@/components/CartContext";
 import "./globals.css";
 import { AuthProvider } from "@/context/authContext";
+import { Toaster } from "sonner";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL?.startsWith("http")
   ? process.env.NEXT_PUBLIC_SITE_URL
@@ -75,6 +76,13 @@ export default async function RootLayout({
             </NextIntlClientProvider>
           </CartProvider>
         </AuthProvider>
+        <Toaster position="top-right"   richColors 
+  toastOptions={{
+    style: {
+      width: "fit-content",
+      maxWidth: "360px",   },
+  }}
+/>
       </body>
     </html>
   );

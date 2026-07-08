@@ -22,6 +22,49 @@ function normalizeCoordinate(value: unknown): string | null {
   return Number.isFinite(coordinate) ? String(coordinate) : null;
 }
 
+function normalizePhoneValue(value: unknown): string | null {
+  if (typeof value !== "string") return null;
+
+  const trimmed = value.trim();
+  if (!trimmed) return null;
+
+  const normalized = trimmed.replace(/^0+/, "");
+  if (!normalized) return null;
+
+  return normalized.startsWith("62") ? normalized : `62${normalized}`;
+}
+
+async function isPhoneAlreadyUsed(
+  phone: string,
+  currentUserId: string,
+): Promise<boolean> {
+  const baseUrl = process.env.NEXT_PUBLIC_STRAPI_URL?.replace(/\/$/, "") ?? "";
+  const params = new URLSearchParams({
+    "filters[phone_no][$eq]": phone,
+    "pagination[pageSize]": "1",
+    "fields[0]": "id",
+  });
+
+  const response = await fetch(`${baseUrl}/api/users?${params.toString()}`, {
+    method: "GET",
+    headers: { "Content-Type": "application/json" },
+    cache: "no-store",
+  });
+
+  if (!response.ok) {
+    const message = await response.text().catch(() => "");
+    throw new Error(
+      message || "Failed to validate phone number availability",
+    );
+  }
+
+  const payload = await response.json();
+  const results = Array.isArray(payload.data) ? payload.data : [];
+  if (results.length === 0) return false;
+
+  return String(results[0].id) !== currentUserId;
+}
+
 function addIfChanged<T extends Record<string, unknown>>(
   fields: T,
   key: keyof T,
@@ -73,6 +116,23 @@ export async function POST(req: NextRequest) {
 
     if (hasField(body, "phone")) {
       const phone = normalizeText(body.phone);
+
+      if (phone) {
+        const normalizedPhone = normalizePhoneValue(phone);
+        const currentNormalizedPhone = normalizePhoneValue(currentUser.phone_no);
+
+        if (
+          normalizedPhone &&
+          normalizedPhone !== currentNormalizedPhone &&
+          (await isPhoneAlreadyUsed(normalizedPhone, String(currentUser.id)))
+        ) {
+          return NextResponse.json(
+            { error: "Nomor whatsapp sudah terdaftar" },
+            { status: 409 },
+          );
+        }
+      }
+
       addIfChanged(userFields, "phone_no", phone, currentUser.phone_no);
       addIfChanged(
         customerFields,

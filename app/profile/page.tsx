@@ -1,7 +1,14 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { toastSuccess } from "@/lib/sonnerToast";
+import {
+  isPhoneNoRegisteredService,
+  sendOtpService,
+  verifyOtpService,
+} from "@/app/data/services/auth-service";
 import { useAuth } from "@/context/authContext";
+import { validatePhoneNo } from "@/lib/auth-validation";
 import type { User } from "@/types/users";
 import { useTranslations } from "next-intl";
 
@@ -75,6 +82,13 @@ export default function AccountPage() {
   const [longitude, setLongitude] = useState<number | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
+  const [isPhoneVerified, setIsPhoneVerified] = useState(true);
+  const [otpSent, setOtpSent] = useState(false);
+  const [otpCode, setOtpCode] = useState("");
+  const [isSendingOtp, setIsSendingOtp] = useState(false);
+  const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
+  const [otpError, setOtpError] = useState("");
   const [initialName, setInitialName] = useState<string>(customerName);
   const [initialPhone, setInitialPhone] = useState<string>(phone);
   const [initialAddress, setInitialAddress] = useState<string>(addressLine);
@@ -123,6 +137,94 @@ export default function AccountPage() {
       3000,
     );
   }
+
+  function cancelEditProfile() {
+    setCustomerName(initialName);
+    setPhone(initialPhone);
+    setIsEditingProfile(false);
+    setIsPhoneVerified(true);
+    setOtpSent(false);
+    setOtpCode("");
+    setOtpError("");
+  }
+
+  const handlePhoneChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const nextPhone = event.target.value;
+    setPhone(nextPhone);
+    setOtpError("");
+    setOtpSent(false);
+    setOtpCode("");
+    if (nextPhone === initialPhone) {
+      setIsPhoneVerified(true);
+    } else {
+      setIsPhoneVerified(false);
+    }
+  };
+
+  const handleSendOtp = async () => {
+    setOtpError("");
+    const phoneErrors = validatePhoneNo(phone);
+    if (phoneErrors.length > 0) {
+      setOtpError(phoneErrors[0]);
+      return;
+    }
+
+    if (phone !== initialPhone) {
+      try {
+        const existing = await isPhoneNoRegisteredService(phone);
+        if (existing) {
+          setOtpError(t("messages.phoneAlreadyUsed"));
+          return;
+        }
+      } catch (error) {
+        const message =
+          error instanceof Error ? error.message : t("messages.otpSendFailed");
+        setOtpError(message);
+        return;
+      }
+    }
+
+    setIsSendingOtp(true);
+    try {
+      await sendOtpService({ phone_no: phone });
+      setOtpSent(true);
+      toastSuccess(t("messages.otpSent"));
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : t("messages.otpSendFailed");
+      setOtpError(message);
+    } finally {
+      setIsSendingOtp(false);
+    }
+  };
+
+  const handleVerifyOtp = async () => {
+    setOtpError("");
+    if (otpCode.trim().length < 6) {
+      setOtpError(t("messages.otpCodeRequired"));
+      return;
+    }
+
+    setIsVerifyingOtp(true);
+    try {
+      await verifyOtpService({ phone_no: phone, otp_code: otpCode.trim() });
+      setIsPhoneVerified(true);
+      setOtpCode("");
+      toastSuccess(t("messages.otpVerified"));
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : t("messages.otpVerifyFailed");
+      setOtpError(message);
+    } finally {
+      setIsVerifyingOtp(false);
+    }
+  };
+
+  const handleResendOtp = async () => {
+    setOtpError("");
+    setOtpCode("");
+    await handleSendOtp();
+  };
 
   useEffect(() => {
     if (!currentUser || initialLoadedRef.current) return;
@@ -189,6 +291,12 @@ export default function AccountPage() {
       );
       localStorage.setItem("ksm_customer_address", addressLine);
 
+      localStorage.setItem("ksm_customer_subdistrict", subdistrict); 
+
+      localStorage.setItem("ksm_customer_latitude", latitude !== null ? String(latitude) : "");
+      
+localStorage.setItem("ksm_customer_longitude", longitude !== null ? String(longitude) : "");
+
       const response = await fetch("/api/profile", {
         method: "POST",
         headers: {
@@ -198,9 +306,17 @@ export default function AccountPage() {
       });
 
       if (!response.ok) {
-        const errorText = await response.text();
-        console.error("Profile update error:", errorText);
-        showToast(t("messages.saveProfileFailed"));
+        let errorMessage = t("messages.saveProfileFailed");
+        try {
+          const responseBody = await response.json();
+          if (responseBody?.error) {
+            errorMessage = responseBody.error;
+          }
+        } catch {
+          const errorText = await response.text();
+          console.error("Profile update error:", errorText);
+        }
+        showToast(errorMessage);
         return false;
       }
 
@@ -210,7 +326,7 @@ export default function AccountPage() {
       setInitialSubdistrict(subdistrict);
       setInitialLatitude(latitude);
       setInitialLongitude(longitude);
-      showToast(successMessage);
+      toastSuccess(successMessage);
       return true;
     } catch (error) {
       console.error(error);
@@ -222,7 +338,15 @@ export default function AccountPage() {
   }
 
   async function saveProfile() {
-    await persistProfile(t("messages.profileUpdated"));
+    if (phone !== initialPhone && !isPhoneVerified) {
+      showToast(t("messages.verifyPhoneFirst"));
+      return;
+    }
+
+    const saved = await persistProfile(t("messages.profileUpdated"));
+    if (saved) {
+      setIsEditingProfile(false);
+    }
   }
 
   function openAddressModal() {
@@ -328,7 +452,7 @@ export default function AccountPage() {
         leafletLoadedRef.current = false;
       }
     };
-  }, [showModal]);
+  }, [showModal, latitude, longitude]);
 
   useEffect(() => {
     if (!showModal || !leafletLoadedRef.current || !mapInstanceRef.current) {
@@ -427,7 +551,8 @@ export default function AccountPage() {
           <input
             value={customerName}
             onChange={(event) => setCustomerName(event.target.value)}
-            className="w-full rounded-md border px-3 py-2"
+            readOnly={!isEditingProfile}
+            className={`w-full rounded-md border px-3 py-2 ${isEditingProfile ? "bg-white" : "bg-secondary-100 text-secondary-700"}`}
           />
         </div>
 
@@ -435,49 +560,135 @@ export default function AccountPage() {
           <label className="mb-1 block text-sm">{t("fields.phone")}</label>
           <input
             value={phone}
-            onChange={(event) => setPhone(event.target.value)}
-            className="w-full rounded-md border px-3 py-2"
+            onChange={handlePhoneChange}
+            readOnly={!isEditingProfile}
+            className={`w-full rounded-md border px-3 py-2 ${isEditingProfile ? "bg-white" : "bg-secondary-100 text-secondary-700"}`}
           />
+          {isEditingProfile && phone !== initialPhone && (
+            <div className="mt-3 max-w-[400px] rounded-lg border border-orange-200/80 bg-orange-50/80 p-3 text-sm text-orange-900 shadow-sm">
+              <p className="font-medium">{t("messages.phoneVerificationHint")}</p>
+              <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center">
+                {!otpSent ? (
+                  <button
+                    type="button"
+                    onClick={handleSendOtp}
+                    disabled={isSendingOtp || !phone.trim()}
+                    className="rounded-md bg-red-600 px-4 py-2 text-white disabled:opacity-50"
+                  >
+                    {isSendingOtp ? t("actions.sending") : t("actions.sendOtp")}
+                  </button>
+                ) : (
+                  <>
+                    <input
+                      type="text"
+                      value={otpCode}
+                      onChange={(event) => setOtpCode(event.target.value.replace(/[^0-9]/g, ""))}
+                      maxLength={6}
+                      placeholder={t("placeholders.otpCode")}
+                      className="w-full rounded-md border border-orange-200 bg-white px-3 py-2 text-sm sm:max-w-[220px]"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleVerifyOtp}
+                      disabled={isVerifyingOtp || otpCode.trim().length < 6 || isPhoneVerified}
+                      className="rounded-md bg-red-600 px-4 py-2 text-white disabled:opacity-50"
+                    >
+                      {isVerifyingOtp ? t("actions.verifyingOtp") : t("actions.verifyOtp")}
+                    </button>
+                  </>
+                )}
+              </div>
+              {otpSent && !isPhoneVerified && (
+                <div className="mt-2 flex flex-col gap-1">
+                  {otpError ? (
+                    <p className="text-xs text-orange-900">{otpError}</p>
+                  ) : (
+                    <p className="text-xs text-orange-900">{t("messages.otpSent")}</p>
+                  )}
+                  <button
+                    type="button"
+                    onClick={handleResendOtp}
+                    disabled={isSendingOtp}
+                    className="self-start mt-4 text-xs font-medium text-red-600 underline underline-offset-2 disabled:opacity-50"
+                  >
+                    {t("actions.resendOtp")}
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
-        <div>
-          <button
-            onClick={saveProfile}
-            disabled={!hasChanges || isSaving}
-            className="rounded-md bg-red-600 px-4 py-2 text-white disabled:opacity-50"
-          >
-            {isSaving ? t("actions.saving") : t("actions.save")}
-          </button>
+        <div className="flex flex-wrap items-center gap-3">
+          {!isEditingProfile ? (
+            <button
+              type="button"
+              onClick={() => setIsEditingProfile(true)}
+              className="rounded-md bg-red-600 px-4 py-2 text-white"
+            >
+              {t("actions.editProfile")}
+            </button>
+          ) : (
+            <>
+              <button
+                type="button"
+                onClick={cancelEditProfile}
+                disabled={isSaving}
+                className="rounded-md border border-gray-300 bg-white px-4 py-2 text-gray-700 disabled:opacity-50"
+              >
+                {t("actions.cancel")}
+              </button>
+              <button
+                type="button"
+                onClick={saveProfile}
+                disabled={!hasChanges || isSaving || (phone !== initialPhone && !isPhoneVerified)}
+                className="rounded-md bg-red-600 px-4 py-2 text-white disabled:opacity-50"
+              >
+                {isSaving ? t("actions.saving") : t("actions.save")}
+              </button>
+            </>
+          )}
         </div>
 
-        <div className="mt-6 flex items-center justify-between gap-4">
-          <h2 className="text-xl font-semibold">{t("address.title")}</h2>
-          <button
-            type="button"
-            onClick={openAddressModal}
-            className="rounded-md bg-red-600 px-4 py-2 text-white"
-          >
-            {hasSavedAddress ? t("actions.editAddress") : t("actions.addAddress")}
-          </button>
-        </div>
-
-        {hasSavedAddress ? (
-          <div className="rounded-md border bg-white p-4">
-            <p className="text-sm text-secondary-600">{addressLine}</p>
-            <p className="mt-1 text-sm text-secondary-600">
-              {t("fields.subdistrict")}: {subdistrict}
-            </p>
-            {latitude !== null && longitude !== null && (
-              <p className="mt-2 text-sm text-secondary-700">
-                {t("fields.coordinates")}: {latitude.toFixed(6)}, {longitude.toFixed(6)}
-              </p>
+        <div className="mt-6">
+          <div className="flex items-center justify-between gap-4">
+            <h2 className="text-xl font-semibold">{t("address.title")}</h2>
+            {hasSavedAddress && (
+              <button
+                type="button"
+                onClick={openAddressModal}
+                className="rounded-md bg-red-600 px-4 py-2 text-white"
+              >
+                {t("actions.editAddress")}
+              </button>
             )}
           </div>
-        ) : (
-          <p className="text-sm text-secondary-600">
-            {t("address.empty")}
-          </p>
-        )}
+
+          {hasSavedAddress ? (
+            <div className="mt-4 rounded-md border bg-white p-4">
+              <p className="text-sm text-secondary-600">{addressLine}</p>
+              <p className="mt-1 text-sm text-secondary-600">
+                {t("fields.subdistrict")}: {subdistrict}
+              </p>
+              {latitude !== null && longitude !== null && (
+                <p className="mt-2 text-sm text-secondary-700">
+                  {t("fields.coordinates")}: {latitude.toFixed(6)}, {longitude.toFixed(6)}
+                </p>
+              )}
+            </div>
+          ) : (
+            <div className="mt-4 space-y-3 rounded-md border bg-white p-4">
+              <p className="text-sm text-secondary-600">{t("address.empty")}</p>
+              <button
+                type="button"
+                onClick={openAddressModal}
+                className="rounded-md bg-red-600 px-4 py-2 text-white"
+              >
+                {t("actions.addAddress")}
+              </button>
+            </div>
+          )}
+        </div>
       </div>
 
       {showModal && (

@@ -1,13 +1,14 @@
 "use client";
 
-import { useState } from "react";
-import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { useCallback, useEffect, useState } from "react";
+import { FaArrowLeft, FaEye, FaEyeSlash } from "react-icons/fa";
 import {
   loginAction,
   resetPasswordWithPhoneAction,
   sendOtpAction,
   sendPasswordResetOtpAction,
   verifyOtpAction,
+  verifyPasswordResetOtpAction,
   registerAction,
 } from "@/app/data/actions/auth-actions";
 import { useAuth } from "@/context/authContext";
@@ -16,6 +17,7 @@ import {
   hasAuthFieldErrors,
   normalizeAuthPhoneInput,
   validatePassword,
+  validatePasswordLogin,
   validatePasswordConfirmation,
   validatePhoneNo,
   validateUsername,
@@ -33,14 +35,13 @@ type Step =
 interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSuccess?: () => void;
+  onSuccess?: (username: string) => void;
 }
 
-export default function AuthModal({
-  isOpen,
+function AuthModalContent({
   onClose,
   onSuccess,
-}: AuthModalProps) {
+}: Omit<AuthModalProps, "isOpen">) {
   const { login } = useAuth();
 
   const [step, setStep] = useState<Step>("login");
@@ -51,16 +52,66 @@ export default function AuthModal({
   const [username, setusername] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [resetToken, setResetToken] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   const [fieldErrors, setFieldErrors] = useState<AuthFieldErrors>({});
+  const [otpSecondsLeft, setOtpSecondsLeft] = useState(0);
 
-  if (!isOpen) return null;
+  useEffect(() => {
+    let timer: number | undefined;
+    if (otpSecondsLeft > 0) {
+      timer = window.setInterval(() => {
+        setOtpSecondsLeft((s) => {
+          if (s <= 1) {
+            window.clearInterval(timer);
+            return 0;
+          }
+          return s - 1;
+        });
+      }, 1000);
+    }
+    return () => {
+      if (timer) window.clearInterval(timer);
+    };
+  }, [otpSecondsLeft]);
+
+  const resetFeedback = useCallback(() => {
+    setErrorMsg("");
+    setFieldErrors({});
+  }, []);
+
+  const resetState = useCallback(() => {
+    setStep("login");
+    setPhone("");
+    setResetPhone("");
+    setPassword("");
+    setOtp(["", "", "", "", "", ""]);
+    setusername("");
+    setNewPassword("");
+    setConfirmPassword("");
+    setResetToken("");
+    setShowPassword(false);
+    setShowNewPassword(false);
+    setShowConfirmPassword(false);
+    setIsLoading(false);
+    resetFeedback();
+  }, [resetFeedback]);
 
   const otpCode = otp.join("");
+
+  const formatSeconds = (s: number) => {
+    const mm = Math.floor(s / 60)
+      .toString()
+      .padStart(2, "0");
+    const ss = Math.floor(s % 60)
+      .toString()
+      .padStart(2, "0");
+    return `${mm}:${ss}`;
+  };
 
   const handlePhoneChange = (value: string) => {
     setPhone(normalizeAuthPhoneInput(value));
@@ -70,9 +121,9 @@ export default function AuthModal({
     setResetPhone(normalizeAuthPhoneInput(value));
   };
 
-  const resetFeedback = () => {
-    setErrorMsg("");
-    setFieldErrors({});
+  const handleClose = () => {
+    resetState();
+    onClose();
   };
 
   const applyActionErrors = (
@@ -118,7 +169,7 @@ export default function AuthModal({
     setErrorMsg("");
     const nextFieldErrors: AuthFieldErrors = {
       phone_no: validatePhoneNo(phone),
-      password: validatePassword(password),
+      password: validatePasswordLogin(password),
     };
     setFieldErrors(nextFieldErrors);
 
@@ -134,7 +185,7 @@ export default function AuthModal({
       return;
     }
     login(result.data!.token, result.data!.user);
-    onSuccess?.();
+    onSuccess?.(result.data!.user.username);
     onClose();
   };
 
@@ -150,13 +201,16 @@ export default function AuthModal({
     }
 
     setIsLoading(true);
+    console.debug("[AuthModal] sendOtp ->", { phone });
     const result = await sendOtpAction({ phone_no: phone });
+    console.debug("[AuthModal] sendOtp result ->", result);
     setIsLoading(false);
     if (!result.success) {
       applyActionErrors("Gagal mengirim OTP.", result);
       return;
     }
     setOtp(["", "", "", "", "", ""]);
+    setOtpSecondsLeft(300);
     setStep("otp");
   };
 
@@ -172,13 +226,16 @@ export default function AuthModal({
     }
 
     setIsLoading(true);
+    console.debug("[AuthModal] sendPasswordResetOtp ->", { phone: resetPhone });
     const result = await sendPasswordResetOtpAction({ phone_no: resetPhone });
+    console.debug("[AuthModal] sendPasswordResetOtp result ->", result);
     setIsLoading(false);
     if (!result.success) {
       applyActionErrors("Gagal mengirim OTP.", result);
       return;
     }
     setOtp(["", "", "", "", "", ""]);
+    setOtpSecondsLeft(300);
     setStep("forgot-otp");
   };
 
@@ -190,10 +247,9 @@ export default function AuthModal({
       return;
     }
     setIsLoading(true);
-    const result = await verifyOtpAction({
-      phone_no: phone,
-      otp_code: otpCode,
-    });
+    console.debug("[AuthModal] verifyOtp ->", { phone, otp: otpCode });
+    const result = await verifyOtpAction({ phone_no: phone, otp_code: otpCode });
+    console.debug("[AuthModal] verifyOtp result ->", result);
     setIsLoading(false);
     if (!result.success) {
       setErrorMsg(result.error ?? "Kode OTP tidak valid.");
@@ -209,6 +265,26 @@ export default function AuthModal({
       setErrorMsg("Masukkan 6 digit kode OTP.");
       return;
     }
+
+    setIsLoading(true);
+    console.debug("[AuthModal] verifyPasswordResetOtp ->", {
+      phone: resetPhone,
+      otp: otpCode,
+    });
+    const result = await verifyPasswordResetOtpAction({
+      phone_no: resetPhone,
+      otp_code: otpCode,
+    });
+    console.debug("[AuthModal] verifyPasswordResetOtp result ->", result);
+    setIsLoading(false);
+
+    if (!result.success) {
+      applyActionErrors("Gagal verifikasi OTP.", result);
+      return;
+    }
+
+    // OTP valid — simpan reset token, lanjut ke form password baru
+    setResetToken(result.data!.resetToken);
     setNewPassword("");
     setConfirmPassword("");
     setStep("reset-password");
@@ -239,10 +315,11 @@ export default function AuthModal({
       return;
     }
     login(result.data!.token, result.data!.user);
-    onSuccess?.();
+    onSuccess?.(username);
     onClose();
   };
 
+  // Satu-satunya handleResetPassword — pakai reset_token, bukan otp_code
   const handleResetPassword = async () => {
     setErrorMsg("");
     const nextFieldErrors: AuthFieldErrors = {
@@ -259,18 +336,33 @@ export default function AuthModal({
     }
 
     setIsLoading(true);
+    console.debug("[AuthModal] resetPasswordWithPhone ->", {
+      phone: resetPhone,
+      resetTokenProvided: Boolean(resetToken),
+      passwordProvided: Boolean(newPassword),
+    });
     const result = await resetPasswordWithPhoneAction({
       phone_no: resetPhone,
-      otp_code: otpCode,
+      reset_token: resetToken,
       password: newPassword,
       password_confirmation: confirmPassword,
     });
+    console.debug("[AuthModal] resetPasswordWithPhone result ->", result);
     setIsLoading(false);
+
     if (!result.success) {
+      const err = result.error ?? "Gagal mengganti kata sandi.";
+      // Kalau sesi reset expired/tidak valid, suruh mulai dari awal
+      if (/sesi|kadaluarsa|expired|token/i.test(err)) {
+        setStep("forgot-password");
+        setErrorMsg(err);
+        return;
+      }
       applyActionErrors("Gagal mengganti kata sandi.", result);
       return;
     }
 
+    setResetToken("");
     setPassword("");
     setNewPassword("");
     setConfirmPassword("");
@@ -282,18 +374,32 @@ export default function AuthModal({
   return (
     <div
       className="fixed inset-0 z-100 flex items-center justify-center bg-black/50 px-4"
-      onClick={onClose}
+      onClick={handleClose}
     >
       <div
-        className="relative w-full max-w-sm overflow-hidden rounded-2xl bg-white animate-in fade-in zoom-in-95 duration-200"
+        className="relative w-full max-w-md overflow-hidden rounded-2xl bg-white animate-in fade-in zoom-in-95 duration-200"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="relative flex items-center justify-center px-6 pt-6 pb-4 border-b border-secondary-200">
+          {(step === "otp" || step === "forgot-otp") && (
+            <button
+              type="button"
+              onClick={() => {
+                resetFeedback();
+                setStep(step === "otp" ? "register" : "forgot-password");
+              }}
+              aria-label="Back"
+              className="absolute left-4 rounded-lg p-1.5 text-secondary-600 hover:bg-secondary-200 transition-colors"
+            >
+              <FaArrowLeft />
+            </button>
+          )}
+
           <div className="text-center">
             {step === "login" && (
               <>
-                <p className="text-2xl font-bold text-tertiary-900">Masuk</p>
-                <h2 className="text-sm text-secondary-600">
+                <p className="text-2xl font-bold">Masuk</p>
+                <h2 className="text-sm text-secondary-600 mt-2">
                   Selamat datang kembali
                 </h2>
               </>
@@ -301,13 +407,13 @@ export default function AuthModal({
             {step === "register" && (
               <>
                 <p className="text-2xl font-bold text-tertiary-900">Daftar</p>
-                <h2 className="text-sm text-secondary-600">Buat akun baru</h2>
+                <h2 className="text-sm text-secondary-600 mt-2">Buat akun baru</h2>
               </>
             )}
             {step === "otp" && (
               <>
                 <p className="text-2xl font-bold text-tertiary-900">Kode OTP</p>
-                <h2 className="text-sm text-secondary-600">
+                <h2 className="text-sm text-secondary-600 mt-2">
                   Verifikasi nomor WhatsApp
                 </h2>
               </>
@@ -317,7 +423,7 @@ export default function AuthModal({
                 <p className="text-2xl font-bold text-tertiary-900">
                   Lupa Kata Sandi
                 </p>
-                <h2 className="text-sm text-secondary-600">
+                <h2 className="text-sm text-secondary-600 mt-2">
                   Masukkan nomor WhatsApp
                 </h2>
               </>
@@ -325,7 +431,7 @@ export default function AuthModal({
             {step === "forgot-otp" && (
               <>
                 <p className="text-2xl font-bold text-tertiary-900">Kode OTP</p>
-                <h2 className="text-sm text-secondary-600">
+                <h2 className="text-sm text-secondary-600 mt-2">
                   Verifikasi nomor WhatsApp
                 </h2>
               </>
@@ -335,7 +441,7 @@ export default function AuthModal({
                 <p className="text-2xl font-bold text-tertiary-900">
                   Kata Sandi Baru
                 </p>
-                <h2 className="text-sm text-secondary-600">
+                <h2 className="text-sm text-secondary-600 mt-2">
                   Buat kata sandi baru
                 </h2>
               </>
@@ -345,7 +451,7 @@ export default function AuthModal({
                 <p className="text-2xl font-bold text-tertiary-900">
                   Data Diri
                 </p>
-                <h2 className="text-sm text-secondary-600">
+                <h2 className="text-sm text-secondary-600 mt-2">
                   Lengkapi data diri
                 </h2>
               </>
@@ -353,7 +459,7 @@ export default function AuthModal({
           </div>
 
           <button
-            onClick={onClose}
+            onClick={handleClose}
             className="absolute right-4 rounded-lg p-1.5 text-secondary-600 hover:bg-secondary-200 transition-colors"
           >
             <svg
@@ -374,7 +480,7 @@ export default function AuthModal({
         </div>
 
         <div className="px-6 py-5 flex flex-col gap-4">
-          {errorMsg && (
+          {errorMsg && step !== "otp" && step !== "forgot-otp" && (
             <p className="text-xs text-red-500 text-center bg-red-50 rounded-lg px-3 py-2">
               {errorMsg}
             </p>
@@ -404,7 +510,7 @@ export default function AuthModal({
 
               <div className="flex flex-col gap-1.5">
                 <label className="text-sm font-semibold text-tertiary-800">
-                  Password
+                  Kata Sandi
                 </label>
                 <div className="relative">
                   <input
@@ -412,7 +518,7 @@ export default function AuthModal({
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     onKeyDown={(e) => e.key === "Enter" && handleLogin()}
-                    placeholder="Masukkan password"
+                    placeholder="Masukkan kata sandi"
                     className="w-full rounded-xl border border-secondary-400 px-3 py-2.5 text-sm outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-all text-tertiary-900 placeholder:text-secondary-500"
                   />
                   <button
@@ -429,7 +535,7 @@ export default function AuthModal({
               <button
                 onClick={handleLogin}
                 disabled={isLoading}
-                className="w-full rounded-xl bg-primary-500 py-3 text-sm font-bold text-white hover:bg-primary-600 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                className="w-full rounded-xl bg-red-600 py-3 text-sm font-bold text-white hover:bg-red-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 {isLoading ? "Memproses..." : "Masuk"}
               </button>
@@ -489,7 +595,7 @@ export default function AuthModal({
               <button
                 onClick={handleSendOtp}
                 disabled={isLoading}
-                className="w-full rounded-xl bg-primary-500 py-3 text-sm font-bold text-white hover:bg-primary-600 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                className="w-full rounded-xl bg-red-600 py-3 text-sm font-bold text-white hover:bg-red-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 {isLoading ? "Mengirim OTP..." : "Kirim Kode OTP"}
               </button>
@@ -511,12 +617,14 @@ export default function AuthModal({
 
           {step === "otp" && (
             <>
-              <p className="text-sm text-secondary-600 text-center">
-                Kode OTP telah dikirim ke WhatsApp{" "}
-                <span className="font-semibold text-tertiary-900">
-                  +62{phone}
-                </span>
-              </p>
+              {errorMsg ? (
+                <p className="text-sm text-red-500 text-center">{errorMsg}</p>
+              ) : (
+                <p className="text-sm text-secondary-600 text-center">
+                  Kode OTP telah dikirim ke WhatsApp{" "}
+                  <span className="font-semibold text-tertiary-900">+62{phone}</span>
+                </p>
+              )}
 
               <div className="flex items-center justify-center gap-2">
                 {otp.map((digit, i) => (
@@ -537,19 +645,21 @@ export default function AuthModal({
               <button
                 onClick={handleVerifyOtp}
                 disabled={isLoading}
-                className="w-full rounded-xl bg-primary-500 py-3 text-sm font-bold text-white hover:bg-primary-600 transition-colors disabled:opacity-60"
+                className="w-full rounded-xl bg-red-600 py-3 text-sm font-bold text-white hover:bg-red-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 {isLoading ? "Memverifikasi..." : "Verifikasi"}
               </button>
 
-              <p className="text-center text-xs text-secondary-600">
+              <p className="text-center text-xs text-secondary-600 mt-3">
                 Tidak menerima kode?{" "}
                 <button
                   onClick={handleSendOtp}
-                  disabled={isLoading}
-                  className="font-semibold text-primary-500 hover:underline disabled:opacity-60"
+                  disabled={isLoading || otpSecondsLeft > 0}
+                  className="font-semibold text-primary-500 underline underline-offset-2 disabled:opacity-60 disabled:cursor-not-allowed"
                 >
-                  Kirim ulang
+                  {otpSecondsLeft > 0
+                    ? `Kirim ulang dalam ${formatSeconds(otpSecondsLeft)}`
+                    : "Kirim ulang kode"}
                 </button>
               </p>
             </>
@@ -580,7 +690,7 @@ export default function AuthModal({
               <button
                 onClick={handleSendPasswordResetOtp}
                 disabled={isLoading}
-                className="w-full rounded-xl bg-primary-500 py-3 text-sm font-bold text-white hover:bg-primary-600 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                className="w-full rounded-xl bg-red-600 py-3 text-sm font-bold text-white hover:bg-red-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 {isLoading ? "Mengirim OTP..." : "Kirim Kode OTP"}
               </button>
@@ -599,12 +709,14 @@ export default function AuthModal({
 
           {step === "forgot-otp" && (
             <>
-              <p className="text-sm text-secondary-600 text-center">
-                Kode OTP telah dikirim ke WhatsApp{" "}
-                <span className="font-semibold text-tertiary-900">
-                  +62{resetPhone}
-                </span>
-              </p>
+              {errorMsg ? (
+                <p className="text-sm text-red-500 text-center">{errorMsg}</p>
+              ) : (
+                <p className="text-sm text-secondary-600 text-center">
+                  Kode OTP telah dikirim ke WhatsApp{" "}
+                  <span className="font-semibold text-tertiary-900">+62{resetPhone}</span>
+                </p>
+              )}
 
               <div className="flex items-center justify-center gap-2">
                 {otp.map((digit, i) => (
@@ -625,19 +737,21 @@ export default function AuthModal({
               <button
                 onClick={handleVerifyPasswordResetOtp}
                 disabled={isLoading}
-                className="w-full rounded-xl bg-primary-500 py-3 text-sm font-bold text-white hover:bg-primary-600 transition-colors disabled:opacity-60"
+                className="w-full rounded-xl bg-red-600 py-3 text-sm font-bold text-white hover:bg-red-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 {isLoading ? "Memverifikasi..." : "Verifikasi"}
               </button>
 
-              <p className="text-center text-xs text-secondary-600">
+              <p className="text-center text-xs text-secondary-600 mt-3">
                 Tidak menerima kode?{" "}
                 <button
                   onClick={handleSendPasswordResetOtp}
-                  disabled={isLoading}
-                  className="font-semibold text-primary-500 hover:underline disabled:opacity-60"
+                  disabled={isLoading || otpSecondsLeft > 0}
+                  className="font-semibold text-primary-500 underline underline-offset-2 disabled:opacity-60 disabled:cursor-not-allowed"
                 >
-                  Kirim ulang
+                  {otpSecondsLeft > 0
+                    ? `Kirim ulang dalam ${formatSeconds(otpSecondsLeft)}`
+                    : "Kirim ulang"}
                 </button>
               </p>
             </>
@@ -699,7 +813,7 @@ export default function AuthModal({
               <button
                 onClick={handleResetPassword}
                 disabled={isLoading}
-                className="w-full rounded-xl bg-primary-500 py-3 text-sm font-bold text-white hover:bg-primary-600 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                className="w-full rounded-xl bg-red-600 py-3 text-sm font-bold text-white hover:bg-red-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 {isLoading ? "Menyimpan..." : "Simpan Kata Sandi"}
               </button>
@@ -710,7 +824,7 @@ export default function AuthModal({
             <>
               <div className="flex flex-col gap-1.5">
                 <label className="text-sm font-semibold text-tertiary-800">
-                  Nama Lengkap
+                  Nama Pelanggan
                 </label>
                 <input
                   type="text"
@@ -724,7 +838,7 @@ export default function AuthModal({
 
               <div className="flex flex-col gap-1.5">
                 <label className="text-sm font-semibold text-tertiary-800">
-                  Buat Password
+                  Kata Sandi
                 </label>
                 <div className="relative">
                   <input
@@ -749,7 +863,7 @@ export default function AuthModal({
               <button
                 onClick={handleRegister}
                 disabled={isLoading}
-                className="w-full rounded-xl bg-primary-500 py-3 text-sm font-bold text-white hover:bg-primary-600 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                className="w-full rounded-xl bg-red-600 py-3 text-sm font-bold text-white hover:bg-red-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 {isLoading ? "Mendaftar..." : "Daftar"}
               </button>
@@ -759,4 +873,13 @@ export default function AuthModal({
       </div>
     </div>
   );
+}
+
+export default function AuthModal({
+  isOpen,
+  onClose,
+  onSuccess,
+}: AuthModalProps) {
+  if (!isOpen) return null;
+  return <AuthModalContent onClose={onClose} onSuccess={onSuccess} />;
 }

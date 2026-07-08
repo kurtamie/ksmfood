@@ -130,11 +130,13 @@ function XIcon() {
 interface OrderStepperProps {
   currentStep: OrderDisplayStep;
   isExpired?: boolean;
+  bannerAction?: React.ReactNode;
 }
 
 export function OrderStepper({
   currentStep,
   isExpired = false,
+  bannerAction,
 }: OrderStepperProps) {
   const t = useTranslations("orderStepper");
   const currentIndex = Math.max(
@@ -228,24 +230,29 @@ export function OrderStepper({
                 {step.icon}
               </div>
 
-              <div className="flex min-w-0 flex-col items-center text-center">
-                <span
-                  className={`max-w-[5.5rem] text-xs font-semibold leading-tight ${
-                    isExpiredInactive
-                      ? "text-gray-400"
-                      : isExpiredActive
-                        ? "text-red-700"
-                        : isDone
-                          ? "text-emerald-700"
-                          : "text-gray-400"
-                  }`}
-                >
-                  {label}
-                </span>
-                <span className="mt-0.5 max-w-[5.5rem] text-[10px] leading-tight text-secondary-500">
-                  {sublabel}
-                </span>
-              </div>
+                  <div className="flex min-w-0 flex-col items-center text-center">
+                    <span
+                      className={`max-w-[5.5rem] text-xs font-semibold leading-tight ${
+                        isExpiredInactive
+                          ? "text-gray-400"
+                          : isExpiredActive
+                            ? "text-red-700"
+                            : isDone
+                              ? "text-emerald-700"
+                              : "text-gray-400"
+                      }`}
+                    >
+                      {label}
+                    </span>
+                    <span className="mt-0.5 max-w-[5.5rem] text-[10px] leading-tight text-[#6B7280]">
+                      {sublabel}
+                    </span>
+                    {step.key === "success" && isActive && bannerAction ? (
+                      <div className="mt-2 text-sm">
+                        {bannerAction}
+                      </div>
+                    ) : null}
+                  </div>
             </div>
           );
         })}

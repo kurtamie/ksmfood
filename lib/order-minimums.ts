@@ -15,7 +15,7 @@ export const MINIMUM_ORDER_QUANTITY: Record<MinimumOrderService, number> = {
   prasmanan: 150,
   "prasmanan-pernikahan": 150,
   bento: 50,
-  "snack-kotak": 100,
+  "snack-kotak": 1,
   aqiqah: 1,
   tumpeng: 1,
   "katering-pondokan": 150,

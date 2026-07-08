@@ -189,10 +189,9 @@ export function AqiqahOrderModal({
               )}
             </div>
 
-            {/* Subtotal */}
             <div className="flex items-center gap-4">
               <span className="w-36 shrink-0 text-sm font-semibold">
-                {modalT("fields.subtotal")}
+                {modalT("fields.total")}
               </span>
               <span className="text-2xl font-bold text-gray-900">
                 Rp {subtotal.toLocaleString("id-ID")}
