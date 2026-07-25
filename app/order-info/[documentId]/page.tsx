@@ -230,7 +230,7 @@ function toOrderDisplayItems(
       details.length === 1 && menus.length > 1
         ? quantity * unitPrice
         : parseAmount(detail.total_amount ?? detail.amount) ||
-          quantity * unitPrice;
+        quantity * unitPrice;
 
     return {
       id: String(
@@ -498,9 +498,9 @@ export default function OrderInfoPage() {
           item.name === "Menu Pesanan"
             ? t("fallbackMenuName")
             : item.name.replace(
-                /^Menu Pesanan\s+/,
-                `${t("fallbackMenuName")} `,
-              );
+              /^Menu Pesanan\s+/,
+              `${t("fallbackMenuName")} `,
+            );
         return {
           ...item,
           name: session?.name ?? fallbackName,
@@ -943,7 +943,7 @@ export default function OrderInfoPage() {
       arrive_time: deliveryTime || undefined,
       leave: deliveryTime ? getLeaveTime(deliveryTime) : undefined,
       delivery_address: [addressLine.trim(), subdistrict].filter(Boolean).join(", ") ||
-      undefined,
+        undefined,
       latitude: latitude !== null ? String(latitude) : undefined,
       longitude: longitude !== null ? String(longitude) : undefined,
       recipient_name: recipientName || undefined,
@@ -1124,10 +1124,10 @@ export default function OrderInfoPage() {
     const sourceItem = sessionItems[index];
     const minimumQuantity = sourceItem
       ? getMinimumOrderQuantity({
-          slug: sourceItem.slug ?? "",
-          category: sourceItem.category ?? "",
-          name: sourceItem.name,
-        })
+        slug: sourceItem.slug ?? "",
+        category: sourceItem.category ?? "",
+        name: sourceItem.name,
+      })
       : 1;
     if (quantity < minimumQuantity) {
       setSubmitError(t("errors.minimumQuantity", { count: minimumQuantity }));
@@ -1524,10 +1524,10 @@ export default function OrderInfoPage() {
                   {orderItems.map((item, index) => {
                     const minimumQuantity = sessionItems[index]
                       ? getMinimumOrderQuantity({
-                          slug: sessionItems[index].slug ?? "",
-                          category: sessionItems[index].category ?? "",
-                          name: sessionItems[index].name,
-                        })
+                        slug: sessionItems[index].slug ?? "",
+                        category: sessionItems[index].category ?? "",
+                        name: sessionItems[index].name,
+                      })
                       : 1;
                     return (
                       <div
