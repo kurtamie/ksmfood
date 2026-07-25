@@ -201,9 +201,7 @@ function AuthModalContent({
     }
 
     setIsLoading(true);
-    console.debug("[AuthModal] sendOtp ->", { phone });
     const result = await sendOtpAction({ phone_no: phone });
-    console.debug("[AuthModal] sendOtp result ->", result);
     setIsLoading(false);
     if (!result.success) {
       applyActionErrors("Gagal mengirim OTP.", result);
@@ -226,9 +224,7 @@ function AuthModalContent({
     }
 
     setIsLoading(true);
-    console.debug("[AuthModal] sendPasswordResetOtp ->", { phone: resetPhone });
     const result = await sendPasswordResetOtpAction({ phone_no: resetPhone });
-    console.debug("[AuthModal] sendPasswordResetOtp result ->", result);
     setIsLoading(false);
     if (!result.success) {
       applyActionErrors("Gagal mengirim OTP.", result);
@@ -247,9 +243,7 @@ function AuthModalContent({
       return;
     }
     setIsLoading(true);
-    console.debug("[AuthModal] verifyOtp ->", { phone, otp: otpCode });
     const result = await verifyOtpAction({ phone_no: phone, otp_code: otpCode });
-    console.debug("[AuthModal] verifyOtp result ->", result);
     setIsLoading(false);
     if (!result.success) {
       setErrorMsg(result.error ?? "Kode OTP tidak valid.");
@@ -267,15 +261,10 @@ function AuthModalContent({
     }
 
     setIsLoading(true);
-    console.debug("[AuthModal] verifyPasswordResetOtp ->", {
-      phone: resetPhone,
-      otp: otpCode,
-    });
     const result = await verifyPasswordResetOtpAction({
       phone_no: resetPhone,
       otp_code: otpCode,
     });
-    console.debug("[AuthModal] verifyPasswordResetOtp result ->", result);
     setIsLoading(false);
 
     if (!result.success) {
@@ -336,18 +325,12 @@ function AuthModalContent({
     }
 
     setIsLoading(true);
-    console.debug("[AuthModal] resetPasswordWithPhone ->", {
-      phone: resetPhone,
-      resetTokenProvided: Boolean(resetToken),
-      passwordProvided: Boolean(newPassword),
-    });
     const result = await resetPasswordWithPhoneAction({
       phone_no: resetPhone,
       reset_token: resetToken,
       password: newPassword,
       password_confirmation: confirmPassword,
     });
-    console.debug("[AuthModal] resetPasswordWithPhone result ->", result);
     setIsLoading(false);
 
     if (!result.success) {

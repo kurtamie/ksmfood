@@ -255,7 +255,6 @@ export async function registerAction(
     }
 
     const result = await registerService(payload);
-    console.log("[registerAction] result →", JSON.stringify(result));
 
     if (!result.token || !result.user) {
       throw new Error("Response tidak valid dari server.");
@@ -264,7 +263,6 @@ export async function registerAction(
     await setAuthCookies(result.token, result.user);
     return { success: true, data: { token: result.token, user: result.user } };
   } catch (err) {
-    console.log("[registerAction] error →", err);
     return {
       success: false,
       error: extractMessage(err, "Registrasi gagal. Coba lagi."),

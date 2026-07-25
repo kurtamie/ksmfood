@@ -81,7 +81,6 @@ export async function loginService(
   payload: LoginPayload,
 ): Promise<AuthResponse> {
   const phone = normalizePhone(payload.phone_no);
-  console.log("[loginService] phone →", phone);
 
   const res = await fetch(`${getBaseUrl()}/api/auth/login`, {
     method: "POST",
@@ -100,7 +99,6 @@ export async function sendOtpService(
   payload: SendOtpPayload,
 ): Promise<{ message: string }> {
   const phone = normalizePhone(payload.phone_no);
-  console.log("[sendOtpService] phone →", phone);
 
   const res = await fetch(`${getBaseUrl()}/api/auth/send-otp`, {
     method: "POST",
@@ -114,7 +112,6 @@ export async function verifyOtpService(
   payload: VerifyOtpPayload,
 ): Promise<{ message: string; verified: boolean }> {
   const phone = normalizePhone(payload.phone_no);
-  console.log("[verifyOtpService] phone →", phone);
 
   const res = await fetch(`${getBaseUrl()}/api/auth/verify-otp`, {
     method: "POST",
@@ -132,7 +129,6 @@ export async function verifyPasswordResetOtpService(
   payload: VerifyOtpPayload,
 ): Promise<VerifyPasswordResetOtpResponse> {
   const phone = normalizePhone(payload.phone_no);
-  console.log("[verifyPasswordResetOtpService] phone →", phone);
 
   const res = await fetch(`${getBaseUrl()}/api/auth/verify-password-reset-otp`, {
     method: "POST",
@@ -150,11 +146,6 @@ export async function resetPasswordWithPhoneService(
   payload: ResetPasswordPayload,
 ): Promise<{ message: string }> {
   const phone = normalizePhone(payload.phone_no);
-  console.debug("[auth-service] resetPasswordWithPhone ->", {
-    phone,
-    resetTokenProvided: Boolean(payload.reset_token),
-    passwordProvided: Boolean(payload.password),
-  });
 
   const res = await fetch(`${getBaseUrl()}/api/auth/reset-password-phone`, {
     method: "POST",
@@ -167,9 +158,7 @@ export async function resetPasswordWithPhoneService(
     }),
   });
 
-  const result = await handleResponse<{ message: string }>(res);
-  console.debug("[auth-service] resetPasswordWithPhone result ->", result);
-  return result;
+  return handleResponse<{ message: string }>(res);
 }
 
 export async function isPhoneNoRegisteredService(
@@ -197,9 +186,7 @@ export async function isPhoneNoRegisteredService(
     cache: "no-store",
   });
 
-  console.debug("[auth-service] isPhoneNoRegisteredService querying variants ->", variants);
   const data = await handleResponse<unknown>(res);
-  console.debug("[auth-service] isPhoneNoRegisteredService response ->", data);
 
   if (Array.isArray(data)) return data.length > 0;
   if (typeof data === "object" && data !== null && "data" in data) {
@@ -243,7 +230,6 @@ export async function registerService(
   payload: RegisterPayload,
 ): Promise<AuthResponse> {
   const phone = normalizePhone(payload.phone_no);
-  console.log("[registerService] phone →", phone);
 
   const res = await fetch(`${getBaseUrl()}/api/auth/register`, {
     method: "POST",

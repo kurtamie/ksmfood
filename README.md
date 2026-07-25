@@ -1,36 +1,110 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# KSMFood — Website Pemesanan Pelanggan KSM Katering Batam
 
-## Getting Started
+Platform pemesanan katering digital untuk **KSM Food**, memungkinkan pelanggan melihat dan memesan menu makan siang, nasi kotak, dan layanan katering lainnya secara online dengan mudah dan cepat.
 
-First, run the development server:
+---
 
+## 🗂️ Struktur Repository
+
+Project ini terdiri dari **3 repository** yang saling terhubung:
+
+| Repository | Deskripsi | Link |
+|------------|-----------|------|
+| 🗄️ **Backend (Strapi)** | REST API & manajemen konten berbasis Strapi CMS | https://github.com/kurtamie/ksm_katering_backend.git |
+| 🌐 **Frontend Pelanggan** *(repo ini)* | Website publik untuk pelanggan melakukan pemesanan | — |
+| 🖥️ **Frontend Internal** | Dashboard admin & operasional internal KSM Food | https://github.com/kurtamie/ksm_katering.git |
+
+---
+
+## 🚀 Tech Stack
+
+| Kategori | Teknologi |
+|----------|-----------|
+| Framework | Next.js 16 (App Router) |
+| Language | TypeScript |
+| Styling | Tailwind CSS v4 + Shadcn/UI |
+| Animation | Motion.js + GSAP |
+| Auth | JWT via HttpOnly Cookie |
+| i18n | next-intl |
+| AI Chat | OpenAI |
+| Payment | Midtrans |
+| CMS / Backend | Strapi (repository terpisah) |
+
+---
+
+## ⚙️ Instalasi & Menjalankan Aplikasi
+
+### Prasyarat
+
+- **Node.js** v20 atau lebih baru
+- **npm** v10 atau lebih baru
+- Backend Strapi sudah berjalan (lihat repository backend)
+
+### Langkah Instalasi
+
+**1. Clone repository**
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone <url-repo-ini>
+cd ksmfood
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+**2. Install dependencies**
+```bash
+npm install
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+**3. Konfigurasi environment variables**
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Salin file contoh environment dan sesuaikan isinya:
+```bash
+cp .env.example .env.local
+```
 
-## Learn More
+**4. Jalankan development server**
+```bash
+npm run dev
+```
 
-To learn more about Next.js, take a look at the following resources:
+Buka [http://localhost:3000](http://localhost:3000) di browser.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Perintah Lainnya
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+npm run build   # Build untuk production
+npm run start   # Jalankan production server
+npm run lint    # Cek kualitas kode
+```
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 📁 Struktur Folder
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```
+ksmfood/
+├── app/                    # Next.js App Router
+│   ├── api/                # API Route Handlers
+│   ├── data/
+│   │   ├── actions/        # Server Actions
+│   │   └── services/       # Service layer (fetch ke backend)
+│   └── [pages]/            # Halaman aplikasi
+├── components/             # Komponen UI
+│   ├── auth/               # Komponen autentikasi
+│   ├── landing/            # Komponen halaman utama
+│   ├── layout/             # Navbar, Footer, dsb
+│   └── shared/             # Komponen reusable
+├── context/                # React Context (auth state)
+├── lib/                    # Utility & helper functions
+├── types/                  # TypeScript type definitions
+├── i18n/                   # Konfigurasi internasionalisasi
+└── messages/               # File terjemahan (i18n)
+```
+
+---
+
+## 👥 Kontributor
+
+| Nama | Peran |
+|------|-------|
+| Kurtamie | Full-stack Developer |
+
+
