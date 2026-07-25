@@ -163,23 +163,23 @@ export default function OrderSummaryPage() {
 
       const res = invoiceDocId
         ? await fetch(`/api/invoices/${invoiceDocId}`, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ payment_status: "paid" }),
-          })
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ payment_status: "paid" }),
+        })
         : await fetch("/api/invoices", {
-            method: "PATCH",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              invoiceId: invoiceNumId ?? undefined,
-              orderId: numericOrderId ?? undefined,
-              orderDocumentId:
-                typeof documentId === "string"
-                  ? documentId
-                  : (summary?.documentId ?? undefined),
-              payment_status: "paid",
-            }),
-          });
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            invoiceId: invoiceNumId ?? undefined,
+            orderId: numericOrderId ?? undefined,
+            orderDocumentId:
+              typeof documentId === "string"
+                ? documentId
+                : (summary?.documentId ?? undefined),
+            payment_status: "paid",
+          }),
+        });
 
       if (!res.ok) {
         const json = await res.json().catch(() => null);
@@ -533,6 +533,6 @@ export default function OrderSummaryPage() {
           </button>
         </div>
       </div>
-    </>dd
+    </>
   );
 }
