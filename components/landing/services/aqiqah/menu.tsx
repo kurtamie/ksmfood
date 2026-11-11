@@ -3,7 +3,8 @@
 import { useState } from "react";
 import { LuAward, LuCheck, LuPackageOpen } from "react-icons/lu";
 import { Button } from "@/components/ui/button";
-import { AqiqahOrderModal, type AqiqahPackageCard } from "./OrderModal";
+import { createWhatsappLink, createOrderMessage } from "@/const/whatsapp";
+import type { AqiqahPackageCard } from "./OrderModal";
 
 const paketBetina: AqiqahPackageCard[] = [
   {
@@ -202,7 +203,12 @@ function PackageSection({
               </p>
 
               <Button
-                onClick={() => onOrder(card, serviceName)}
+                onClick={() => {
+                  const link = createWhatsappLink(
+                    createOrderMessage(serviceName, card.title, card.subTitle, card.price),
+                  );
+                  window.open(link, "_blank");
+                }}
                 className="mt-4 h-11 rounded-lg bg-[#9F0404] font-bold text-white hover:bg-[#870000]"
               >
                 Pesan Sekarang
@@ -244,16 +250,7 @@ export default function Menu() {
         onOrder={handleOrder}
       />
 
-      {selectedCard && (
-        <AqiqahOrderModal
-          card={selectedCard}
-          serviceName={selectedService}
-          onClose={() => {
-            setSelectedCard(null);
-            setSelectedService("");
-          }}
-        />
-      )}
+      {/* Modal di-hide sementara — akan dihidupkan kembali saat fasa berikutnya. */}
     </>
   );
 }

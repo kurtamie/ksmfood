@@ -4,8 +4,9 @@ import { Button } from "@/components/ui/button";
 import { useLocale, useTranslations } from "next-intl";
 import { LuAward, LuCheck, LuPackageOpen } from "react-icons/lu";
 import { useState } from "react";
-import { OrderModal, type PackageCard } from "./OrderModal";
+import type { PackageCard } from "./OrderModal";
 import { localizePriceUnit } from "@/lib/price-unit";
+import { createWhatsappLink, createOrderMessage } from "@/const/whatsapp";
 
 const packageCards: PackageCard[] = [
   {
@@ -123,7 +124,9 @@ function Menu() {
                 </p>
 
                 <Button
-                  onClick={() => setSelectedCard(card)}
+                  onClick={() => {
+                    window.open(createWhatsappLink(createOrderMessage(serviceName, card.title, card.price)), "_blank");
+                  }}
                   className="mt-3 h-11 w-full bg-red-800 text-white hover:bg-red-900"
                 >
                   {t("orderNow")}
@@ -134,13 +137,7 @@ function Menu() {
         })}
       </div>
 
-      {selectedCard && (
-        <OrderModal
-          card={selectedCard}
-          serviceName={serviceName}
-          onClose={() => setSelectedCard(null)}
-        />
-      )}
+      {/* Modal di-hide sementara — akan dihidupkan kembali saat fasa berikutnya. */}
     </>
   );
 }
