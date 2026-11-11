@@ -1,6 +1,8 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
-import { getTranslations } from "next-intl/server";
+import { useTranslations } from "next-intl";
 import { FaInstagram } from "react-icons/fa";
 import { FiYoutube } from "react-icons/fi";
 import CarouselMoment from "@/components/landing/carouselMoment";
@@ -16,8 +18,8 @@ import pattern from "@/public/images/pattern.webp";
 import { whatsappLink } from "@/const/whatsapp";
 import profile from "@/public/images/about.webp";
 
-export default async function Page() {
-  const t = await getTranslations("home");
+export default function Page() {
+  const t = useTranslations("home");
   const heroWords = t.raw("hero.words") as string[];
 
   return (

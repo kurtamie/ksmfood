@@ -1,5 +1,6 @@
+"use client";
 import { Button } from "@/components/ui/button";
-import { getTranslations } from "next-intl/server";
+import { useTranslations } from "next-intl";
 import Menu from "@/components/landing/services/korporat/menu";
 import Image from "next/image";
 import Cta from "@/components/landing/services/korporat/cta";
@@ -8,8 +9,8 @@ import Testimonial from "@/components/landing/services/korporat/testimonial";
 import korporatSec from "@/public/images/services/korporat/katering_korporat-hero_section.webp";
 import Client from "@/components/landing/services/korporat/client";
 
-export default async function KorporatPage() {
-  const t = await getTranslations("korporatPage");
+export default function KorporatPage() {
+  const t = useTranslations("korporatPage");
 
   return (
     <main className="w-full overflow-x-clip">

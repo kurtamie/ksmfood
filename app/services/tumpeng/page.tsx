@@ -1,13 +1,14 @@
+"use client";
 import { Button } from "@/components/ui/button";
-import { getTranslations } from "next-intl/server";
+import { useTranslations } from "next-intl";
 import Menu from "@/components/landing/services/tumpeng/menu";
 import Image from "next/image";
 import Cta from "@/components/landing/services/tumpeng/cta";
 import SectionRoutes from "@/components/landing/services/tumpeng/sectionRoutes";
 import tumpengSec from "@/public/images/services/tumpeng/tumpeng-hero_section.webp";
 
-export default async function TumpengPage() {
-  const t = await getTranslations("tumpengPage");
+export default function TumpengPage() {
+  const t = useTranslations("tumpengPage");
 
   return (
     <main className="w-full overflow-x-clip">

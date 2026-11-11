@@ -1,13 +1,14 @@
+"use client";
 import { Button } from "@/components/ui/button";
-import { getTranslations } from "next-intl/server";
+import { useTranslations } from "next-intl";
 import Menu from "@/components/landing/services/aqiqah/menu";
 import Cta from "@/components/landing/services/aqiqah/cta";
 import SectionRoutes from "@/components/landing/services/aqiqah/sectionRoutes";
 import { CiGift } from "react-icons/ci";
 import Bonus from "@/components/landing/services/aqiqah/bonus";
 
-export default async function AqiqahPage() {
-  const t = await getTranslations("aqiqahPage");
+export default function AqiqahPage() {
+  const t = useTranslations("aqiqahPage");
 
   return (
     <main className="w-full overflow-x-clip">

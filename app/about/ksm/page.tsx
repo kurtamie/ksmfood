@@ -1,11 +1,13 @@
-import { getTranslations } from "next-intl/server";
+"use client";
+
+import { useTranslations } from "next-intl";
 import Image from "next/image";
 import pattern from "@/public/images/pattern.webp";
 import SectionRoutes from "@/components/landing/services/prasmanan/sectionRoutes";
 import { Button } from "@/components/ui/button";
 
-export default async function AboutKsmPage() {
-  const t = await getTranslations("aboutKsmPage");
+export default function AboutKsmPage() {
+  const t = useTranslations("aboutKsmPage");
   const strategyItems = t.raw("strategy.items") as string[];
 
   return (

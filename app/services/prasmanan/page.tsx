@@ -1,4 +1,5 @@
-import { getTranslations } from "next-intl/server";
+"use client";
+import { useTranslations } from "next-intl";
 import Image from "next/image";
 import pattern from "@/public/images/pattern.webp";
 import Menu from "@/components/landing/services/prasmanan/menu";
@@ -7,8 +8,8 @@ import Cta from "@/components/landing/services/prasmanan/cta";
 import SectionRoutes from "@/components/landing/services/prasmanan/sectionRoutes";
 import OrderingInfo from "@/components/landing/services/prasmanan/orderingInfo";
 
-export default async function PrasmananPage() {
-  const t = await getTranslations("prasmananPage");
+export default function PrasmananPage() {
+  const t = useTranslations("prasmananPage");
 
   return (
     <main className="w-full overflow-x-clip">
