@@ -1,4 +1,4 @@
-import { getTranslations } from "next-intl/server";
+import { useTranslations } from "next-intl";
 import Image from "next/image";
 import {
   FaClock,
@@ -38,8 +38,8 @@ const contacts = [
   emailHref?: string;
 }>;
 
-export default async function ContactPage() {
-  const t = await getTranslations("contactPage");
+export default function ContactPage() {
+  const t = useTranslations("contactPage");
 
   return (
     <main className="w-full overflow-x-clip">

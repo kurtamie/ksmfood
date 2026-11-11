@@ -1,9 +1,9 @@
 "use client";
 
 import { startTransition, useState } from "react";
-import { useLocale, useTranslations } from "next-intl";
-import { useRouter } from "next/navigation";
-import { AppLocale, localeCookieName, locales } from "@/i18n/routing";
+import { useTranslations } from "next-intl";
+import { useAppLocale } from "@/components/layout/locale-provider";
+import { AppLocale, locales } from "@/i18n/routing";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,23 +19,19 @@ type LanguageSwitcherProps = {
 };
 
 function LanguageSwitcher({ className, onSelect }: LanguageSwitcherProps) {
-  const locale = useLocale() as AppLocale;
-  const router = useRouter();
+  const { locale, setLocale } = useAppLocale();
   const t = useTranslations("languages");
   const [open, setOpen] = useState(false);
 
   const changeLocale = (nextLocale: string) => {
-    if (nextLocale === locale) {
+    const next = nextLocale as AppLocale;
+    if (next === locale) {
       setOpen(false);
       onSelect?.();
       return;
     }
 
-    document.cookie = `${localeCookieName}=${nextLocale}; path=/; max-age=31536000; samesite=lax`;
-
-    startTransition(() => {
-      router.refresh();
-    });
+    setLocale(next);
 
     setOpen(false);
     onSelect?.();

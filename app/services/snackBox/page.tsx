@@ -1,5 +1,6 @@
+"use client";
 import { Button } from "@/components/ui/button";
-import { getTranslations } from "next-intl/server";
+import { useTranslations } from "next-intl";
 import Menu from "@/components/landing/services/snackBox/menu";
 import Image from "next/image";
 import pattern from "@/public/images/pattern.webp";
@@ -7,8 +8,8 @@ import MenuServices from "@/components/landing/services/snackBox/menuServices";
 import Cta from "@/components/landing/services/snackBox/cta";
 import SectionRoutes from "@/components/landing/services/snackBox/sectionRoutes";
 
-export default async function SnackBoxPage() {
-  const t = await getTranslations("snackBoxPage");
+export default function SnackBoxPage() {
+  const t = useTranslations("snackBoxPage");
 
   return (
     <main className="w-full overflow-x-clip">

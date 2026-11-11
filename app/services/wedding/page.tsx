@@ -1,4 +1,5 @@
-import { getTranslations } from "next-intl/server";
+"use client";
+import { useTranslations } from "next-intl";
 import Image from "next/image";
 import pattern from "@/public/images/pattern.webp";
 import Menu from "@/components/landing/services/wedding/menu";
@@ -9,8 +10,8 @@ import OrderingInfo from "@/components/landing/services/wedding/orderingInfo";
 import Stand from "@/components/landing/services/wedding/stand";
 import Faq from "@/components/landing/services/wedding/faq";
 
-export default async function WeddingPage() {
-  const t = await getTranslations("weddingPage");
+export default function WeddingPage() {
+  const t = useTranslations("weddingPage");
 
   return (
     <main className="w-full overflow-x-clip">

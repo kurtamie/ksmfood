@@ -1,5 +1,6 @@
+"use client";
 import { Button } from "@/components/ui/button";
-import { getTranslations } from "next-intl/server";
+import { useTranslations } from "next-intl";
 import Menu from "@/components/landing/services/ricebox/menu";
 import { FaTruck } from "react-icons/fa";
 import Image from "next/image";
@@ -8,8 +9,8 @@ import MenuServices from "@/components/landing/services/ricebox/menuServices";
 import Cta from "@/components/landing/services/ricebox/cta";
 import SectionRoutes from "@/components/landing/services/ricebox/sectionRoutes";
 
-export default async function RiceboxPage() {
-  const t = await getTranslations("riceboxPage");
+export default function RiceboxPage() {
+  const t = useTranslations("riceboxPage");
 
   return (
     <main className="w-full overflow-x-clip">

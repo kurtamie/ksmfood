@@ -1,9 +1,7 @@
 import type { Metadata, Viewport } from "next";
-import { cookies } from "next/headers";
-import { NextIntlClientProvider } from "next-intl";
-import { getMessages } from "next-intl/server";
+import { defaultLocale } from "@/i18n/routing";
+import { LocaleProvider } from "@/components/layout/locale-provider";
 import SiteShell from "@/components/layout/site-shell";
-import { defaultLocale, hasLocale, localeCookieName } from "@/i18n/routing";
 import { CartProvider } from "@/components/CartContext";
 import "./globals.css";
 import { AuthProvider } from "@/context/authContext";
@@ -56,33 +54,22 @@ export const viewport: Viewport = {
   themeColor: "#8D0000",
 };
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const cookieLocale = (await cookies()).get(localeCookieName)?.value;
-  const locale =
-    cookieLocale && hasLocale(cookieLocale) ? cookieLocale : defaultLocale;
-  const messages = await getMessages({ locale });
-
   return (
-    <html lang={locale} className="h-full w-full overflow-x-clip antialiased">
-      <body className="flex min-h-full w-full flex-col overflow-x-clip">
+    <html lang={defaultLocale} className="h-full w-full overflow-x-clip antialiased">
+      <body>
         <AuthProvider>
           <CartProvider>
-            <NextIntlClientProvider locale={locale} messages={messages}>
+            <LocaleProvider>
               <SiteShell>{children}</SiteShell>
-            </NextIntlClientProvider>
+            </LocaleProvider>
           </CartProvider>
         </AuthProvider>
-        <Toaster position="top-right"   richColors 
-  toastOptions={{
-    style: {
-      width: "fit-content",
-      maxWidth: "360px",   },
-  }}
-/>
+        <Toaster position="top-right" richColors toastOptions={{ style: { width: "fit-content", maxWidth: "360px" } }} />
       </body>
     </html>
   );

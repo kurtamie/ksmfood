@@ -1,5 +1,6 @@
+"use client";
 import { Button } from "@/components/ui/button";
-import { getTranslations } from "next-intl/server";
+import { useTranslations } from "next-intl";
 import Menu from "@/components/landing/services/bento/menu";
 import { FaClipboardList } from "react-icons/fa";
 import Image from "next/image";
@@ -9,8 +10,8 @@ import Cta from "@/components/landing/services/bento/cta";
 import SectionRoutes from "@/components/landing/services/bento/sectionRoutes";
 import Gallery from "@/components/landing/services/bento/gallery";
 
-export default async function BentoPage() {
-  const t = await getTranslations("bentoPage");
+export default function BentoPage() {
+  const t = useTranslations("bentoPage");
 
   return (
     <main className="w-full overflow-x-clip">
